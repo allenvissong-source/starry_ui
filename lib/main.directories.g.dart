@@ -10,20 +10,20 @@
 // **************************************************************************
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:starry_ui/components/starry_button.usecase.dart'
-    as _starry_ui_components_starry_button_usecase;
-import 'package:starry_ui/components/starry_card.usecase.dart'
-    as _starry_ui_components_starry_card_usecase;
-import 'package:starry_ui/components/starry_input.usecase.dart'
-    as _starry_ui_components_starry_input_usecase;
-import 'package:starry_ui/components/starry_switch.usecase.dart'
-    as _starry_ui_components_starry_switch_usecase;
-import 'package:starry_ui/components/starry_tag.usecase.dart'
-    as _starry_ui_components_starry_tag_usecase;
-import 'package:starry_ui/components/starry_textarea.usecase.dart'
-    as _starry_ui_components_starry_textarea_usecase;
-import 'package:starry_ui/foundations/foundations.usecase.dart'
-    as _starry_ui_foundations_foundations_usecase;
+import 'package:starry_ui/src/components/starry_button.usecase.dart'
+    as _starry_ui_src_components_starry_button_usecase;
+import 'package:starry_ui/src/components/starry_card.usecase.dart'
+    as _starry_ui_src_components_starry_card_usecase;
+import 'package:starry_ui/src/components/starry_input.usecase.dart'
+    as _starry_ui_src_components_starry_input_usecase;
+import 'package:starry_ui/src/components/starry_switch.usecase.dart'
+    as _starry_ui_src_components_starry_switch_usecase;
+import 'package:starry_ui/src/components/starry_tag.usecase.dart'
+    as _starry_ui_src_components_starry_tag_usecase;
+import 'package:starry_ui/src/components/starry_textarea.usecase.dart'
+    as _starry_ui_src_components_starry_textarea_usecase;
+import 'package:starry_ui/src/foundations/foundations.usecase.dart'
+    as _starry_ui_src_foundations_foundations_usecase;
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
 
 final directories = <_widgetbook.WidgetbookNode>[
@@ -35,28 +35,28 @@ final directories = <_widgetbook.WidgetbookNode>[
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Disabled',
-            builder: _starry_ui_components_starry_button_usecase
+            builder: _starry_ui_src_components_starry_button_usecase
                 .disabledStarryButton,
           ),
           _widgetbook.WidgetbookUseCase(
             name: 'Filled',
-            builder:
-                _starry_ui_components_starry_button_usecase.filledStarryButton,
+            builder: _starry_ui_src_components_starry_button_usecase
+                .filledStarryButton,
           ),
           _widgetbook.WidgetbookUseCase(
             name: 'Secondary',
-            builder: _starry_ui_components_starry_button_usecase
+            builder: _starry_ui_src_components_starry_button_usecase
                 .secondaryStarryButton,
           ),
           _widgetbook.WidgetbookUseCase(
             name: 'Tonal',
-            builder:
-                _starry_ui_components_starry_button_usecase.tonalStarryButton,
+            builder: _starry_ui_src_components_starry_button_usecase
+                .tonalStarryButton,
           ),
           _widgetbook.WidgetbookUseCase(
             name: 'With Icon',
-            builder:
-                _starry_ui_components_starry_button_usecase.iconStarryButton,
+            builder: _starry_ui_src_components_starry_button_usecase
+                .iconStarryButton,
           ),
         ],
       ),
@@ -66,16 +66,17 @@ final directories = <_widgetbook.WidgetbookNode>[
           _widgetbook.WidgetbookUseCase(
             name: 'Default',
             builder:
-                _starry_ui_components_starry_card_usecase.defaultStarryCard,
+                _starry_ui_src_components_starry_card_usecase.defaultStarryCard,
           ),
           _widgetbook.WidgetbookUseCase(
             name: 'Flat',
-            builder: _starry_ui_components_starry_card_usecase.flatStarryCard,
+            builder:
+                _starry_ui_src_components_starry_card_usecase.flatStarryCard,
           ),
           _widgetbook.WidgetbookUseCase(
             name: 'Playground',
-            builder:
-                _starry_ui_components_starry_card_usecase.playgroundStarryCard,
+            builder: _starry_ui_src_components_starry_card_usecase
+                .playgroundStarryCard,
           ),
         ],
       ),
@@ -84,13 +85,13 @@ final directories = <_widgetbook.WidgetbookNode>[
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Default',
-            builder:
-                _starry_ui_components_starry_input_usecase.defaultStarryInput,
+            builder: _starry_ui_src_components_starry_input_usecase
+                .defaultStarryInput,
           ),
           _widgetbook.WidgetbookUseCase(
             name: 'Error',
             builder:
-                _starry_ui_components_starry_input_usecase.errorStarryInput,
+                _starry_ui_src_components_starry_input_usecase.errorStarryInput,
           ),
         ],
       ),
@@ -99,13 +100,13 @@ final directories = <_widgetbook.WidgetbookNode>[
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Playground',
-            builder: _starry_ui_components_starry_switch_usecase
+            builder: _starry_ui_src_components_starry_switch_usecase
                 .playgroundStarrySwitch,
           ),
           _widgetbook.WidgetbookUseCase(
             name: 'States',
-            builder:
-                _starry_ui_components_starry_switch_usecase.statesStarrySwitch,
+            builder: _starry_ui_src_components_starry_switch_usecase
+                .statesStarrySwitch,
           ),
         ],
       ),
@@ -115,12 +116,12 @@ final directories = <_widgetbook.WidgetbookNode>[
           _widgetbook.WidgetbookUseCase(
             name: 'All States',
             builder:
-                _starry_ui_components_starry_tag_usecase.allStatesStarryTag,
+                _starry_ui_src_components_starry_tag_usecase.allStatesStarryTag,
           ),
           _widgetbook.WidgetbookUseCase(
             name: 'Playground',
-            builder:
-                _starry_ui_components_starry_tag_usecase.playgroundStarryTag,
+            builder: _starry_ui_src_components_starry_tag_usecase
+                .playgroundStarryTag,
           ),
         ],
       ),
@@ -129,7 +130,7 @@ final directories = <_widgetbook.WidgetbookNode>[
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Default',
-            builder: _starry_ui_components_starry_textarea_usecase
+            builder: _starry_ui_src_components_starry_textarea_usecase
                 .defaultStarryTextArea,
           ),
         ],
@@ -145,7 +146,7 @@ final directories = <_widgetbook.WidgetbookNode>[
           _widgetbook.WidgetbookUseCase(
             name: 'Charts',
             builder:
-                _starry_ui_foundations_foundations_usecase.chartsFoundation,
+                _starry_ui_src_foundations_foundations_usecase.chartsFoundation,
           ),
         ],
       ),
@@ -155,7 +156,7 @@ final directories = <_widgetbook.WidgetbookNode>[
           _widgetbook.WidgetbookUseCase(
             name: 'Colors',
             builder:
-                _starry_ui_foundations_foundations_usecase.colorsFoundation,
+                _starry_ui_src_foundations_foundations_usecase.colorsFoundation,
           ),
         ],
       ),
@@ -164,7 +165,7 @@ final directories = <_widgetbook.WidgetbookNode>[
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Contrast Matrix',
-            builder: _starry_ui_foundations_foundations_usecase
+            builder: _starry_ui_src_foundations_foundations_usecase
                 .contrastMatrixFoundation,
           ),
         ],
@@ -174,8 +175,8 @@ final directories = <_widgetbook.WidgetbookNode>[
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Elevation',
-            builder:
-                _starry_ui_foundations_foundations_usecase.elevationFoundation,
+            builder: _starry_ui_src_foundations_foundations_usecase
+                .elevationFoundation,
           ),
         ],
       ),
@@ -185,7 +186,7 @@ final directories = <_widgetbook.WidgetbookNode>[
           _widgetbook.WidgetbookUseCase(
             name: 'Motion',
             builder:
-                _starry_ui_foundations_foundations_usecase.motionFoundation,
+                _starry_ui_src_foundations_foundations_usecase.motionFoundation,
           ),
         ],
       ),
@@ -195,7 +196,7 @@ final directories = <_widgetbook.WidgetbookNode>[
           _widgetbook.WidgetbookUseCase(
             name: 'Radius',
             builder:
-                _starry_ui_foundations_foundations_usecase.radiusFoundation,
+                _starry_ui_src_foundations_foundations_usecase.radiusFoundation,
           ),
         ],
       ),
@@ -204,8 +205,8 @@ final directories = <_widgetbook.WidgetbookNode>[
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Spacing',
-            builder:
-                _starry_ui_foundations_foundations_usecase.spacingFoundation,
+            builder: _starry_ui_src_foundations_foundations_usecase
+                .spacingFoundation,
           ),
         ],
       ),
@@ -214,8 +215,8 @@ final directories = <_widgetbook.WidgetbookNode>[
         useCases: [
           _widgetbook.WidgetbookUseCase(
             name: 'Typography',
-            builder:
-                _starry_ui_foundations_foundations_usecase.typographyFoundation,
+            builder: _starry_ui_src_foundations_foundations_usecase
+                .typographyFoundation,
           ),
         ],
       ),
