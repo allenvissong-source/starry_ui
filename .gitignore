@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Local diagnostics / scratch (do not commit)
+.diag/
+.wb_shot1.jpeg
+*.wb_shot*.jpeg
+run_wb.ps1
+.commit_msg_tmp.txt

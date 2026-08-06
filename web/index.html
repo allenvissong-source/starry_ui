@@ -34,5 +34,34 @@
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
+  <script>
+    // Flutter Web debug builds loaded through DWDS should call Dart main via
+    // on_load_end_bootstrap.js after all DDC modules are ready. In the local
+    // Widgetbook preview this callback can be skipped by a stale debug session,
+    // leaving the page blank even though $dartRunMain is available. This small
+    // dev-only guard is inert for release builds and only starts main when DWDS
+    // has exposed it but has not executed it yet.
+    (function () {
+      var attempts = 0;
+      var timer = window.setInterval(function () {
+        attempts += 1;
+
+        if (window.$dartMainExecuted || document.querySelector('flutter-view')) {
+          window.clearInterval(timer);
+          return;
+        }
+
+        if (typeof window.$dartRunMain === 'function') {
+          window.clearInterval(timer);
+          window.$dartRunMain();
+          return;
+        }
+
+        if (attempts >= 200) {
+          window.clearInterval(timer);
+        }
+      }, 100);
+    }());
+  </script>
 </body>
 </html>

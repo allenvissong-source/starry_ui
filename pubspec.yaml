@@ -7,6 +7,7 @@ environment:
   sdk: ^3.9.2
 
 dependencies:
+  emoji_regex: ^0.0.5
   flutter:
     sdk: flutter
   widgetbook: ^3.23.0
@@ -21,3 +22,16 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Outfit
+      fonts:
+        - asset: fonts/Outfit-VF.ttf
+    - family: Inter
+      fonts:
+        - asset: fonts/Inter-VF.ttf
+    - family: MiSans
+      fonts:
+        - asset: fonts/MiSans-VF.ttf
+    - family: Twemoji
+      fonts:
+        - asset: fonts/Twemoji.ttf
