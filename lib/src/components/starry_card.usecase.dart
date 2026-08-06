@@ -1,45 +1,83 @@
 import 'package:flutter/material.dart';
-import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 import 'package:widgetbook/widgetbook.dart';
+import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 
+import '../theme/starry_tokens.dart';
 import 'starry_card.dart';
 
-@UseCase(name: 'Default', type: StarryCard)
-Widget defaultStarryCard(BuildContext context) {
-  return const Center(
-    child: StarryCard(
-      title: '卡片标题',
-      body: '表面色、文字、描边与圆角绑定变量，阴影使用 shadow/md 规范。',
-      actionLabel: '查看详情 →',
-    ),
+Widget _content(BuildContext context, String title, String body) {
+  final t = Theme.of(context).extension<StarryTokens>()!;
+  final s = t.semantic;
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      Text(
+        title,
+        style: t.typography.titleMedium.textStyle.copyWith(
+          color: s.textPrimary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      SizedBox(height: t.spacing.s2),
+      Text(
+        body,
+        style: t.typography.bodyMedium.textStyle.copyWith(
+          color: s.textSecondary,
+        ),
+      ),
+    ],
   );
 }
 
-@UseCase(name: 'Flat', type: StarryCard)
-Widget flatStarryCard(BuildContext context) {
-  return const Center(
-    child: StarryCard(
-      title: '卡片标题',
-      body: '仅描边、无阴影的扁平卡片。',
-      elevated: false,
+@UseCase(name: 'All States', type: StarryCard)
+Widget allStatesStarryCard(BuildContext context) {
+  final t = Theme.of(context).extension<StarryTokens>()!;
+  return Padding(
+    padding: EdgeInsets.all(t.spacing.s6),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        StarryCard(
+          child: _content(context, 'Elevated card', 'Uses level2 elevation.'),
+        ),
+        SizedBox(height: t.spacing.s4),
+        StarryCard(
+          elevated: false,
+          child: _content(context, 'Flat card', 'Uses the semantic border.'),
+        ),
+        SizedBox(height: t.spacing.s4),
+        StarryCard(
+          onTap: () {},
+          child: _content(context, 'Interactive card', 'Keyboard and tap ready.'),
+        ),
+      ],
     ),
   );
 }
 
 @UseCase(name: 'Playground', type: StarryCard)
 Widget playgroundStarryCard(BuildContext context) {
-  return Center(
-    child: StarryCard(
-      title: context.knobs.string(label: 'Title', initialValue: '卡片标题'),
-      body: context.knobs.stringOrNull(
-        label: 'Body',
-        initialValue: '表面色、文字、描边与圆角绑定变量，阴影使用 shadow/md 规范。',
-      ),
-      actionLabel: context.knobs.stringOrNull(
-        label: 'Action',
-        initialValue: '查看详情 →',
-      ),
-      elevated: context.knobs.boolean(label: 'Elevated', initialValue: true),
+  final t = Theme.of(context).extension<StarryTokens>()!;
+  final interactive = context.knobs.boolean(label: 'Interactive');
+  return Padding(
+    padding: EdgeInsets.all(t.spacing.s6),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        StarryCard(
+          elevated: context.knobs.boolean(label: 'Elevated', initialValue: true),
+          onTap: interactive ? () {} : null,
+          child: _content(
+            context,
+            context.knobs.string(label: 'Title', initialValue: 'Card title'),
+            context.knobs
+                .string(label: 'Body', initialValue: 'Card body content.'),
+          ),
+        ),
+      ],
     ),
   );
 }

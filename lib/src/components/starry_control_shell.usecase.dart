@@ -18,9 +18,11 @@ Widget _label(BuildContext context, String text) {
 @UseCase(name: 'All States', type: StarryControlShell)
 Widget allStatesStarryControlShell(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
-  return Center(
+  return Padding(
+    padding: EdgeInsets.all(t.spacing.s6),
     child: Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(
           height: t.controlMetrics.controlHeight,
@@ -41,6 +43,16 @@ Widget allStatesStarryControlShell(BuildContext context) {
           ),
         ),
         SizedBox(height: t.spacing.s4),
+        SizedBox(
+          height: t.controlMetrics.controlHeight,
+          child: StarryControlShell(
+            pill: true,
+            padding: StarryControlShell.horizontalPadding(t),
+            alignment: Alignment.centerLeft,
+            child: _label(context, 'Pill control shell'),
+          ),
+        ),
+        SizedBox(height: t.spacing.s4),
         StarryRoundIconShell(
           onTap: () {},
           semanticsLabel: 'Add',
@@ -55,7 +67,8 @@ Widget allStatesStarryControlShell(BuildContext context) {
 Widget animatedStarryControlShell(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
   final active = context.knobs.boolean(label: 'Active');
-  return Center(
+  return Padding(
+    padding: EdgeInsets.all(t.spacing.s6),
     child: SizedBox(
       height: t.controlMetrics.controlHeight,
       child: StarryAnimatedControlShell(
@@ -71,7 +84,8 @@ Widget animatedStarryControlShell(BuildContext context) {
 @UseCase(name: 'Round Icon', type: StarryRoundIconShell)
 Widget roundIconStarryControlShell(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
-  return Center(
+  return Padding(
+    padding: EdgeInsets.all(t.spacing.s6),
     child: StarryRoundIconShell(
       isActive: context.knobs.boolean(label: 'Active'),
       onTap: () {},

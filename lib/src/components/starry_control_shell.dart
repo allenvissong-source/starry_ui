@@ -13,13 +13,14 @@ import '../theme/starry_tokens.dart';
 /// Token wiring (all derived from [StarryTokens]):
 /// * fill            -> `semantic.surface`
 /// * active border   -> `semantic.brand`
-/// * radius          -> `radius.lg`
+/// * radius          -> `radius.xxl`
 /// * elevation       -> `elevation.level2`
 /// * border width    -> `controlMetrics.focusBorderWidth`
-/// * inner radius    -> `radius.lg - controlMetrics.innerRadiusDelta`
+/// * inner radius    -> `radius.xxl - controlMetrics.innerRadiusDelta`
 ///
-/// The press micro-interaction ([pressDuration]/[pressCurve]) has no design
-/// token and stays an internal primitive constant.
+/// Convention: lightweight press / expand micro-interactions in this control
+/// family all use `motion.durationShort`; only the curve ([pressCurve]) has no
+/// design token and stays an internal primitive constant.
 class StarryControlShell extends StatelessWidget {
   const StarryControlShell({
     required this.child,
@@ -34,27 +35,31 @@ class StarryControlShell extends StatelessWidget {
     this.shellBorderRadius,
     this.shellBorderSide,
     this.shape = BoxShape.rectangle,
+    this.pill = false,
     this.alignment,
   });
 
-  /// Duration of the press-scale micro-interaction. No design token exists for
-  /// this transient affordance, so it stays an internal primitive constant.
-  static const Duration pressDuration = Duration(milliseconds: 200);
-
-  /// Curve of the press-scale micro-interaction. See [pressDuration].
+  /// Curve of the press-scale micro-interaction. Duration comes from
+  /// `motion.durationShort`; no design token exists for this transient curve,
+  /// so it stays an internal primitive constant.
   static const Curve pressCurve = Curves.easeOutCubic;
 
-  /// Outer border radius of the shell, derived from `radius.lg`.
+  /// Outer border radius of the shell, derived from `radius.xxl`.
   static BorderRadius borderRadius(StarryTokens t) =>
-      BorderRadius.circular(t.radius.lg);
+      BorderRadius.circular(t.radius.xxl);
 
   /// Inner border radius for content clipped inside a bordered shell.
-  /// Geometrically `radius.lg - innerRadiusDelta` (the border width).
+  /// Geometrically `radius.xxl - innerRadiusDelta` (the border width).
   static BorderRadius innerBorderRadius(StarryTokens t) =>
-      BorderRadius.circular(t.radius.lg - t.controlMetrics.innerRadiusDelta);
+      BorderRadius.circular(t.radius.xxl - t.controlMetrics.innerRadiusDelta);
 
   /// Icon extent that matches the shell's control language (`iconMd`).
   static double iconSize(StarryTokens t) => t.controlMetrics.iconMd;
+
+  /// Extra extent added around [iconSize] to form the centered glyph box. No
+  /// design token covers this transient hit-area outset, so it stays an
+  /// internal primitive constant.
+  static const double _kHitAreaInset = 2;
 
   /// Horizontal content padding for single-line controls (`spacing.s5`).
   static EdgeInsets horizontalPadding(StarryTokens t) =>
@@ -69,20 +74,24 @@ class StarryControlShell extends StatelessWidget {
   ///
   /// The width stays [StarryControlMetrics.focusBorderWidth] in both states so
   /// activating the highlight never changes the control's measured size; only
-  /// the color toggles between `semantic.brand` and transparent.
+  /// the color toggles between `semantic.brand` and transparent. Pass [color]
+  /// to paint a caller-owned color (e.g. validation states) in both rest and
+  /// active states; this is the single source of truth for the input family's
+  /// border rule too.
   static BorderSide activeBorderSide(
     BuildContext context, {
     bool isActive = true,
+    Color? color,
   }) {
     final t = Theme.of(context).extension<StarryTokens>()!;
     return BorderSide(
-      color: isActive ? t.semantic.brand : Colors.transparent,
+      color: color ?? (isActive ? t.semantic.brand : Colors.transparent),
       width: t.controlMetrics.focusBorderWidth,
     );
   }
 
   /// The shell decoration shared by the static and animated variants.
-  static BoxDecoration decoration(
+  static ShapeDecoration decoration(
     BuildContext context, {
     bool isActive = false,
     Color? backgroundColor,
@@ -90,26 +99,39 @@ class StarryControlShell extends StatelessWidget {
     BorderRadius? borderRadius,
     BorderSide? borderSide,
     BoxShape shape = BoxShape.rectangle,
+    bool pill = false,
   }) {
     final t = Theme.of(context).extension<StarryTokens>()!;
-    return BoxDecoration(
+    final side = borderSide ?? activeBorderSide(context, isActive: isActive);
+    final ShapeBorder border;
+    if (shape == BoxShape.circle) {
+      border = CircleBorder(side: side);
+    } else if (pill) {
+      border = StadiumBorder(side: side);
+    } else {
+      border = RoundedRectangleBorder(
+        borderRadius: borderRadius ?? StarryControlShell.borderRadius(t),
+        side: side,
+      );
+    }
+    return ShapeDecoration(
       color: backgroundColor ?? t.semantic.surface,
-      borderRadius: shape == BoxShape.circle
-          ? null
-          : (borderRadius ?? StarryControlShell.borderRadius(t)),
-      shape: shape,
-      boxShadow: boxShadow ?? t.elevation.level2,
-      border: Border.fromBorderSide(
-        borderSide ?? activeBorderSide(context, isActive: isActive),
-      ),
+      shape: border,
+      shadows: boxShadow ?? t.elevation.level2,
     );
   }
 
-  /// Wraps [child] in the press-scale micro-interaction.
-  static Widget pressable({required bool isPressed, required Widget child}) {
+  /// Wraps [child] in the press-scale micro-interaction. The settle duration is
+  /// resolved from `motion.durationShort` via [context].
+  static Widget pressable({
+    required BuildContext context,
+    required bool isPressed,
+    required Widget child,
+  }) {
+    final t = Theme.of(context).extension<StarryTokens>()!;
     return AnimatedScale(
-      scale: isPressed ? 0.95 : 1.0,
-      duration: pressDuration,
+      scale: isPressed ? t.motion.pressedScale : 1.0,
+      duration: t.motion.durationShort,
       curve: pressCurve,
       child: child,
     );
@@ -128,6 +150,7 @@ class StarryControlShell extends StatelessWidget {
   final BorderRadius? shellBorderRadius;
   final BorderSide? shellBorderSide;
   final BoxShape shape;
+  final bool pill;
   final AlignmentGeometry? alignment;
 
   @override
@@ -146,6 +169,7 @@ class StarryControlShell extends StatelessWidget {
         borderRadius: shellBorderRadius,
         borderSide: shellBorderSide,
         shape: shape,
+        pill: pill,
       ),
       child: child,
     );
@@ -170,6 +194,7 @@ class StarryAnimatedControlShell extends StatelessWidget {
     this.shellBorderRadius,
     this.shellBorderSide,
     this.shape = BoxShape.rectangle,
+    this.pill = false,
     this.alignment,
     this.duration,
     this.curve,
@@ -186,6 +211,7 @@ class StarryAnimatedControlShell extends StatelessWidget {
   final BorderRadius? shellBorderRadius;
   final BorderSide? shellBorderSide;
   final BoxShape shape;
+  final bool pill;
   final AlignmentGeometry? alignment;
 
   /// Transition duration. Defaults to `motion.durationShort` when null.
@@ -213,6 +239,7 @@ class StarryAnimatedControlShell extends StatelessWidget {
         borderRadius: shellBorderRadius,
         borderSide: shellBorderSide,
         shape: shape,
+        pill: pill,
       ),
       child: child,
     );
@@ -261,6 +288,7 @@ class _StarryRoundIconShellState extends State<StarryRoundIconShell> {
       enabled: widget.onTap != null,
       label: widget.semanticsLabel,
       child: StarryControlShell.pressable(
+        context: context,
         isPressed: _pressed,
         child: FocusableActionDetector(
           enabled: widget.onTap != null,
@@ -280,9 +308,23 @@ class _StarryRoundIconShellState extends State<StarryRoundIconShell> {
               highlightColor: Colors.transparent,
               child: Center(
                 child: SizedBox(
-                  width: StarryControlShell.iconSize(t) + 2,
-                  height: StarryControlShell.iconSize(t) + 2,
-                  child: Center(child: widget.child),
+                  width:
+                      StarryControlShell.iconSize(t) +
+                      StarryControlShell._kHitAreaInset,
+                  height:
+                      StarryControlShell.iconSize(t) +
+                      StarryControlShell._kHitAreaInset,
+                  child: Center(
+                    // Enforce the shell's `iconMd` glyph extent so a size-less
+                    // `Icon` child renders at the control language's size (18)
+                    // instead of Material's ambient 24 default — which would
+                    // overflow this 20px box asymmetrically and read as an
+                    // off-center glyph. An explicit `Icon(size:)` still wins.
+                    child: IconTheme.merge(
+                      data: IconThemeData(size: StarryControlShell.iconSize(t)),
+                      child: widget.child,
+                    ),
+                  ),
                 ),
               ),
             ),
