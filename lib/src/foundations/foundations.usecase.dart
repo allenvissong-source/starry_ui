@@ -16,10 +16,19 @@ Widget elevationFoundation(BuildContext context) => const ElevationFoundation();
 Widget chartsFoundation(BuildContext context) => const ChartsFoundation();
 
 @UseCase(name: 'Typography', type: TypographyFoundation)
-Widget typographyFoundation(BuildContext context) => const TypographyFoundation();
+Widget typographyFoundation(BuildContext context) =>
+    const TypographyFoundation();
 
 @UseCase(name: 'Spacing', type: SpacingFoundation)
 Widget spacingFoundation(BuildContext context) => const SpacingFoundation();
+
+@UseCase(name: 'Breakpoints', type: BreakpointsFoundation)
+Widget breakpointsFoundation(BuildContext context) =>
+    const BreakpointsFoundation();
+
+@UseCase(name: 'Control Metrics', type: ControlMetricsFoundation)
+Widget controlMetricsFoundation(BuildContext context) =>
+    const ControlMetricsFoundation();
 
 @UseCase(name: 'Motion', type: MotionFoundation)
 Widget motionFoundation(BuildContext context) => const MotionFoundation();

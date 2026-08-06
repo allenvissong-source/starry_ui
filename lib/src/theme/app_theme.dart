@@ -11,13 +11,12 @@ class AppTheme {
   const AppTheme._();
 
   /// 品牌种子色。改这一个值即可换肤。
-  static const Color seed = Color(0xFFAB99FF);
-
-  /// 品牌色上的前景文字：品牌色块一律用深紫，绝不用纯白。
-  static const Color onBrand = Color(0xFF241B45);
-
-  /// 次要品牌色（晴空蓝 blue500）。
-  static const Color secondary = Color(0xFF4F8CF7);
+  ///
+  /// 这是唯一保留的颜色字面量：它是 `ColorScheme.fromSeed` 的锚点。语义
+  /// token 的品牌色（`semantic.brand` = 0xFFAA99FF）在此基础上做过微调，
+  /// 故种子色与语义品牌色刻意不完全相等。`onPrimary` / `secondary` 则直接
+  /// 派生自 [StarryTokens]，不再各写一份，避免手动同步的双源。
+  static const Color seed = Color(0xFFAB99FF); // hardcode-allow: seed 是唯一色字面量,喂 ColorScheme.fromSeed(见 AGENTS §1.4)
 
   static ThemeData light() => _base(Brightness.light);
 
@@ -25,15 +24,16 @@ class AppTheme {
 
   static ThemeData _base(Brightness brightness) {
     final isLight = brightness == Brightness.light;
+    final tokens = isLight ? StarryTokens.light : StarryTokens.dark;
     final colorScheme = ColorScheme.fromSeed(
       seedColor: seed,
       brightness: brightness,
     ).copyWith(
       primary: seed,
-      onPrimary: onBrand,
-      secondary: secondary,
+      // 品牌色前景与次要品牌色直接吃 token，明暗各自取值、随主题自适应。
+      onPrimary: tokens.semantic.onBrand,
+      secondary: tokens.semantic.brandStrong,
     );
-    final tokens = isLight ? StarryTokens.light : StarryTokens.dark;
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
