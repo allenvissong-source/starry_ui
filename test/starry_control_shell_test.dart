@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starry_ui/starry_ui.dart';
+import 'package:starry_ui/src/inputs/input_shell.dart';
 
 Widget _host(Widget child) {
   return MaterialApp(
@@ -9,37 +10,36 @@ Widget _host(Widget child) {
   );
 }
 
-BoxDecoration _shellDecoration(WidgetTester tester, Finder root) {
+ShapeDecoration _shellDecoration(WidgetTester tester, Finder root) {
   final container = tester
       .widgetList<Container>(
         find.descendant(of: root, matching: find.byType(Container)),
       )
-      .firstWhere(
-        (c) =>
-            c.decoration is BoxDecoration &&
-            (c.decoration! as BoxDecoration).border != null,
-      );
-  return container.decoration! as BoxDecoration;
+      .firstWhere((c) => c.decoration is ShapeDecoration);
+  return container.decoration! as ShapeDecoration;
 }
 
-BoxDecoration _animatedShellDecoration(WidgetTester tester, Finder root) {
+ShapeDecoration _animatedShellDecoration(WidgetTester tester, Finder root) {
   final container = tester
       .widgetList<AnimatedContainer>(
         find.descendant(of: root, matching: find.byType(AnimatedContainer)),
       )
-      .firstWhere(
-        (c) =>
-            c.decoration is BoxDecoration &&
-            (c.decoration! as BoxDecoration).border != null,
-      );
-  return container.decoration! as BoxDecoration;
+      .firstWhere((c) => c.decoration is ShapeDecoration);
+  return container.decoration! as ShapeDecoration;
+}
+
+BorderSide _sideOf(ShapeBorder shape) {
+  if (shape is RoundedRectangleBorder) return shape.side;
+  if (shape is StadiumBorder) return shape.side;
+  if (shape is CircleBorder) return shape.side;
+  fail('Unexpected shape: $shape');
 }
 
 void main() {
   final tokens = StarryTokens.light;
 
   group('StarryControlShell primitive', () {
-    testWidgets('paints radius.lg + surface fill + level2 by default',
+    testWidgets('paints radius.xxl + surface fill + level2 by default',
         (tester) async {
       await tester.pumpWidget(
         _host(const StarryControlShell(child: SizedBox(width: 80, height: 48))),
@@ -48,8 +48,9 @@ void main() {
 
       final deco = _shellDecoration(tester, find.byType(StarryControlShell));
       expect(deco.color, tokens.semantic.surface);
-      expect(deco.borderRadius, BorderRadius.circular(tokens.radius.lg));
-      expect(deco.boxShadow, tokens.elevation.level2);
+      final shape = deco.shape as RoundedRectangleBorder;
+      expect(shape.borderRadius, BorderRadius.circular(tokens.radius.xxl));
+      expect(deco.shadows, tokens.elevation.level2);
     });
 
     testWidgets('rest border is transparent at focusBorderWidth', (tester) async {
@@ -59,9 +60,9 @@ void main() {
       await tester.pumpAndSettle();
 
       final deco = _shellDecoration(tester, find.byType(StarryControlShell));
-      final border = deco.border! as Border;
-      expect(border.top.color, Colors.transparent);
-      expect(border.top.width, tokens.controlMetrics.focusBorderWidth);
+      final side = _sideOf(deco.shape);
+      expect(side.color, Colors.transparent);
+      expect(side.width, tokens.controlMetrics.focusBorderWidth);
     });
 
     testWidgets('active border is brand at focusBorderWidth (equal width)',
@@ -77,10 +78,63 @@ void main() {
       await tester.pumpAndSettle();
 
       final deco = _shellDecoration(tester, find.byType(StarryControlShell));
-      final border = deco.border! as Border;
-      expect(border.top.color, tokens.semantic.brand);
+      final side = _sideOf(deco.shape);
+      expect(side.color, tokens.semantic.brand);
       // Size stability: active and rest widths are identical.
-      expect(border.top.width, tokens.controlMetrics.focusBorderWidth);
+      expect(side.width, tokens.controlMetrics.focusBorderWidth);
+    });
+
+    testWidgets('pill renders a StadiumBorder', (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const StarryControlShell(
+            pill: true,
+            child: SizedBox(width: 80, height: 48),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final deco = _shellDecoration(tester, find.byType(StarryControlShell));
+      expect(deco.shape, isA<StadiumBorder>());
+    });
+
+    testWidgets('activeBorderSide honors an explicit color at focusBorderWidth',
+        (tester) async {
+      const validation = Color(0xFFAABBCC);
+      late BorderSide restColored;
+      late BorderSide activeColored;
+      late BorderSide restDefault;
+      await tester.pumpWidget(
+        _host(
+          Builder(
+            builder: (context) {
+              restColored = StarryControlShell.activeBorderSide(
+                context,
+                isActive: false,
+                color: validation,
+              );
+              activeColored = StarryControlShell.activeBorderSide(
+                context,
+                isActive: true,
+                color: validation,
+              );
+              restDefault =
+                  StarryControlShell.activeBorderSide(context, isActive: false);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+
+      // Explicit color wins in BOTH rest and active states.
+      expect(restColored.color, validation);
+      expect(activeColored.color, validation);
+      // Width is always focusBorderWidth (size stability).
+      expect(restColored.width, tokens.controlMetrics.focusBorderWidth);
+      expect(activeColored.width, tokens.controlMetrics.focusBorderWidth);
+      // Without a color, rest falls back to transparent.
+      expect(restDefault.color, Colors.transparent);
     });
   });
 
@@ -99,9 +153,9 @@ void main() {
 
       final deco =
           _animatedShellDecoration(tester, find.byType(StarryAnimatedControlShell));
-      final border = deco.border! as Border;
-      expect(border.top.color, tokens.semantic.brand);
-      expect(border.top.width, tokens.controlMetrics.focusBorderWidth);
+      final side = _sideOf(deco.shape);
+      expect(side.color, tokens.semantic.brand);
+      expect(side.width, tokens.controlMetrics.focusBorderWidth);
     });
   });
 
@@ -140,10 +194,72 @@ void main() {
 
       final deco =
           _animatedShellDecoration(tester, find.byType(StarryRoundIconShell));
-      expect(deco.shape, BoxShape.circle);
+      expect(deco.shape, isA<CircleBorder>());
 
       await tester.tap(find.byType(InkWell));
       expect(taps, 1);
+    });
+  });
+
+  group('StarryInputShell parity', () {
+    testWidgets('focus paints brand border at focusBorderWidth + level2',
+        (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const StarryInputShell(
+            focused: true,
+            child: SizedBox(width: 120, height: 48),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final deco =
+          _animatedShellDecoration(tester, find.byType(StarryInputShell));
+      final side = _sideOf(deco.shape);
+      expect(side.color, tokens.semantic.brand);
+      expect(side.width, tokens.controlMetrics.focusBorderWidth);
+      expect(deco.shadows, tokens.elevation.level2);
+    });
+
+    testWidgets('rest is transparent border + level1 elevation',
+        (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const StarryInputShell(
+            focused: false,
+            child: SizedBox(width: 120, height: 48),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final deco =
+          _animatedShellDecoration(tester, find.byType(StarryInputShell));
+      final side = _sideOf(deco.shape);
+      expect(side.color, Colors.transparent);
+      expect(side.width, tokens.controlMetrics.focusBorderWidth);
+      expect(deco.shadows, tokens.elevation.level1);
+    });
+
+    testWidgets('borderColor is painted even at rest', (tester) async {
+      const validation = Color(0xFFEE0000);
+      await tester.pumpWidget(
+        _host(
+          const StarryInputShell(
+            focused: false,
+            borderColor: validation,
+            child: SizedBox(width: 120, height: 48),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final deco =
+          _animatedShellDecoration(tester, find.byType(StarryInputShell));
+      final side = _sideOf(deco.shape);
+      expect(side.color, validation);
+      expect(side.width, tokens.controlMetrics.focusBorderWidth);
     });
   });
 }
