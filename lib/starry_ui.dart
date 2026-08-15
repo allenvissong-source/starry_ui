@@ -62,6 +62,8 @@ export 'src/interactions/starry_slidable_drawer.dart';
 export 'src/interactions/starry_swipeable.dart';
 
 // Layout.
+export 'src/layout/masonry_feed_metrics.dart';
+export 'src/layout/sliver_masonry_feed.dart';
 export 'src/layout/starry_glass_panel.dart';
 export 'src/layout/starry_gradient_fallback.dart';
 export 'src/layout/starry_immersive_background.dart';
