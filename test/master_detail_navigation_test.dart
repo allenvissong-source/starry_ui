@@ -62,7 +62,257 @@ Future<void> _pumpAt(
   await tester.pumpAndSettle();
 }
 
+const _detailKey = Key('detail-region');
+
+Widget _layout({
+  required bool paneVisible,
+  required ValueChanged<bool> onChanged,
+  double? paneWidth,
+}) {
+  return StarryMasterDetailLayout(
+    paneVisible: paneVisible,
+    onPaneVisibleChanged: onChanged,
+    paneWidth: paneWidth,
+    pane: StarryNavigationPane(
+      sections: _sections,
+      selectedId: 'profile',
+      onItemSelected: (_) {},
+    ),
+    detail: const SizedBox.expand(
+      key: _detailKey,
+      child: Center(child: Text('detail-body')),
+    ),
+  );
+}
+
 void main() {
+  group('StarryMasterDetailLayout', () {
+    testWidgets('renders side by side at the expanded entry point', (
+      tester,
+    ) async {
+      await _pumpAt(
+        tester,
+        const Size(840, 800),
+        child: _layout(paneVisible: true, onChanged: (_) {}),
+      );
+
+      expect(find.text('detail-body'), findsOneWidget);
+      expect(find.byType(StarryNavigationPane), findsOneWidget);
+      expect(
+        tester.getSize(find.byType(StarryNavigationPane)).width,
+        StarryMasterDetailLayout.defaultPaneWidth,
+      );
+      expect(tester.getTopLeft(find.byType(StarryNavigationPane)).dx, 0);
+      // Detail starts after the pane + separator: the pane takes layout space.
+      expect(
+        tester.getTopLeft(find.byKey(_detailKey)).dx,
+        greaterThanOrEqualTo(StarryMasterDetailLayout.defaultPaneWidth),
+      );
+    });
+
+    testWidgets('falls back to overlay just below the breakpoint', (
+      tester,
+    ) async {
+      await _pumpAt(
+        tester,
+        const Size(839, 800),
+        child: _layout(paneVisible: true, onChanged: (_) {}),
+      );
+
+      // The pane floats above the detail instead of pushing it aside.
+      expect(tester.getTopLeft(find.byType(StarryNavigationPane)).dx, 0);
+      expect(tester.getTopLeft(find.byKey(_detailKey)).dx, 0);
+      expect(find.byType(StarryNavigationPane), findsOneWidget);
+    });
+
+    testWidgets('side-by-side hides the pane entirely when collapsed', (
+      tester,
+    ) async {
+      await _pumpAt(
+        tester,
+        const Size(1000, 800),
+        child: _layout(paneVisible: false, onChanged: (_) {}),
+      );
+
+      expect(find.byType(StarryNavigationPane), findsNothing);
+      // Detail reclaims the leading edge once the pane is gone.
+      expect(tester.getTopLeft(find.byKey(_detailKey)).dx, 0);
+      expect(find.text('detail-body'), findsOneWidget);
+    });
+
+    testWidgets('overlay scrim tap reports a visibility change', (
+      tester,
+    ) async {
+      bool? reported;
+      await _pumpAt(
+        tester,
+        const Size(700, 800),
+        child: _layout(
+          paneVisible: true,
+          onChanged: (value) => reported = value,
+        ),
+      );
+
+      await tester.tapAt(const Offset(650, 400));
+      await tester.pumpAndSettle();
+
+      expect(reported, isFalse);
+    });
+
+    testWidgets('overlay is not mounted while collapsed', (tester) async {
+      await _pumpAt(
+        tester,
+        const Size(700, 800),
+        child: _layout(paneVisible: false, onChanged: (_) {}),
+      );
+
+      expect(find.byType(StarryNavigationPane), findsNothing);
+    });
+
+    testWidgets('Escape closes the open overlay pane', (tester) async {
+      bool? reported;
+      await _pumpAt(
+        tester,
+        const Size(700, 800),
+        child: _layout(
+          paneVisible: true,
+          onChanged: (value) => reported = value,
+        ),
+      );
+      expect(find.byType(StarryNavigationPane), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+
+      expect(reported, isFalse);
+      // The layout does not own visibility: the host rebuilds with
+      // paneVisible=false, which this controlled test does not do.
+    });
+
+    testWidgets('overlay close button takes focus on open and closes on tap', (
+      tester,
+    ) async {
+      bool? reported;
+      await _pumpAt(
+        tester,
+        const Size(700, 800),
+        child: _layout(
+          paneVisible: true,
+          onChanged: (value) => reported = value,
+        ),
+      );
+
+      // The sheet must grab keyboard focus when it mounts.
+      final closeFocus = Focus.of(
+        tester.element(find.byKey(StarryMasterDetailLayout.closeKey)),
+      );
+      expect(closeFocus.hasPrimaryFocus, isTrue);
+
+      await tester.tap(find.byKey(StarryMasterDetailLayout.closeKey));
+      await tester.pumpAndSettle();
+
+      expect(reported, isFalse);
+    });
+
+    testWidgets('open overlay excludes the backing detail from semantics', (
+      tester,
+    ) async {
+      await _pumpAt(
+        tester,
+        const Size(700, 800),
+        child: _layout(paneVisible: true, onChanged: (_) {}),
+      );
+
+      final excluded = tester.widget<ExcludeSemantics>(
+        find
+            .ancestor(
+              of: find.text('detail-body'),
+              matching: find.byType(ExcludeSemantics),
+            )
+            .first,
+      );
+      expect(excluded.excluding, isTrue);
+    });
+
+    testWidgets('collapsed overlay leaves the backing detail semantics live', (
+      tester,
+    ) async {
+      await _pumpAt(
+        tester,
+        const Size(700, 800),
+        child: _layout(paneVisible: false, onChanged: (_) {}),
+      );
+
+      final excluded = tester.widget<ExcludeSemantics>(
+        find
+            .ancestor(
+              of: find.text('detail-body'),
+              matching: find.byType(ExcludeSemantics),
+            )
+            .first,
+      );
+      expect(excluded.excluding, isFalse);
+    });
+
+    testWidgets('honours reduced motion by settling immediately', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(700, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(
+        _host(
+          size: const Size(700, 800),
+          disableAnimations: true,
+          child: _layout(paneVisible: true, onChanged: (_) {}),
+        ),
+      );
+      await tester.pump();
+
+      // With animations disabled the pane is already at its resting offset
+      // after a single frame.
+      expect(tester.getTopLeft(find.byType(StarryNavigationPane)).dx, 0);
+    });
+
+    test('exposes defaultPaneWidth as the 256pt navigation spec', () {
+      expect(StarryMasterDetailLayout.defaultPaneWidth, 256);
+    });
+
+    testWidgets('honours a custom paneWidth in side-by-side', (tester) async {
+      await _pumpAt(
+        tester,
+        const Size(840, 800),
+        child: _layout(paneVisible: true, onChanged: (_) {}, paneWidth: 320),
+      );
+
+      expect(tester.getSize(find.byType(StarryNavigationPane)).width, 320);
+      // Detail starts after the custom-width pane + separator.
+      expect(
+        tester.getTopLeft(find.byKey(_detailKey)).dx,
+        greaterThanOrEqualTo(320),
+      );
+    });
+
+    testWidgets('honours a custom paneWidth in overlay', (tester) async {
+      await _pumpAt(
+        tester,
+        const Size(700, 800),
+        child: _layout(paneVisible: true, onChanged: (_) {}, paneWidth: 300),
+      );
+
+      // The floating sheet that hosts the pane is the nearest SizedBox
+      // ancestor of the pane and takes the custom width.
+      final sheetBox = tester.widget<SizedBox>(
+        find
+            .ancestor(
+              of: find.byType(StarryNavigationPane),
+              matching: find.byType(SizedBox),
+            )
+            .first,
+      );
+      expect(sheetBox.width, 300);
+    });
+  });
+
   group('StarryNavigationPane', () {
     testWidgets('renders section titles and every item', (tester) async {
       await _pumpAt(
@@ -141,7 +391,7 @@ void main() {
     ) async {
       await _pumpAt(
         tester,
-        const Size(256, 900),
+        const Size(StarryMasterDetailLayout.defaultPaneWidth, 900),
         child: StarryNavigationPane(
           sections: _sections,
           selectedId: 'profile',
@@ -176,7 +426,7 @@ void main() {
     ) async {
       await _pumpAt(
         tester,
-        const Size(256, 900),
+        const Size(StarryMasterDetailLayout.defaultPaneWidth, 900),
         child: StarryNavigationPane(
           sections: _sections,
           selectedId: 'profile',

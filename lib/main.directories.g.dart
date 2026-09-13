@@ -76,6 +76,8 @@ import 'package:starry_ui/src/layout/starry_group_card.usecase.dart'
     as _starry_ui_src_layout_starry_group_card_usecase;
 import 'package:starry_ui/src/layout/starry_immersive_background.usecase.dart'
     as _starry_ui_src_layout_starry_immersive_background_usecase;
+import 'package:starry_ui/src/layout/starry_master_detail_layout.usecase.dart'
+    as _starry_ui_src_layout_starry_master_detail_layout_usecase;
 import 'package:starry_ui/src/layout/starry_page_wrapper.usecase.dart'
     as _starry_ui_src_layout_starry_page_wrapper_usecase;
 import 'package:starry_ui/src/layout/starry_section_header.usecase.dart'
@@ -92,6 +94,8 @@ import 'package:starry_ui/src/media/starry_reference_card.usecase.dart'
     as _starry_ui_src_media_starry_reference_card_usecase;
 import 'package:starry_ui/src/navigation/starry_dock_bar.usecase.dart'
     as _starry_ui_src_navigation_starry_dock_bar_usecase;
+import 'package:starry_ui/src/navigation/starry_navigation_pane.usecase.dart'
+    as _starry_ui_src_navigation_starry_navigation_pane_usecase;
 import 'package:starry_ui/src/navigation/starry_page_top_bar.usecase.dart'
     as _starry_ui_src_navigation_starry_page_top_bar_usecase;
 import 'package:starry_ui/src/navigation/starry_round_action_button.usecase.dart'
@@ -804,6 +808,21 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookComponent(
+        name: 'StarryMasterDetailLayout',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_layout_starry_master_detail_layout_usecase
+                .allVariantsStarryMasterDetailLayout,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_layout_starry_master_detail_layout_usecase
+                .playgroundStarryMasterDetailLayout,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
         name: 'StarryPageWrapper',
         useCases: [
           _widgetbook.WidgetbookUseCase(
@@ -954,6 +973,21 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookComponent(
+        name: 'StarryNavigationPane',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_navigation_starry_navigation_pane_usecase
+                .allVariantsStarryNavigationPane,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_navigation_starry_navigation_pane_usecase
+                .playgroundStarryNavigationPane,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
         name: 'StarryPageTopBar',
         useCases: [
           _widgetbook.WidgetbookUseCase(
@@ -989,21 +1023,6 @@ final directories = <_widgetbook.WidgetbookNode>[
                     .playgroundStarryRoundActionButton,
           ),
         ],
-      _widgetbook.WidgetbookComponent(
-        name: 'StarryNavigationPane',
-        useCases: [
-          _widgetbook.WidgetbookUseCase(
-            name: 'All Variants',
-            builder: _starry_ui_src_navigation_starry_navigation_pane_usecase
-                .allVariantsStarryNavigationPane,
-          ),
-          _widgetbook.WidgetbookUseCase(
-            name: 'Playground',
-            builder: _starry_ui_src_navigation_starry_navigation_pane_usecase
-                .playgroundStarryNavigationPane,
-          ),
-        ],
-      ),
       ),
       _widgetbook.WidgetbookComponent(
         name: 'StarrySegmentedControl',

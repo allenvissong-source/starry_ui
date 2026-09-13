@@ -68,6 +68,7 @@ export 'src/layout/starry_desktop_window_frame.dart';
 export 'src/layout/starry_glass_panel.dart';
 export 'src/layout/starry_gradient_fallback.dart';
 export 'src/layout/starry_immersive_background.dart';
+export 'src/layout/starry_master_detail_layout.dart';
 export 'src/layout/starry_page_wrapper.dart';
 export 'src/layout/starry_group_card.dart';
 export 'src/layout/starry_section_header.dart';
