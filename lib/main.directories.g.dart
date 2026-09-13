@@ -989,6 +989,21 @@ final directories = <_widgetbook.WidgetbookNode>[
                     .playgroundStarryRoundActionButton,
           ),
         ],
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryNavigationPane',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_navigation_starry_navigation_pane_usecase
+                .allVariantsStarryNavigationPane,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_navigation_starry_navigation_pane_usecase
+                .playgroundStarryNavigationPane,
+          ),
+        ],
+      ),
       ),
       _widgetbook.WidgetbookComponent(
         name: 'StarrySegmentedControl',

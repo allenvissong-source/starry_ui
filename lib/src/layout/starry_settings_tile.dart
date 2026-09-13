@@ -41,6 +41,7 @@ class StarrySettingsTile extends StatefulWidget {
     this.foregroundColor,
     this.semanticsLabel,
     this.minHeight,
+    this.titleWeight,
     this.toggleValue,
     this.onToggleChanged,
   });
@@ -66,9 +67,10 @@ class StarrySettingsTile extends StatefulWidget {
     this.foregroundColor,
     this.semanticsLabel,
     this.minHeight,
+    this.showChevron = true,
   }) : trailing = null,
        trailingText = null,
-       showChevron = true,
+       titleWeight = null,
        toggleValue = null,
        onToggleChanged = null;
 
@@ -96,6 +98,7 @@ class StarrySettingsTile extends StatefulWidget {
     this.semanticsLabel,
     this.minHeight,
   }) : trailing = null,
+       titleWeight = null,
        toggleValue = null,
        onToggleChanged = null;
 
@@ -122,6 +125,7 @@ class StarrySettingsTile extends StatefulWidget {
     this.minHeight,
   }) : trailing = null,
        trailingText = null,
+       titleWeight = null,
        onTap = null,
        onLongPress = null,
        showChevron = false,
@@ -150,6 +154,12 @@ class StarrySettingsTile extends StatefulWidget {
   final Color? foregroundColor;
   final String? semanticsLabel;
   final double? minHeight;
+
+  /// Overrides the resting title weight. Defaults to the settings-list weight
+  /// (`w500`, or `w600` when selected). Dense navigation surfaces pass a
+  /// lighter weight so a long list of labels reads calmly.
+  final FontWeight? titleWeight;
+
   final bool? toggleValue;
   final ValueChanged<bool>? onToggleChanged;
 
@@ -207,9 +217,13 @@ class _StarrySettingsTileState extends State<StarrySettingsTile> {
           horizontal: t.spacing.s4,
           vertical: widget.dense ? t.spacing.s3 : t.spacing.s4,
         );
+    final restingWeight = widget.titleWeight ?? FontWeight.w500;
+    // Selection always reads one step heavier than rest, whatever the caller
+    // chose as its resting weight, so the cue survives a lighter override.
+    final selectedWeight = _oneStepHeavier(restingWeight);
     final titleStyle = t.typography.labelLarge.textStyle.copyWith(
       color: effectiveForeground,
-      fontWeight: widget.selected ? FontWeight.w600 : FontWeight.w500,
+      fontWeight: widget.selected ? selectedWeight : restingWeight,
     );
     final subtitleStyle = t.typography.bodySmall.textStyle.copyWith(
       color: secondaryForeground,
@@ -409,3 +423,18 @@ class _StarrySettingsTileState extends State<StarrySettingsTile> {
     return Row(mainAxisSize: MainAxisSize.min, children: children);
   }
 }
+
+/// Next heavier step on the weight ramp, saturating at `w900`.
+///
+/// Explicit rather than index arithmetic: `FontWeight.index` is deprecated,
+/// and an ordered map states the intent without depending on enum ordering.
+FontWeight _oneStepHeavier(FontWeight weight) => switch (weight) {
+  FontWeight.w100 => FontWeight.w200,
+  FontWeight.w200 => FontWeight.w300,
+  FontWeight.w300 => FontWeight.w400,
+  FontWeight.w400 => FontWeight.w500,
+  FontWeight.w500 => FontWeight.w600,
+  FontWeight.w600 => FontWeight.w700,
+  FontWeight.w700 => FontWeight.w800,
+  _ => FontWeight.w900,
+};

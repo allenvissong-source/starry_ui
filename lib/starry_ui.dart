@@ -75,6 +75,7 @@ export 'src/layout/starry_settings_tile.dart';
 
 // Navigation.
 export 'src/navigation/starry_dock_bar.dart';
+export 'src/navigation/starry_navigation_pane.dart';
 export 'src/navigation/starry_page_top_bar.dart';
 export 'src/navigation/starry_round_action_button.dart';
 export 'src/navigation/starry_segmented_control.dart';
