@@ -36,6 +36,7 @@ export 'src/components/starry_card.dart';
 export 'src/components/starry_expandable_card.dart';
 export 'src/components/starry_masonry_card.dart';
 export 'src/components/starry_control_shell.dart';
+export 'src/components/starry_surface.dart';
 
 // Feedback.
 export 'src/feedback/starry_message_list.dart';
