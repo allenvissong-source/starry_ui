@@ -11,21 +11,21 @@ Widget compactExamplesStarryCountFormatter(BuildContext context) =>
 class StarryCountFormatterPreview extends StatelessWidget {
   const StarryCountFormatterPreview({super.key});
 
-  static const _examples = <int>[0, 9999, 12345, 99999, 100000];
+  static const _examples = <int>[0, 9999, 12345, 99999, 100000, 1234567];
 
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
     final s = t.semantic;
 
-    return Padding(
+    return SingleChildScrollView(
       padding: EdgeInsets.all(t.spacing.s10),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            'StarryCountFormatter.compact',
+            'StarryCountFormatter.compact (feed-card metrics)',
             style: t.typography.bodyMedium.textStyle.copyWith(
               color: s.textPrimary,
               fontWeight: FontWeight.w700,
@@ -37,7 +37,23 @@ class StarryCountFormatterPreview extends StatelessWidget {
               value: value,
               formatted: StarryCountFormatter.compact(value),
             ),
-            if (value != _examples.last) SizedBox(height: t.spacing.s2),
+            SizedBox(height: t.spacing.s2),
+          ],
+          SizedBox(height: t.spacing.s8),
+          Text(
+            'StarryCountFormatter.grouped (exact counts)',
+            style: t.typography.bodyMedium.textStyle.copyWith(
+              color: s.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: t.spacing.s6),
+          for (final value in _examples) ...<Widget>[
+            _FormatterExampleRow(
+              value: value,
+              formatted: StarryCountFormatter.grouped(value),
+            ),
+            SizedBox(height: t.spacing.s2),
           ],
         ],
       ),

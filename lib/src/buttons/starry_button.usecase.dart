@@ -28,6 +28,12 @@ Widget allVariantsStarryButton(BuildContext context) {
           onPressed: () {},
         ),
         SizedBox(height: t.spacing.s4),
+        StarryButton(
+          label: '次要操作',
+          variant: StarryButtonVariant.neutral,
+          onPressed: () {},
+        ),
+        SizedBox(height: t.spacing.s4),
         StarryButton(label: '发布', icon: Icons.add, onPressed: () {}),
         SizedBox(height: t.spacing.s4),
         StarryButton(label: '提交中', loading: true, onPressed: () {}),

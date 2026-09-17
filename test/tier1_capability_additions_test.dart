@@ -172,6 +172,61 @@ void main() {
     );
   });
 
+  group('StarryButton neutral variant', () {
+    testWidgets('neutral is in the variant enum', (_) async {
+      expect(
+        StarryButtonVariant.values.contains(StarryButtonVariant.neutral),
+        isTrue,
+      );
+    });
+
+    testWidgets(
+      'enabled neutral is transparent with textSecondary foreground',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(
+            const StarryButton(
+              label: 'Later',
+              variant: StarryButtonVariant.neutral,
+            ),
+          ),
+        );
+        final t = _tokens(tester, find.byType(StarryButton));
+        final style = tester.widget<TextButton>(find.byType(TextButton)).style!;
+        expect(
+          style.backgroundColor!.resolve(<WidgetState>{}),
+          Colors.transparent,
+        );
+        expect(
+          style.foregroundColor!.resolve(<WidgetState>{}),
+          t.semantic.textSecondary,
+        );
+      },
+    );
+
+    testWidgets('disabled neutral keeps a transparent background', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const StarryButton(
+            label: 'Later',
+            variant: StarryButtonVariant.neutral,
+          ),
+        ),
+      );
+      final t = _tokens(tester, find.byType(StarryButton));
+      final style = tester.widget<TextButton>(find.byType(TextButton)).style!;
+      expect(
+        style.backgroundColor!.resolve(<WidgetState>{WidgetState.disabled}),
+        Colors.transparent,
+      );
+      expect(
+        style.foregroundColor!.resolve(<WidgetState>{WidgetState.disabled}),
+        t.semantic.textDisabled,
+      );
+    });
+  });
   group('Item 3 — StarrySearchInput / InputShell soft variant', () {
     testWidgets('default (soft=false) shell uses focus-border width at rest', (
       tester,

@@ -73,6 +73,23 @@ void main() {
     });
   });
 
+  group('StarryCountFormatter.grouped', () {
+    test('small counts render as the plain decimal string', () {
+      expect(StarryCountFormatter.grouped(0), '0');
+      expect(StarryCountFormatter.grouped(999), '999');
+      expect(StarryCountFormatter.grouped(1234), '1,234');
+    });
+
+    test('inserts a comma every three digits from the right', () {
+      expect(StarryCountFormatter.grouped(1234567), '1,234,567');
+      expect(StarryCountFormatter.grouped(100000), '100,000');
+      expect(StarryCountFormatter.grouped(100000000), '100,000,000');
+    });
+
+    test('negative counts clamp to 0 (no stray minus)', () {
+      expect(StarryCountFormatter.grouped(-5), '0');
+    });
+  });
   group('StarryAvatar', () {
     testWidgets('size enum carries the shipped diameter tiers', (tester) async {
       expect(

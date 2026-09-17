@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import '../theme/starry_tokens.dart';
 import '../components/starry_control_shell.dart';
 
-/// Button hierarchy: primary / secondary brand / tonal / text. All variants
-/// share one token-driven base and only swap the color pair + fill.
-enum StarryButtonVariant { filled, secondary, tonal, text, destructive }
+/// Button hierarchy: primary / secondary brand / tonal / text / neutral. All
+/// variants share one token-driven base and only swap the color pair + fill.
+///
+/// [StarryButtonVariant.text] is the low-emphasis *brand* transparent button;
+/// [StarryButtonVariant.neutral] is the same transparent fill but uses the
+/// neutral secondary-text foreground — for secondary actions that should not
+/// read as brand-colored at all.
+enum StarryButtonVariant { filled, secondary, tonal, text, neutral, destructive }
 
 /// Content layout of a [StarryButton].
 ///
@@ -132,6 +137,9 @@ class _StarryButtonState extends State<StarryButton> {
       case StarryButtonVariant.text:
         background = Colors.transparent;
         foreground = s.brandStrong;
+      case StarryButtonVariant.neutral:
+        background = Colors.transparent;
+        foreground = s.textSecondary;
       case StarryButtonVariant.destructive:
         background = s.error;
         foreground = s.onError;
@@ -172,7 +180,8 @@ class _StarryButtonState extends State<StarryButton> {
       backgroundColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.disabled)) {
           return widget.variant == StarryButtonVariant.text ||
-                  widget.variant == StarryButtonVariant.tonal
+                  widget.variant == StarryButtonVariant.tonal ||
+                  widget.variant == StarryButtonVariant.neutral
               ? Colors.transparent
               : s.surfaceVariant;
         }
