@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-09-20
+goal: Stop the shared UI package imposing a documentation tool on its consumers,
+  and resolve migration residue
