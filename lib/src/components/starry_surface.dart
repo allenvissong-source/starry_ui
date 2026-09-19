@@ -76,11 +76,7 @@ class StarrySurface extends StatelessWidget {
       button: true,
       child: Material(
         type: MaterialType.transparency,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: radius,
-          child: content,
-        ),
+        child: InkWell(onTap: onTap, borderRadius: radius, child: content),
       ),
     );
   }

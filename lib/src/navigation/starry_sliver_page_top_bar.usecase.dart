@@ -6,8 +6,12 @@ import 'starry_page_top_bar.dart';
 import 'starry_sliver_page_top_bar.dart';
 
 const List<Color> _demoGradient = <Color>[
-  Color(0xFF3A2E6E), // hardcode-allow: 画廊演示用的沉浸式渐变背板,仅展示 expandedBackground 折叠效果,非被消费的组件配色
-  Color(0xFF1B1533), // hardcode-allow: 画廊演示用的沉浸式渐变背板,仅展示 expandedBackground 折叠效果,非被消费的组件配色
+  Color(
+    0xFF3A2E6E,
+  ), // hardcode-allow: 画廊演示用的沉浸式渐变背板,仅展示 expandedBackground 折叠效果,非被消费的组件配色
+  Color(
+    0xFF1B1533,
+  ), // hardcode-allow: 画廊演示用的沉浸式渐变背板,仅展示 expandedBackground 折叠效果,非被消费的组件配色
 ];
 
 @UseCase(name: 'Pinned', type: StarrySliverPageTopBar)
@@ -63,7 +67,9 @@ Widget defaultBackStarrySliverPageTopBar(BuildContext context) {
           body: Center(
             child: FilledButton(
               onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(builder: (_) => const _DefaultBackDemo()),
+                MaterialPageRoute<void>(
+                  builder: (_) => const _DefaultBackDemo(),
+                ),
               ),
               child: const Text('打开可返回页面'),
             ),

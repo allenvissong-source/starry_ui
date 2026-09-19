@@ -159,13 +159,11 @@ class StarryInputShell extends StatelessWidget {
       backgroundColor: fill,
       shellBoxShadow: focused ? t.elevation.level2 : t.elevation.level1,
       pill: pill,
-      shellBorderRadius:
-          pill ? null : BorderRadius.circular(borderRadius ?? t.radius.lg),
+      shellBorderRadius: pill
+          ? null
+          : BorderRadius.circular(borderRadius ?? t.radius.lg),
       constraints: BoxConstraints(minHeight: t.controlMetrics.controlHeight),
-      padding: EdgeInsetsDirectional.only(
-        start: endPadding(t),
-        end: end,
-      ),
+      padding: EdgeInsetsDirectional.only(start: endPadding(t), end: end),
       child: child,
     );
   }

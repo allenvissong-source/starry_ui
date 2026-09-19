@@ -41,8 +41,8 @@ class SliverMasonryFeed extends StatelessWidget {
         // minimum width" assertion inside the masonry grid.
         final childCrossAxisExtent = metrics.columns > 0
             ? (metrics.gridWidth -
-                    masonryFeedColumnGap * (metrics.columns - 1)) /
-                metrics.columns
+                      masonryFeedColumnGap * (metrics.columns - 1)) /
+                  metrics.columns
             : 0.0;
         if (childCrossAxisExtent <= 0) {
           return const SliverToBoxAdapter(child: SizedBox.shrink());

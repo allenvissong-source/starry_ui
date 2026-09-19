@@ -63,8 +63,9 @@ void main() {
     }
   });
 
-  testWidgets('collapsed cross-axis extent renders empty without asserting',
-      (tester) async {
+  testWidgets('collapsed cross-axis extent renders empty without asserting', (
+    tester,
+  ) async {
     await _pumpAtWidth(tester, width: 0, itemCount: 12);
     // No "negative minimum width" assertion should be thrown; no cards render.
     expect(find.byKey(const ValueKey('card_0')), findsNothing);

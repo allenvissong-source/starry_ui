@@ -42,7 +42,10 @@ Widget _host({
   } else {
     frame = body;
   }
-  return MaterialApp(theme: AppTheme.light(), home: Scaffold(body: frame));
+  return MaterialApp(
+    theme: AppTheme.light(),
+    home: Scaffold(body: frame),
+  );
 }
 
 /// Mirrors production wiring: the frame is installed through
@@ -430,9 +433,7 @@ void main() {
     final inkWell = tester.widget<InkWell>(
       find.descendant(of: finder, matching: find.byType(InkWell)),
     );
-    final tokens = Theme.of(tester.element(
-      finder,
-    )).extension<StarryTokens>()!;
+    final tokens = Theme.of(tester.element(finder)).extension<StarryTokens>()!;
 
     // At rest the InkWell paints nothing of its own.
     expect(
@@ -442,7 +443,9 @@ void main() {
     // Pressed stacks the MD3 pressed step over the semantic foreground.
     expect(
       inkWell.overlayColor!.resolve(const <WidgetState>{WidgetState.pressed}),
-      tokens.semantic.textPrimary.withValues(alpha: tokens.opacity.statePressed),
+      tokens.semantic.textPrimary.withValues(
+        alpha: tokens.opacity.statePressed,
+      ),
     );
     // Hover/focus stay owned by the manual opaque fill, so they must not gain
     // an InkWell overlay of their own.
@@ -467,13 +470,13 @@ void main() {
     final inkWell = tester.widget<InkWell>(
       find.descendant(of: finder, matching: find.byType(InkWell)),
     );
-    final tokens = Theme.of(tester.element(
-      finder,
-    )).extension<StarryTokens>()!;
+    final tokens = Theme.of(tester.element(finder)).extension<StarryTokens>()!;
 
     expect(
       inkWell.overlayColor!.resolve(const <WidgetState>{WidgetState.pressed}),
-      tokens.semantic.textPrimary.withValues(alpha: tokens.opacity.statePressed),
+      tokens.semantic.textPrimary.withValues(
+        alpha: tokens.opacity.statePressed,
+      ),
     );
 
     final gesture = await tester.press(finder);
@@ -483,33 +486,31 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('macOS control reveals its glyph immediately under reduced motion', (
-    tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(600, 160));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    await tester.pumpWidget(
-      _host(
-        platform: StarryDesktopPlatform.macOS,
-        disableAnimations: true,
-      ),
-    );
+  testWidgets(
+    'macOS control reveals its glyph immediately under reduced motion',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(600, 160));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(
+        _host(platform: StarryDesktopPlatform.macOS, disableAnimations: true),
+      );
 
-    final button = find.byKey(StarryDesktopWindowFrame.closeKey);
-    final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-    addTearDown(gesture.removePointer);
-    // Start outside the control so hover flips on, not off.
-    await gesture.addPointer(
-      location: tester.getTopLeft(button) - const Offset(24, 24),
-    );
-    await gesture.moveTo(tester.getCenter(button));
-    // A single frame must already be at the resting opacity: with animations
-    // disabled the 150ms fade must not interpolate at all.
-    await tester.pump();
+      final button = find.byKey(StarryDesktopWindowFrame.closeKey);
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(gesture.removePointer);
+      // Start outside the control so hover flips on, not off.
+      await gesture.addPointer(
+        location: tester.getTopLeft(button) - const Offset(24, 24),
+      );
+      await gesture.moveTo(tester.getCenter(button));
+      // A single frame must already be at the resting opacity: with animations
+      // disabled the 150ms fade must not interpolate at all.
+      await tester.pump();
 
-    final opacity = tester.widget<AnimatedOpacity>(
-      find.descendant(of: button, matching: find.byType(AnimatedOpacity)),
-    );
-    expect(opacity.opacity, 1.0);
-  });
+      final opacity = tester.widget<AnimatedOpacity>(
+        find.descendant(of: button, matching: find.byType(AnimatedOpacity)),
+      );
+      expect(opacity.opacity, 1.0);
+    },
+  );
 }

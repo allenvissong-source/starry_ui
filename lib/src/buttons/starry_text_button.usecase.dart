@@ -16,17 +16,9 @@ Widget allStatesStarryTextButton(BuildContext context) {
       children: <Widget>[
         StarryTextButton(label: 'Default', onPressed: () {}),
         SizedBox(height: t.spacing.s3),
-        StarryTextButton(
-          label: 'With icon',
-          icon: Icons.add,
-          onPressed: () {},
-        ),
+        StarryTextButton(label: 'With icon', icon: Icons.add, onPressed: () {}),
         SizedBox(height: t.spacing.s3),
-        StarryTextButton(
-          label: 'Loading',
-          loading: true,
-          onPressed: () {},
-        ),
+        StarryTextButton(label: 'Loading', loading: true, onPressed: () {}),
         SizedBox(height: t.spacing.s3),
         const StarryTextButton(label: 'Disabled', onPressed: null),
       ],
@@ -45,8 +37,10 @@ Widget playgroundStarryTextButton(BuildContext context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         StarryTextButton(
-          label:
-              context.knobs.string(label: 'Label', initialValue: 'Text action'),
+          label: context.knobs.string(
+            label: 'Label',
+            initialValue: 'Text action',
+          ),
           icon: context.knobs.boolean(label: 'Show icon') ? Icons.add : null,
           loading: context.knobs.boolean(label: 'Loading'),
           fullWidth: context.knobs.boolean(label: 'Full width'),

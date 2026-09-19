@@ -7,10 +7,8 @@ import 'starry_slider.dart';
 @UseCase(name: 'Default', type: StarrySlider)
 Widget defaultStarrySlider(BuildContext context) {
   return _StarrySliderDemo(
-    builder: (value, onChanged) => StarrySlider(
-      value: value,
-      onChanged: onChanged,
-    ),
+    builder: (value, onChanged) =>
+        StarrySlider(value: value, onChanged: onChanged),
   );
 }
 
@@ -34,8 +32,14 @@ Widget playgroundStarrySlider(BuildContext context) {
     min: 2,
     max: 20,
   );
-  final showThumb = context.knobs.boolean(label: 'Show thumb', initialValue: true);
-  final showHeader = context.knobs.boolean(label: 'Show header', initialValue: true);
+  final showThumb = context.knobs.boolean(
+    label: 'Show thumb',
+    initialValue: true,
+  );
+  final showHeader = context.knobs.boolean(
+    label: 'Show header',
+    initialValue: true,
+  );
   return _StarrySliderDemo(
     builder: (value, onChanged) => StarrySlider(
       value: value,
@@ -67,10 +71,7 @@ class _StarrySliderDemoState extends State<_StarrySliderDemo> {
         padding: const EdgeInsets.all(24),
         child: SizedBox(
           width: 360,
-          child: widget.builder(
-            _value,
-            (v) => setState(() => _value = v),
-          ),
+          child: widget.builder(_value, (v) => setState(() => _value = v)),
         ),
       ),
     );

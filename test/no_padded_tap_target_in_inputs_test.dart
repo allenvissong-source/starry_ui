@@ -85,11 +85,7 @@ int _lineOf(String source, int index) =>
 void main() {
   test('lib/src/inputs 内可点击控件必须声明 shrinkWrap(同心高度安全)', () {
     final dir = Directory(_guardedDir);
-    expect(
-      dir.existsSync(),
-      isTrue,
-      reason: '未找到 $_guardedDir——请在包根目录运行测试。',
-    );
+    expect(dir.existsSync(), isTrue, reason: '未找到 $_guardedDir——请在包根目录运行测试。');
 
     final violations = <String>[];
 
@@ -118,7 +114,8 @@ void main() {
     expect(
       violations,
       isEmpty,
-      reason: '以下 Material 可点击控件位于高度受限外壳目录($_guardedDir),'
+      reason:
+          '以下 Material 可点击控件位于高度受限外壳目录($_guardedDir),'
           '却未声明 `$_safeToken`——默认的 `padded` 命中区会顶穿外壳内腔、'
           '破坏同心(AGENTS.md §1.5.2「可视高 ≠ 布局高」):\n'
           '${violations.join('\n')}\n\n'

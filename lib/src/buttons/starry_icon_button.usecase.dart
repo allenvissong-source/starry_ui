@@ -51,10 +51,7 @@ Widget allVariantsStarryIconButton(BuildContext context) {
 @UseCase(name: 'Playground', type: StarryIconButton)
 Widget playgroundStarryIconButton(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
-  final enabled = context.knobs.boolean(
-    label: 'Enabled',
-    initialValue: true,
-  );
+  final enabled = context.knobs.boolean(label: 'Enabled', initialValue: true);
   final selected = context.knobs.boolean(
     label: 'Selected',
     initialValue: false,

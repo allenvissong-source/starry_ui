@@ -13,8 +13,9 @@ void main() {
   final tokens = StarryTokens.light;
 
   group('StarrySlider', () {
-    testWidgets('bare slider (no header) wires token track colors',
-        (tester) async {
+    testWidgets('bare slider (no header) wires token track colors', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           SizedBox(
@@ -30,13 +31,18 @@ void main() {
       expect(find.byType(Text), findsNothing);
 
       final sliderTheme = tester.widget<SliderTheme>(
-        find.ancestor(
-          of: find.byType(Slider),
-          matching: find.byType(SliderTheme),
-        ).first,
+        find
+            .ancestor(
+              of: find.byType(Slider),
+              matching: find.byType(SliderTheme),
+            )
+            .first,
       );
       expect(sliderTheme.data.activeTrackColor, tokens.semantic.brand);
-      expect(sliderTheme.data.inactiveTrackColor, tokens.semantic.surfaceVariant);
+      expect(
+        sliderTheme.data.inactiveTrackColor,
+        tokens.semantic.surfaceVariant,
+      );
       expect(sliderTheme.data.thumbColor, tokens.semantic.surface);
       expect(sliderTheme.data.trackHeight, StarrySlider.trackHeight);
     });
@@ -66,21 +72,19 @@ void main() {
         _host(
           SizedBox(
             width: 360,
-            child: StarrySlider(
-              value: 40,
-              onChanged: (_) {},
-              showThumb: false,
-            ),
+            child: StarrySlider(value: 40, onChanged: (_) {}, showThumb: false),
           ),
         ),
       );
       await tester.pumpAndSettle();
 
       final sliderTheme = tester.widget<SliderTheme>(
-        find.ancestor(
-          of: find.byType(Slider),
-          matching: find.byType(SliderTheme),
-        ).first,
+        find
+            .ancestor(
+              of: find.byType(Slider),
+              matching: find.byType(SliderTheme),
+            )
+            .first,
       );
       expect(sliderTheme.data.thumbColor, Colors.transparent);
       expect(sliderTheme.data.overlayColor, Colors.transparent);
@@ -92,10 +96,7 @@ void main() {
         _host(
           SizedBox(
             width: 360,
-            child: StarrySlider(
-              value: 40,
-              onChanged: (v) => changed = v,
-            ),
+            child: StarrySlider(value: 40, onChanged: (v) => changed = v),
           ),
         ),
       );
@@ -123,10 +124,12 @@ void main() {
       await tester.pumpAndSettle();
 
       final sliderTheme = tester.widget<SliderTheme>(
-        find.ancestor(
-          of: find.byType(Slider),
-          matching: find.byType(SliderTheme),
-        ).first,
+        find
+            .ancestor(
+              of: find.byType(Slider),
+              matching: find.byType(SliderTheme),
+            )
+            .first,
       );
       expect(sliderTheme.data.activeTrackColor, custom);
     });

@@ -27,7 +27,9 @@ BoxDecoration _cardSurfaceDecoration(WidgetTester tester, Finder root) {
 }
 
 void main() {
-  testWidgets('StarryMessageList renders items, title and badge', (tester) async {
+  testWidgets('StarryMessageList renders items, title and badge', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         StarryMessageList(
@@ -70,7 +72,9 @@ void main() {
     expect(find.text('Team'), findsOneWidget);
   });
 
-  testWidgets('StarryMessageList shows empty label when no items', (tester) async {
+  testWidgets('StarryMessageList shows empty label when no items', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         const StarryMessageList(
@@ -85,8 +89,9 @@ void main() {
     expect(find.byIcon(Icons.inbox), findsOneWidget);
   });
 
-  testWidgets('StarryMessageList reuses the shared surface primitive',
-      (tester) async {
+  testWidgets('StarryMessageList reuses the shared surface primitive', (
+    tester,
+  ) async {
     final tokens = StarryTokens.light;
     await tester.pumpWidget(
       _host(
@@ -122,14 +127,11 @@ void main() {
     expect(find.text('99+'), findsOneWidget);
   });
 
-  testWidgets('StarryBadge hides when count is zero and not a dot', (tester) async {
+  testWidgets('StarryBadge hides when count is zero and not a dot', (
+    tester,
+  ) async {
     await tester.pumpWidget(
-      _host(
-        const StarryBadge(
-          count: 0,
-          child: Icon(Icons.mail_outline),
-        ),
-      ),
+      _host(const StarryBadge(count: 0, child: Icon(Icons.mail_outline))),
     );
     await tester.pumpAndSettle();
 
@@ -177,13 +179,12 @@ void main() {
     expect(find.text('Selected'), findsOneWidget);
   });
 
-  testWidgets('StarryButton fires onPressed and exposes button semantics',
-      (tester) async {
+  testWidgets('StarryButton fires onPressed and exposes button semantics', (
+    tester,
+  ) async {
     var tapped = 0;
     await tester.pumpWidget(
-      _host(
-        StarryButton(label: '提交', onPressed: () => tapped++),
-      ),
+      _host(StarryButton(label: '提交', onPressed: () => tapped++)),
     );
     await tester.pumpAndSettle();
 
@@ -192,11 +193,11 @@ void main() {
     expect(tapped, 1);
   });
 
-  testWidgets('StarryButton is disabled when onPressed is null', (tester) async {
+  testWidgets('StarryButton is disabled when onPressed is null', (
+    tester,
+  ) async {
     await tester.pumpWidget(
-      _host(
-        const StarryButton(label: '禁用', onPressed: null),
-      ),
+      _host(const StarryButton(label: '禁用', onPressed: null)),
     );
     await tester.pumpAndSettle();
 
@@ -219,8 +220,9 @@ void main() {
     expect(tapped, 0);
   });
 
-  testWidgets('StarryButton renders every variant without error',
-      (tester) async {
+  testWidgets('StarryButton renders every variant without error', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         Wrap(
@@ -274,12 +276,11 @@ void main() {
     expect(value, isTrue);
   });
 
-  testWidgets('StarrySwitch is non-interactive when onChanged is null',
-      (tester) async {
+  testWidgets('StarrySwitch is non-interactive when onChanged is null', (
+    tester,
+  ) async {
     await tester.pumpWidget(
-      _host(
-        const StarrySwitch(value: true, onChanged: null),
-      ),
+      _host(const StarrySwitch(value: true, onChanged: null)),
     );
     await tester.pumpAndSettle();
 
@@ -311,9 +312,7 @@ void main() {
   testWidgets('StarryTextArea renders label and accepts input', (tester) async {
     final controller = TextEditingController();
     await tester.pumpWidget(
-      _host(
-        StarryTextArea(label: '备注', controller: controller),
-      ),
+      _host(StarryTextArea(label: '备注', controller: controller)),
     );
     await tester.pumpAndSettle();
 
@@ -321,12 +320,11 @@ void main() {
     expect(controller.text, '一些描述');
   });
 
-  testWidgets('StarryEmptyState renders title, message and default icon',
-      (tester) async {
+  testWidgets('StarryEmptyState renders title, message and default icon', (
+    tester,
+  ) async {
     await tester.pumpWidget(
-      _host(
-        const StarryEmptyState(title: '暂无数据', message: '这里空空如也'),
-      ),
+      _host(const StarryEmptyState(title: '暂无数据', message: '这里空空如也')),
     );
     await tester.pumpAndSettle();
 
@@ -335,8 +333,9 @@ void main() {
     expect(find.byIcon(Icons.inbox_outlined), findsOneWidget);
   });
 
-  testWidgets('StarryEmptyState uses custom icon and action when provided',
-      (tester) async {
+  testWidgets('StarryEmptyState uses custom icon and action when provided', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         StarryEmptyState(
@@ -354,15 +353,15 @@ void main() {
   });
 
   testWidgets('StarryLoadingIndicator renders a spinner', (tester) async {
-    await tester.pumpWidget(
-      _host(const StarryLoadingIndicator()),
-    );
+    await tester.pumpWidget(_host(const StarryLoadingIndicator()));
     await tester.pump();
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('StarryFullScreenLoadingIndicator renders message', (tester) async {
+  testWidgets('StarryFullScreenLoadingIndicator renders message', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _host(const StarryFullScreenLoadingIndicator(message: '加载中')),
     );
@@ -372,13 +371,10 @@ void main() {
     expect(find.text('加载中'), findsOneWidget);
   });
 
-  testWidgets('StarryPageWrapper wraps child in SafeArea with padding',
-      (tester) async {
-    await tester.pumpWidget(
-      _host(
-        const StarryPageWrapper(child: Text('内容')),
-      ),
-    );
+  testWidgets('StarryPageWrapper wraps child in SafeArea with padding', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_host(const StarryPageWrapper(child: Text('内容'))));
     await tester.pumpAndSettle();
 
     expect(find.text('内容'), findsOneWidget);
@@ -387,9 +383,7 @@ void main() {
 
   testWidgets('StarryPageWrapper omits SafeArea when disabled', (tester) async {
     await tester.pumpWidget(
-      _host(
-        const StarryPageWrapper(safeArea: false, child: Text('内容')),
-      ),
+      _host(const StarryPageWrapper(safeArea: false, child: Text('内容'))),
     );
     await tester.pumpAndSettle();
 
@@ -398,8 +392,9 @@ void main() {
     expect(find.byType(SafeArea), findsNothing);
   });
 
-  testWidgets('Starry looping animations build (enabled and disabled)',
-      (tester) async {
+  testWidgets('Starry looping animations build (enabled and disabled)', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         const Column(
@@ -423,8 +418,9 @@ void main() {
     expect(find.byIcon(Icons.favorite), findsOneWidget);
   });
 
-  testWidgets('StarryExpandableCard toggles children on header tap',
-      (tester) async {
+  testWidgets('StarryExpandableCard toggles children on header tap', (
+    tester,
+  ) async {
     var expanded = false;
     await tester.pumpWidget(
       _host(
@@ -464,11 +460,10 @@ void main() {
     expect(find.text('展开内容'), findsOneWidget);
   });
 
-  testWidgets('StarryCard renders the shared radius.lg + level2 surface',
-      (tester) async {
-    await tester.pumpWidget(
-      _host(const StarryCard(child: Text('卡片'))),
-    );
+  testWidgets('StarryCard renders the shared radius.lg + level2 surface', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_host(const StarryCard(child: Text('卡片'))));
     await tester.pumpAndSettle();
 
     final deco = _cardSurfaceDecoration(tester, find.byType(StarryCard));
@@ -479,177 +474,188 @@ void main() {
   });
 
   testWidgets(
-      'StarryExpandableCard header is a split 48-tall / 28-radius pill surface',
-      (tester) async {
-    await tester.pumpWidget(
-      _host(
-        const StarryExpandableCard(
-          header: Text('分区'),
-          children: <Widget>[Text('内容')],
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    final tokens = StarryTokens.light;
-    // The header pill is the first bordered surface. Its corner uses the same
-    // textfield invariant max(radius.xxl, controlHeight / 2) = 28, and it is
-    // pinned to controlHeight (48) tall — reading exactly like a single-line
-    // StarryTextField.
-    final headerDeco =
-        _cardSurfaceDecoration(tester, find.byType(StarryExpandableCard));
-    final expectedRadius = math.max(
-      tokens.radius.xxl,
-      tokens.controlMetrics.controlHeight / 2,
-    );
-    expect(headerDeco.borderRadius, BorderRadius.circular(expectedRadius));
-    expect((headerDeco.border! as Border).top.color, tokens.semantic.border);
-    expect(headerDeco.boxShadow, tokens.elevation.level2);
-
-    // Header is pinned to the single-line control height (48).
-    final headerBox = tester.widget<SizedBox>(
-      find
-          .descendant(
-            of: find.byType(StarryExpandableCard),
-            matching: find.byType(SizedBox),
-          )
-          .first,
-    );
-    expect(headerBox.height, tokens.controlMetrics.controlHeight);
-  });
-
-  testWidgets(
-      'StarryExpandableCard detaches a separate radius.xxl content panel when '
-      'expanded', (tester) async {
-    await tester.pumpWidget(
-      _host(
-        const StarryExpandableCard(
-          header: Text('分区'),
-          initiallyExpanded: true,
-          children: <Widget>[Text('内容')],
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    final tokens = StarryTokens.light;
-    // The expanded state exposes two distinct bordered surfaces: the header
-    // pill (28) and a detached content panel (radius.xxl = 28).
-    final decorations = tester
-        .widgetList<Container>(
-          find.descendant(
-            of: find.byType(StarryExpandableCard),
-            matching: find.byType(Container),
+    'StarryExpandableCard header is a split 48-tall / 28-radius pill surface',
+    (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const StarryExpandableCard(
+            header: Text('分区'),
+            children: <Widget>[Text('内容')],
           ),
-        )
-        .map((c) => c.decoration)
-        .whereType<BoxDecoration>()
-        .where((d) => d.border != null)
-        .toList();
-    final radii = decorations
-        .map((d) => d.borderRadius)
-        .whereType<BorderRadius>()
-        .toList();
-    final headerRadius = math.max(
-      tokens.radius.xxl,
-      tokens.controlMetrics.controlHeight / 2,
-    );
-    expect(radii, contains(BorderRadius.circular(headerRadius)));
-    expect(radii, contains(BorderRadius.circular(tokens.radius.xxl)));
-  });
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tokens = StarryTokens.light;
+      // The header pill is the first bordered surface. Its corner uses the same
+      // textfield invariant max(radius.xxl, controlHeight / 2) = 28, and it is
+      // pinned to controlHeight (48) tall — reading exactly like a single-line
+      // StarryTextField.
+      final headerDeco = _cardSurfaceDecoration(
+        tester,
+        find.byType(StarryExpandableCard),
+      );
+      final expectedRadius = math.max(
+        tokens.radius.xxl,
+        tokens.controlMetrics.controlHeight / 2,
+      );
+      expect(headerDeco.borderRadius, BorderRadius.circular(expectedRadius));
+      expect((headerDeco.border! as Border).top.color, tokens.semantic.border);
+      expect(headerDeco.boxShadow, tokens.elevation.level2);
+
+      // Header is pinned to the single-line control height (48).
+      final headerBox = tester.widget<SizedBox>(
+        find
+            .descendant(
+              of: find.byType(StarryExpandableCard),
+              matching: find.byType(SizedBox),
+            )
+            .first,
+      );
+      expect(headerBox.height, tokens.controlMetrics.controlHeight);
+    },
+  );
 
   testWidgets(
-      'StarryDropdown trigger is a 48-tall / 28-radius pill surface showing the '
-      'hint', (tester) async {
-    await tester.pumpWidget(
-      _host(
-        StarryDropdown<String>(
-          hint: '请选择',
-          items: const <StarryDropdownItem<String>>[
-            StarryDropdownItem<String>(value: 'a', label: '选项 A'),
-            StarryDropdownItem<String>(value: 'b', label: '选项 B'),
-          ],
-          onSelected: (_) {},
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    final tokens = StarryTokens.light;
-    // Collapsed: the hint shows and options are not laid out.
-    expect(find.text('请选择'), findsOneWidget);
-    expect(find.text('选项 A'), findsNothing);
-
-    // The trigger pill uses the same textfield invariant as the ExpandableCard
-    // header: max(radius.xxl, controlHeight / 2) = 28, pinned to controlHeight.
-    final triggerDeco =
-        _cardSurfaceDecoration(tester, find.byType(StarryDropdown<String>));
-    final expectedRadius = math.max(
-      tokens.radius.xxl,
-      tokens.controlMetrics.controlHeight / 2,
-    );
-    expect(triggerDeco.borderRadius, BorderRadius.circular(expectedRadius));
-    expect(triggerDeco.boxShadow, tokens.elevation.level2);
-
-    final triggerBox = tester.widget<SizedBox>(
-      find
-          .descendant(
-            of: find.byType(StarryDropdown<String>),
-            matching: find.byType(SizedBox),
-          )
-          .first,
-    );
-    expect(triggerBox.height, tokens.controlMetrics.controlHeight);
-  });
-
-  testWidgets(
-      'StarryDropdown expands an inline detached radius.xxl option panel',
-      (tester) async {
-    await tester.pumpWidget(
-      _host(
-        StarryDropdown<String>(
-          hint: '请选择',
-          initiallyExpanded: true,
-          items: const <StarryDropdownItem<String>>[
-            StarryDropdownItem<String>(value: 'a', label: '选项 A'),
-            StarryDropdownItem<String>(value: 'b', label: '选项 B'),
-          ],
-          onSelected: (_) {},
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    final tokens = StarryTokens.light;
-    // Both option rows are laid out inline (not in a floating overlay).
-    expect(find.text('选项 A'), findsOneWidget);
-    expect(find.text('选项 B'), findsOneWidget);
-
-    // The expanded state exposes two distinct bordered surfaces: the trigger
-    // pill (28) and a detached option panel (radius.xxl = 28).
-    final radii = tester
-        .widgetList<Container>(
-          find.descendant(
-            of: find.byType(StarryDropdown<String>),
-            matching: find.byType(Container),
+    'StarryExpandableCard detaches a separate radius.xxl content panel when '
+    'expanded',
+    (tester) async {
+      await tester.pumpWidget(
+        _host(
+          const StarryExpandableCard(
+            header: Text('分区'),
+            initiallyExpanded: true,
+            children: <Widget>[Text('内容')],
           ),
-        )
-        .map((c) => c.decoration)
-        .whereType<BoxDecoration>()
-        .where((d) => d.border != null)
-        .map((d) => d.borderRadius)
-        .whereType<BorderRadius>()
-        .toList();
-    final triggerRadius = math.max(
-      tokens.radius.xxl,
-      tokens.controlMetrics.controlHeight / 2,
-    );
-    expect(radii, contains(BorderRadius.circular(triggerRadius)));
-    expect(radii, contains(BorderRadius.circular(tokens.radius.xxl)));
-  });
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tokens = StarryTokens.light;
+      // The expanded state exposes two distinct bordered surfaces: the header
+      // pill (28) and a detached content panel (radius.xxl = 28).
+      final decorations = tester
+          .widgetList<Container>(
+            find.descendant(
+              of: find.byType(StarryExpandableCard),
+              matching: find.byType(Container),
+            ),
+          )
+          .map((c) => c.decoration)
+          .whereType<BoxDecoration>()
+          .where((d) => d.border != null)
+          .toList();
+      final radii = decorations
+          .map((d) => d.borderRadius)
+          .whereType<BorderRadius>()
+          .toList();
+      final headerRadius = math.max(
+        tokens.radius.xxl,
+        tokens.controlMetrics.controlHeight / 2,
+      );
+      expect(radii, contains(BorderRadius.circular(headerRadius)));
+      expect(radii, contains(BorderRadius.circular(tokens.radius.xxl)));
+    },
+  );
 
   testWidgets(
-      'StarryDropdown fills the trigger and collapses on select', (tester) async {
+    'StarryDropdown trigger is a 48-tall / 28-radius pill surface showing the '
+    'hint',
+    (tester) async {
+      await tester.pumpWidget(
+        _host(
+          StarryDropdown<String>(
+            hint: '请选择',
+            items: const <StarryDropdownItem<String>>[
+              StarryDropdownItem<String>(value: 'a', label: '选项 A'),
+              StarryDropdownItem<String>(value: 'b', label: '选项 B'),
+            ],
+            onSelected: (_) {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tokens = StarryTokens.light;
+      // Collapsed: the hint shows and options are not laid out.
+      expect(find.text('请选择'), findsOneWidget);
+      expect(find.text('选项 A'), findsNothing);
+
+      // The trigger pill uses the same textfield invariant as the ExpandableCard
+      // header: max(radius.xxl, controlHeight / 2) = 28, pinned to controlHeight.
+      final triggerDeco = _cardSurfaceDecoration(
+        tester,
+        find.byType(StarryDropdown<String>),
+      );
+      final expectedRadius = math.max(
+        tokens.radius.xxl,
+        tokens.controlMetrics.controlHeight / 2,
+      );
+      expect(triggerDeco.borderRadius, BorderRadius.circular(expectedRadius));
+      expect(triggerDeco.boxShadow, tokens.elevation.level2);
+
+      final triggerBox = tester.widget<SizedBox>(
+        find
+            .descendant(
+              of: find.byType(StarryDropdown<String>),
+              matching: find.byType(SizedBox),
+            )
+            .first,
+      );
+      expect(triggerBox.height, tokens.controlMetrics.controlHeight);
+    },
+  );
+
+  testWidgets(
+    'StarryDropdown expands an inline detached radius.xxl option panel',
+    (tester) async {
+      await tester.pumpWidget(
+        _host(
+          StarryDropdown<String>(
+            hint: '请选择',
+            initiallyExpanded: true,
+            items: const <StarryDropdownItem<String>>[
+              StarryDropdownItem<String>(value: 'a', label: '选项 A'),
+              StarryDropdownItem<String>(value: 'b', label: '选项 B'),
+            ],
+            onSelected: (_) {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tokens = StarryTokens.light;
+      // Both option rows are laid out inline (not in a floating overlay).
+      expect(find.text('选项 A'), findsOneWidget);
+      expect(find.text('选项 B'), findsOneWidget);
+
+      // The expanded state exposes two distinct bordered surfaces: the trigger
+      // pill (28) and a detached option panel (radius.xxl = 28).
+      final radii = tester
+          .widgetList<Container>(
+            find.descendant(
+              of: find.byType(StarryDropdown<String>),
+              matching: find.byType(Container),
+            ),
+          )
+          .map((c) => c.decoration)
+          .whereType<BoxDecoration>()
+          .where((d) => d.border != null)
+          .map((d) => d.borderRadius)
+          .whereType<BorderRadius>()
+          .toList();
+      final triggerRadius = math.max(
+        tokens.radius.xxl,
+        tokens.controlMetrics.controlHeight / 2,
+      );
+      expect(radii, contains(BorderRadius.circular(triggerRadius)));
+      expect(radii, contains(BorderRadius.circular(tokens.radius.xxl)));
+    },
+  );
+
+  testWidgets('StarryDropdown fills the trigger and collapses on select', (
+    tester,
+  ) async {
     String? selected;
     await tester.pumpWidget(
       MaterialApp(
@@ -660,18 +666,18 @@ void main() {
         home: Scaffold(
           body: Center(
             child: StatefulBuilder(
-          builder: (context, setState) {
-            return StarryDropdown<String>(
-              hint: '请选择',
-              value: selected,
-              initiallyExpanded: true,
-              items: const <StarryDropdownItem<String>>[
-                StarryDropdownItem<String>(value: 'a', label: '选项 A'),
-                StarryDropdownItem<String>(value: 'b', label: '选项 B'),
-              ],
-              onSelected: (v) => setState(() => selected = v),
-            );
-          },
+              builder: (context, setState) {
+                return StarryDropdown<String>(
+                  hint: '请选择',
+                  value: selected,
+                  initiallyExpanded: true,
+                  items: const <StarryDropdownItem<String>>[
+                    StarryDropdownItem<String>(value: 'a', label: '选项 A'),
+                    StarryDropdownItem<String>(value: 'b', label: '选项 B'),
+                  ],
+                  onSelected: (v) => setState(() => selected = v),
+                );
+              },
             ),
           ),
         ),
@@ -720,8 +726,9 @@ void main() {
   });
 
   group('StarryEmojiText', () {
-    testWidgets('splits emoji and text runs into separate styled spans',
-        (tester) async {
+    testWidgets('splits emoji and text runs into separate styled spans', (
+      tester,
+    ) async {
       await tester.pumpWidget(_host(const StarryEmojiText('AB👋CD')));
 
       final richText = tester.widget<RichText>(

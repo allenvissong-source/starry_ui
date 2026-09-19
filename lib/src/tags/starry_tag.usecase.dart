@@ -31,22 +31,24 @@ Widget playgroundStarryTag(BuildContext context) {
   return Padding(
     padding: EdgeInsets.all(t.spacing.s6),
     child: Container(
-      color: onMedia ? const Color(0xFF334155) : null, // hardcode-allow: 画廊演示用的深色媒体背板,仅为展示 onMedia 效果,非被消费的组件配色
+      color: onMedia
+          ? const Color(0xFF334155)
+          : null, // hardcode-allow: 画廊演示用的深色媒体背板,仅为展示 onMedia 效果,非被消费的组件配色
       padding: onMedia ? EdgeInsets.all(t.spacing.s4) : EdgeInsets.zero,
       child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        StarryTag(
-          label: context.knobs.string(label: 'Label', initialValue: '标签'),
-          status: context.knobs.object.dropdown<StarryTagStatus>(
-            label: 'Status',
-            options: StarryTagStatus.values,
-            labelBuilder: (v) => v.name,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          StarryTag(
+            label: context.knobs.string(label: 'Label', initialValue: '标签'),
+            status: context.knobs.object.dropdown<StarryTagStatus>(
+              label: 'Status',
+              options: StarryTagStatus.values,
+              labelBuilder: (v) => v.name,
+            ),
+            onMedia: onMedia,
           ),
-          onMedia: onMedia,
-        ),
-      ],
+        ],
       ),
     ),
   );

@@ -52,8 +52,7 @@ class _StarryMasonryCardState extends State<StarryMasonryCard> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
-    final radius =
-        widget.borderRadius ?? BorderRadius.circular(t.radius.lg);
+    final radius = widget.borderRadius ?? BorderRadius.circular(t.radius.lg);
 
     return MouseRegion(
       onEnter: (_) => _setHovered(true),

@@ -7,7 +7,11 @@ import 'starry_dock_bar.dart';
 import 'starry_round_action_button.dart';
 
 const List<StarryNavItem> _demoItems = <StarryNavItem>[
-  StarryNavItem(label: 'Home', icon: Icons.home_outlined, activeIcon: Icons.home),
+  StarryNavItem(
+    label: 'Home',
+    icon: Icons.home_outlined,
+    activeIcon: Icons.home,
+  ),
   StarryNavItem(
     label: 'Search',
     icon: Icons.search_outlined,

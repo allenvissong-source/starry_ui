@@ -45,8 +45,12 @@ Widget playgroundStarryAiButton(BuildContext context) {
   return Center(
     child: StarryAiButton(
       busy: context.knobs.boolean(label: 'Busy', initialValue: false),
-      size: context.knobs.double
-          .slider(label: 'Size', initialValue: 48, min: 32, max: 96),
+      size: context.knobs.double.slider(
+        label: 'Size',
+        initialValue: 48,
+        min: 32,
+        max: 96,
+      ),
       onTap: () {},
     ),
   );

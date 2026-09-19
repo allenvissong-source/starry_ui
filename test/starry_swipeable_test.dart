@@ -45,34 +45,37 @@ void main() {
       expect(find.text('row body'), findsOneWidget);
     });
 
-    testWidgets('swiping left reveals the action, tapping it fires and closes',
-        (tester) async {
-      var deleted = false;
-      await tester.pumpWidget(
-        _host(
-          SizedBox(
-            width: 320,
-            child: StarrySwipeable(
-              actions: _actions(tokens, onDelete: () => deleted = true),
-              child: const SizedBox(height: 60, child: Text('row body')),
+    testWidgets(
+      'swiping left reveals the action, tapping it fires and closes',
+      (tester) async {
+        var deleted = false;
+        await tester.pumpWidget(
+          _host(
+            SizedBox(
+              width: 320,
+              child: StarrySwipeable(
+                actions: _actions(tokens, onDelete: () => deleted = true),
+                child: const SizedBox(height: 60, child: Text('row body')),
+              ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      // Drag the content left far enough to open the action row.
-      await tester.drag(find.text('row body'), const Offset(-120, 0));
-      await tester.pumpAndSettle();
+        // Drag the content left far enough to open the action row.
+        await tester.drag(find.text('row body'), const Offset(-120, 0));
+        await tester.pumpAndSettle();
 
-      expect(find.text('删除'), findsOneWidget);
-      await tester.tap(find.text('删除'));
-      await tester.pumpAndSettle();
-      expect(deleted, isTrue);
-    });
+        expect(find.text('删除'), findsOneWidget);
+        await tester.tap(find.text('删除'));
+        await tester.pumpAndSettle();
+        expect(deleted, isTrue);
+      },
+    );
 
-    testWidgets('no actions disables swipe (action never appears)',
-        (tester) async {
+    testWidgets('no actions disables swipe (action never appears)', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           SizedBox(
@@ -93,8 +96,9 @@ void main() {
   });
 
   group('StarrySlidableDrawer', () {
-    testWidgets('delegates to StarrySwipeable and reveals inset action chips',
-        (tester) async {
+    testWidgets('delegates to StarrySwipeable and reveals inset action chips', (
+      tester,
+    ) async {
       var deleted = false;
       await tester.pumpWidget(
         _host(
@@ -102,10 +106,7 @@ void main() {
             width: 360,
             child: StarrySlidableDrawer(
               actions: _actions(tokens, onDelete: () => deleted = true),
-              child: const SizedBox(
-                height: 60,
-                child: Text('drawer body'),
-              ),
+              child: const SizedBox(height: 60, child: Text('drawer body')),
             ),
           ),
         ),

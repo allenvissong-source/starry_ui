@@ -416,7 +416,10 @@ void main() {
     ) async {
       await pumpPoppableSliver(
         tester,
-        const StarrySliverPageTopBar(titleText: 'Detail', showDefaultBack: true),
+        const StarrySliverPageTopBar(
+          titleText: 'Detail',
+          showDefaultBack: true,
+        ),
       );
       expect(find.byIcon(Icons.arrow_back_ios_new), findsOneWidget);
     });
@@ -426,7 +429,10 @@ void main() {
     ) async {
       await tester.pumpWidget(
         sliverHost(
-          const StarrySliverPageTopBar(titleText: 'Home', showDefaultBack: true),
+          const StarrySliverPageTopBar(
+            titleText: 'Home',
+            showDefaultBack: true,
+          ),
         ),
       );
       expect(find.byIcon(Icons.arrow_back_ios_new), findsNothing);

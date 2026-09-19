@@ -38,8 +38,7 @@ class StarrySlidableDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
-    final chipRadius =
-        actionBorderRadius ?? BorderRadius.circular(t.radius.lg);
+    final chipRadius = actionBorderRadius ?? BorderRadius.circular(t.radius.lg);
     return StarrySwipeable(
       actions: actions,
       onTap: onTap,

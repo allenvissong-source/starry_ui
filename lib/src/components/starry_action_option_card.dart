@@ -49,16 +49,9 @@ class StarryActionOptionCard extends StatelessWidget {
         Container(
           width: t.spacing.s10,
           height: t.spacing.s10,
-          decoration: BoxDecoration(
-            color: s.brand,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: s.brand, shape: BoxShape.circle),
           alignment: Alignment.center,
-          child: Icon(
-            icon,
-            size: t.controlMetrics.iconLg,
-            color: s.onBrand,
-          ),
+          child: Icon(icon, size: t.controlMetrics.iconLg, color: s.onBrand),
         ),
         SizedBox(width: t.spacing.s4),
         Expanded(

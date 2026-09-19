@@ -268,7 +268,6 @@ class _SubDivider extends StatelessWidget {
   }
 }
 
-
 /// Shared page scaffold: paints the poster canvas edge-to-edge (no seam),
 /// then centers the section column within a comfortable max width so every
 /// foundation page reads as one centered poster instead of a left-stretched

@@ -30,9 +30,6 @@ Widget playgroundStarryLoadingIndicator(BuildContext context) {
 @UseCase(name: 'Full Screen', type: StarryFullScreenLoadingIndicator)
 Widget fullScreenStarryLoadingIndicator(BuildContext context) {
   return StarryFullScreenLoadingIndicator(
-    message: context.knobs.stringOrNull(
-      label: 'Message',
-      initialValue: '加载中…',
-    ),
+    message: context.knobs.stringOrNull(label: 'Message', initialValue: '加载中…'),
   );
 }

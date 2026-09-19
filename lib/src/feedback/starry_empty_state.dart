@@ -40,10 +40,7 @@ class StarryEmptyState extends StatelessWidget {
           children: <Widget>[
             if (icon != null)
               IconTheme(
-                data: IconThemeData(
-                  color: s.textTertiary,
-                  size: t.spacing.s16,
-                ),
+                data: IconThemeData(color: s.textTertiary, size: t.spacing.s16),
                 child: icon!,
               )
             else

@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:starry_ui/starry_ui.dart';
 
 Widget _host(Widget child) => MaterialApp(
-      theme: AppTheme.light(),
-      home: Scaffold(body: Center(child: child)),
-    );
+  theme: AppTheme.light(),
+  home: Scaffold(body: Center(child: child)),
+);
 
 StarryTokens _tokens(WidgetTester tester, Finder anchor) {
   final ctx = tester.element(anchor);
@@ -17,10 +17,12 @@ void main() {
   group('StarryMediaStage', () {
     testWidgets('uses the given aspectRatio', (tester) async {
       await tester.pumpWidget(
-        _host(const StarryMediaStage(
-          aspectRatio: 1.5,
-          child: ColoredBox(color: Colors.blue),
-        )),
+        _host(
+          const StarryMediaStage(
+            aspectRatio: 1.5,
+            child: ColoredBox(color: Colors.blue),
+          ),
+        ),
       );
       final ar = tester.widget<AspectRatio>(
         find.descendant(
@@ -33,10 +35,12 @@ void main() {
 
     testWidgets('normalizes non-positive aspectRatio to 1', (tester) async {
       await tester.pumpWidget(
-        _host(const StarryMediaStage(
-          aspectRatio: 0,
-          child: ColoredBox(color: Colors.blue),
-        )),
+        _host(
+          const StarryMediaStage(
+            aspectRatio: 0,
+            child: ColoredBox(color: Colors.blue),
+          ),
+        ),
       );
       final ar = tester.widget<AspectRatio>(
         find.descendant(
@@ -49,10 +53,12 @@ void main() {
 
     testWidgets('no overlay → no scrim gradient container', (tester) async {
       await tester.pumpWidget(
-        _host(const StarryMediaStage(
-          aspectRatio: 1,
-          child: ColoredBox(color: Colors.blue),
-        )),
+        _host(
+          const StarryMediaStage(
+            aspectRatio: 1,
+            child: ColoredBox(color: Colors.blue),
+          ),
+        ),
       );
       final gradients = tester
           .widgetList<Container>(
@@ -61,20 +67,25 @@ void main() {
               matching: find.byType(Container),
             ),
           )
-          .where((c) =>
-              c.decoration is BoxDecoration &&
-              (c.decoration! as BoxDecoration).gradient != null);
+          .where(
+            (c) =>
+                c.decoration is BoxDecoration &&
+                (c.decoration! as BoxDecoration).gradient != null,
+          );
       expect(gradients, isEmpty);
     });
 
-    testWidgets('overlay renders over a transparent → mediaOverlayEnd scrim',
-        (tester) async {
+    testWidgets('overlay renders over a transparent → mediaOverlayEnd scrim', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const StarryMediaStage(
-          aspectRatio: 1,
-          overlay: Text('LIVE'),
-          child: ColoredBox(color: Colors.blue),
-        )),
+        _host(
+          const StarryMediaStage(
+            aspectRatio: 1,
+            overlay: Text('LIVE'),
+            child: ColoredBox(color: Colors.blue),
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryMediaStage));
       expect(
@@ -91,9 +102,11 @@ void main() {
               matching: find.byType(Container),
             ),
           )
-          .firstWhere((c) =>
-              c.decoration is BoxDecoration &&
-              (c.decoration! as BoxDecoration).gradient != null);
+          .firstWhere(
+            (c) =>
+                c.decoration is BoxDecoration &&
+                (c.decoration! as BoxDecoration).gradient != null,
+          );
       final gradient =
           (container.decoration! as BoxDecoration).gradient! as LinearGradient;
       expect(gradient.begin, Alignment.topCenter);
@@ -102,8 +115,9 @@ void main() {
       expect(gradient.colors.last, t.semantic.mediaOverlayEnd);
     });
 
-    testWidgets('brightnessAnimation drives a ColorFiltered media layer',
-        (tester) async {
+    testWidgets('brightnessAnimation drives a ColorFiltered media layer', (
+      tester,
+    ) async {
       final controller = AnimationController(
         vsync: const TestVSync(),
         duration: const Duration(seconds: 1),
@@ -111,11 +125,13 @@ void main() {
       addTearDown(controller.dispose);
 
       await tester.pumpWidget(
-        _host(StarryMediaStage(
-          aspectRatio: 1,
-          brightnessAnimation: controller,
-          child: const ColoredBox(color: Colors.blue),
-        )),
+        _host(
+          StarryMediaStage(
+            aspectRatio: 1,
+            brightnessAnimation: controller,
+            child: const ColoredBox(color: Colors.blue),
+          ),
+        ),
       );
       expect(
         find.descendant(
@@ -126,13 +142,16 @@ void main() {
       );
     });
 
-    testWidgets('no brightnessAnimation → no ColorFiltered layer',
-        (tester) async {
+    testWidgets('no brightnessAnimation → no ColorFiltered layer', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const StarryMediaStage(
-          aspectRatio: 1,
-          child: ColoredBox(color: Colors.blue),
-        )),
+        _host(
+          const StarryMediaStage(
+            aspectRatio: 1,
+            child: ColoredBox(color: Colors.blue),
+          ),
+        ),
       );
       expect(
         find.descendant(
@@ -158,8 +177,9 @@ void main() {
       );
     }
 
-    testWidgets('composes StarryPressScale + a single shadow layer',
-        (tester) async {
+    testWidgets('composes StarryPressScale + a single shadow layer', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(const StarryMasonryCard(child: SizedBox(width: 40, height: 40))),
       );
@@ -180,8 +200,9 @@ void main() {
       expect(hoverScaleFinder(tester), findsOneWidget);
     });
 
-    testWidgets('at rest: scale 1.0 and elevation.level2 shadow',
-        (tester) async {
+    testWidgets('at rest: scale 1.0 and elevation.level2 shadow', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(const StarryMasonryCard(child: SizedBox(width: 40, height: 40))),
       );
@@ -198,15 +219,15 @@ void main() {
       expect(deco.boxShadow, t.elevation.level2);
     });
 
-    testWidgets('hover: scales up to 1.01 and lifts to elevation.level3',
-        (tester) async {
+    testWidgets('hover: scales up to 1.01 and lifts to elevation.level3', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(const StarryMasonryCard(child: SizedBox(width: 40, height: 40))),
       );
       final t = _tokens(tester, find.byType(StarryMasonryCard));
 
-      final gesture =
-          await tester.createGesture(kind: PointerDeviceKind.mouse);
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
       await gesture.addPointer(location: Offset.zero);
       addTearDown(gesture.removePointer);
       await tester.pump();
@@ -228,10 +249,12 @@ void main() {
     testWidgets('onTap fires', (tester) async {
       var taps = 0;
       await tester.pumpWidget(
-        _host(StarryMasonryCard(
-          onTap: () => taps++,
-          child: const SizedBox(width: 40, height: 40),
-        )),
+        _host(
+          StarryMasonryCard(
+            onTap: () => taps++,
+            child: const SizedBox(width: 40, height: 40),
+          ),
+        ),
       );
       await tester.tap(find.byType(StarryMasonryCard));
       await tester.pump();
@@ -240,17 +263,20 @@ void main() {
   });
 
   group('StarryMetricButton — activeColor', () {
-    testWidgets('activeColor overrides the active ink (icon + count)',
-        (tester) async {
+    testWidgets('activeColor overrides the active ink (icon + count)', (
+      tester,
+    ) async {
       const heart = Color(0xFFEF4444);
       await tester.pumpWidget(
-        _host(const StarryMetricButton(
-          icon: Icons.favorite,
-          count: 3,
-          semanticLabel: 'like',
-          active: true,
-          activeColor: heart,
-        )),
+        _host(
+          const StarryMetricButton(
+            icon: Icons.favorite,
+            count: 3,
+            semanticLabel: 'like',
+            active: true,
+            activeColor: heart,
+          ),
+        ),
       );
       final icon = tester.widget<Icon>(
         find.descendant(
@@ -268,16 +294,19 @@ void main() {
       expect(text.style!.color, heart);
     });
 
-    testWidgets('activeColor is ignored when inactive (follows tone)',
-        (tester) async {
+    testWidgets('activeColor is ignored when inactive (follows tone)', (
+      tester,
+    ) async {
       const heart = Color(0xFFEF4444);
       await tester.pumpWidget(
-        _host(const StarryMetricButton(
-          icon: Icons.favorite_border,
-          count: 3,
-          semanticLabel: 'like',
-          activeColor: heart,
-        )),
+        _host(
+          const StarryMetricButton(
+            icon: Icons.favorite_border,
+            count: 3,
+            semanticLabel: 'like',
+            activeColor: heart,
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryMetricButton));
       final icon = tester.widget<Icon>(
@@ -289,15 +318,18 @@ void main() {
       expect(icon.color, t.semantic.textSecondary);
     });
 
-    testWidgets('null activeColor + active on surface tone → brand ink',
-        (tester) async {
+    testWidgets('null activeColor + active on surface tone → brand ink', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const StarryMetricButton(
-          icon: Icons.thumb_up,
-          count: 3,
-          semanticLabel: 'like',
-          active: true,
-        )),
+        _host(
+          const StarryMetricButton(
+            icon: Icons.thumb_up,
+            count: 3,
+            semanticLabel: 'like',
+            active: true,
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryMetricButton));
       final icon = tester.widget<Icon>(

@@ -374,15 +374,14 @@ class _WindowsControlButtonState extends State<_WindowsControlButton> {
               // opaque fill on the Material above. Scoping the overlay to the
               // pressed state keeps those layers untouched and stacks the MD3
               // pressed step (statePressed) over them instead.
-              overlayColor:
-                  WidgetStateProperty.resolveWith<Color?>((states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return tokens.semantic.textPrimary.withValues(
-                        alpha: tokens.opacity.statePressed,
-                      );
-                    }
-                    return Colors.transparent;
-                  }),
+              overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+                if (states.contains(WidgetState.pressed)) {
+                  return tokens.semantic.textPrimary.withValues(
+                    alpha: tokens.opacity.statePressed,
+                  );
+                }
+                return Colors.transparent;
+              }),
               child: Icon(
                 switch (widget.kind) {
                   _WindowControlKind.minimize => Icons.minimize,
@@ -426,7 +425,8 @@ class _MacControlButtonState extends State<_MacControlButton> {
     final tokens = Theme.of(context).extension<StarryTokens>()!;
     // Reduced motion: mirror StarryMasterDetailLayout._duration so the dot
     // reveal / glyph fade switch state on the next frame instead of animating.
-    final reduceMotion = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    final reduceMotion =
+        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
     final duration = reduceMotion ? Duration.zero : tokens.motion.durationShort;
     final fill = switch (widget.kind) {
       _WindowControlKind.close => tokens.semantic.error,
@@ -454,15 +454,14 @@ class _MacControlButtonState extends State<_MacControlButton> {
               focusColor: Colors.transparent,
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              overlayColor:
-                  WidgetStateProperty.resolveWith<Color?>((states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return tokens.semantic.textPrimary.withValues(
-                        alpha: tokens.opacity.statePressed,
-                      );
-                    }
-                    return Colors.transparent;
-                  }),
+              overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+                if (states.contains(WidgetState.pressed)) {
+                  return tokens.semantic.textPrimary.withValues(
+                    alpha: tokens.opacity.statePressed,
+                  );
+                }
+                return Colors.transparent;
+              }),
               child: Center(
                 child: AnimatedContainer(
                   duration: duration,

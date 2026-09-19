@@ -5,13 +5,14 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 import '../theme/starry_tokens.dart';
 import 'starry_dropdown.dart';
 
-const List<StarryDropdownItem<String>> _demoItems = <StarryDropdownItem<String>>[
-  StarryDropdownItem<String>(value: 'a', label: '选项 A'),
-  StarryDropdownItem<String>(value: 'b', label: '选项 B'),
-  StarryDropdownItem<String>(value: 'c', label: '选项 C'),
-  StarryDropdownItem<String>(value: 'd', label: '选项 D'),
-  StarryDropdownItem<String>(value: 'e', label: '选项 E'),
-];
+const List<StarryDropdownItem<String>> _demoItems =
+    <StarryDropdownItem<String>>[
+      StarryDropdownItem<String>(value: 'a', label: '选项 A'),
+      StarryDropdownItem<String>(value: 'b', label: '选项 B'),
+      StarryDropdownItem<String>(value: 'c', label: '选项 C'),
+      StarryDropdownItem<String>(value: 'd', label: '选项 D'),
+      StarryDropdownItem<String>(value: 'e', label: '选项 E'),
+    ];
 
 @UseCase(name: 'All States', type: StarryDropdown)
 Widget allStatesStarryDropdown(BuildContext context) {
@@ -53,8 +54,10 @@ Widget playgroundStarryDropdown(BuildContext context) {
     padding: EdgeInsets.all(t.spacing.s6),
     child: _StatefulDropdownDemo(
       hint: context.knobs.string(label: 'Hint', initialValue: '请选择'),
-      initiallyExpanded:
-          context.knobs.boolean(label: 'Initially expanded', initialValue: false),
+      initiallyExpanded: context.knobs.boolean(
+        label: 'Initially expanded',
+        initialValue: false,
+      ),
       items: _demoItems,
     ),
   );

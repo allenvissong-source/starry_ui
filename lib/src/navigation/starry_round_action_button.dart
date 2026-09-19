@@ -86,7 +86,9 @@ class StarryRoundActionButton extends StatelessWidget {
                 isSelected: focused,
                 borderRadius: BorderRadius.circular(size / 2),
                 selectedColor: Colors.transparent,
-                selectedShadow: <BoxShadow>[BoxShadow(color: resolvedFocusRing)],
+                selectedShadow: <BoxShadow>[
+                  BoxShadow(color: resolvedFocusRing),
+                ],
                 selectedBorderColor: resolvedFocusRing,
                 child: InkWell(
                   key: const Key('starry-round-action-button'),

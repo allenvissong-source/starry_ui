@@ -25,8 +25,7 @@ class _SwitchDemoState extends State<_SwitchDemo> {
     return StarrySwitch(
       value: _value,
       label: widget.label,
-      onChanged:
-          widget.enabled ? (v) => setState(() => _value = v) : null,
+      onChanged: widget.enabled ? (v) => setState(() => _value = v) : null,
     );
   }
 }
@@ -41,11 +40,15 @@ Widget playgroundStarrySwitch(BuildContext context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _SwitchDemo(
-          initial:
-              context.knobs.boolean(label: 'Initial value', initialValue: true),
+          initial: context.knobs.boolean(
+            label: 'Initial value',
+            initialValue: true,
+          ),
           enabled: context.knobs.boolean(label: 'Enabled', initialValue: true),
-          label:
-              context.knobs.stringOrNull(label: 'Label', initialValue: '接收通知'),
+          label: context.knobs.stringOrNull(
+            label: 'Label',
+            initialValue: '接收通知',
+          ),
         ),
       ],
     ),

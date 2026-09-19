@@ -19,9 +19,7 @@ Widget _host(Widget child) {
   return MaterialApp(
     theme: AppTheme.light(),
     home: Scaffold(
-      body: Center(
-        child: SizedBox(width: 320, child: child),
-      ),
+      body: Center(child: SizedBox(width: 320, child: child)),
     ),
   );
 }
@@ -38,9 +36,9 @@ Widget _host(Widget child) {
   final shape = deco.shape as RoundedRectangleBorder;
   final radius = (shape.borderRadius.resolve(TextDirection.ltr)).topLeft.x;
 
-  final element = containerFinder
-      .evaluate()
-      .firstWhere((e) => (e.widget as AnimatedContainer).decoration is ShapeDecoration);
+  final element = containerFinder.evaluate().firstWhere(
+    (e) => (e.widget as AnimatedContainer).decoration is ShapeDecoration,
+  );
   final box = element.renderObject! as RenderBox;
   return (radius: radius, height: box.size.height);
 }
@@ -50,14 +48,11 @@ void main() {
   final fixedRadius = tokens.radius.xxl; // 28
 
   group('StarryTextField shape invariant', () {
-    testWidgets('single line clamps to a full pill (radius >= height / 2)',
-        (tester) async {
+    testWidgets('single line clamps to a full pill (radius >= height / 2)', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(
-          const StarryTextField(
-            hint: 'single line',
-          ),
-        ),
+        _host(const StarryTextField(hint: 'single line')),
       );
       await tester.pumpAndSettle();
 
@@ -75,15 +70,12 @@ void main() {
       );
     });
 
-    testWidgets('multi line stays a fixed radius.xxl rounded rectangle',
-        (tester) async {
+    testWidgets('multi line stays a fixed radius.xxl rounded rectangle', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(
-          const StarryTextField(
-            hint: 'multi line',
-            minLines: 5,
-            maxLines: 5,
-          ),
+          const StarryTextField(hint: 'multi line', minLines: 5, maxLines: 5),
         ),
       );
       await tester.pumpAndSettle();

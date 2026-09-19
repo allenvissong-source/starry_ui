@@ -51,7 +51,9 @@ Widget onMediaStarryMetricButton(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
   return Center(
     child: Container(
-      color: const Color(0xFF334155), // hardcode-allow: 画廊演示用的深色媒体背板,仅展示 onMedia 效果,非被消费的组件配色
+      color: const Color(
+        0xFF334155,
+      ), // hardcode-allow: 画廊演示用的深色媒体背板,仅展示 onMedia 效果,非被消费的组件配色
       padding: EdgeInsets.all(t.spacing.s6),
       child: StarryMetricButton(
         icon: Icons.favorite,

@@ -21,20 +21,24 @@ Widget _swatch(BuildContext context, String label, Widget layer) {
 Widget allStatesStarryStateLayer(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
   Widget base(Widget child) => DecoratedBox(
-        decoration: BoxDecoration(
-          color: t.semantic.surface,
-          borderRadius: BorderRadius.circular(t.radius.md),
-          border: Border.all(color: t.semantic.border),
-        ),
-        child: child,
-      );
+    decoration: BoxDecoration(
+      color: t.semantic.surface,
+      borderRadius: BorderRadius.circular(t.radius.md),
+      border: Border.all(color: t.semantic.border),
+    ),
+    child: child,
+  );
   return Padding(
     padding: EdgeInsets.all(t.spacing.s10),
     child: Wrap(
       spacing: t.spacing.s10,
       runSpacing: t.spacing.s10,
       children: <Widget>[
-        _swatch(context, 'rest', const StarryStateLayer(child: SizedBox.expand())),
+        _swatch(
+          context,
+          'rest',
+          const StarryStateLayer(child: SizedBox.expand()),
+        ),
         _swatch(
           context,
           'hover',
@@ -89,8 +93,14 @@ Widget playgroundStarryStateLayer(BuildContext context) {
   final focused = context.knobs.boolean(label: 'Focused', initialValue: false);
   final pressed = context.knobs.boolean(label: 'Pressed', initialValue: false);
   final dragged = context.knobs.boolean(label: 'Dragged', initialValue: false);
-  final disabled = context.knobs.boolean(label: 'Disabled', initialValue: false);
-  final selected = context.knobs.boolean(label: 'Selected', initialValue: false);
+  final disabled = context.knobs.boolean(
+    label: 'Disabled',
+    initialValue: false,
+  );
+  final selected = context.knobs.boolean(
+    label: 'Selected',
+    initialValue: false,
+  );
   return Center(
     child: SizedBox(
       width: 120,

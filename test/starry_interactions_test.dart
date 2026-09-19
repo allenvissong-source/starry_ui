@@ -13,39 +13,41 @@ void main() {
   final tokens = StarryTokens.light;
 
   group('StarryPressScale', () {
-    testWidgets('rests at scale 1.0 and settles to pressedScale on press down',
-        (tester) async {
-      await tester.pumpWidget(
-        _host(
-          const StarryPressScale(
-            child: SizedBox(
-              width: 80,
-              height: 48,
-              child: ColoredBox(color: Color(0xFF000000)),
+    testWidgets(
+      'rests at scale 1.0 and settles to pressedScale on press down',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(
+            const StarryPressScale(
+              child: SizedBox(
+                width: 80,
+                height: 48,
+                child: ColoredBox(color: Color(0xFF000000)),
+              ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      AnimatedScale scaleOf() => tester.widget<AnimatedScale>(
-            find.descendant(
-              of: find.byType(StarryPressScale),
-              matching: find.byType(AnimatedScale),
-            ),
-          );
-      expect(scaleOf().scale, 1.0);
+        AnimatedScale scaleOf() => tester.widget<AnimatedScale>(
+          find.descendant(
+            of: find.byType(StarryPressScale),
+            matching: find.byType(AnimatedScale),
+          ),
+        );
+        expect(scaleOf().scale, 1.0);
 
-      final gesture = await tester.startGesture(
-        tester.getCenter(find.byType(StarryPressScale)),
-      );
-      await tester.pump();
-      expect(scaleOf().scale, tokens.motion.pressedScale);
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.byType(StarryPressScale)),
+        );
+        await tester.pump();
+        expect(scaleOf().scale, tokens.motion.pressedScale);
 
-      await gesture.up();
-      await tester.pumpAndSettle();
-      expect(scaleOf().scale, 1.0);
-    });
+        await gesture.up();
+        await tester.pumpAndSettle();
+        expect(scaleOf().scale, 1.0);
+      },
+    );
 
     testWidgets('invokes onTap', (tester) async {
       var taps = 0;
@@ -77,8 +79,9 @@ void main() {
       return c.decoration! as BoxDecoration;
     }
 
-    testWidgets('selected paints surface fill + brand border + level2',
-        (tester) async {
+    testWidgets('selected paints surface fill + brand border + level2', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const StarrySelectedHighlight(
@@ -97,8 +100,9 @@ void main() {
       expect(deco.borderRadius, BorderRadius.circular(tokens.radius.lg));
     });
 
-    testWidgets('rest is fully transparent at equal border width',
-        (tester) async {
+    testWidgets('rest is fully transparent at equal border width', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const StarrySelectedHighlight(

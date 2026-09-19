@@ -23,9 +23,9 @@ class StarryReferenceCard extends StatelessWidget {
     this.onTap,
     this.onRemove,
   }) : assert(
-          coverUrl == null || coverImage == null,
-          'Provide either coverUrl or coverImage, not both.',
-        );
+         coverUrl == null || coverImage == null,
+         'Provide either coverUrl or coverImage, not both.',
+       );
 
   final String title;
   final String description;
@@ -76,9 +76,9 @@ class StarryReferenceCard extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: t.typography.labelMedium.textStyle
                                     .copyWith(
-                                  color: s.textPrimary,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                      color: s.textPrimary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
                             ),
                             if ((typeLabel ?? '').trim().isNotEmpty) ...[
@@ -110,8 +110,9 @@ class StarryReferenceCard extends StatelessWidget {
       ),
     );
 
-    final tappableCard =
-        onTap == null ? card : StarryPressScale(onTap: onTap, child: card);
+    final tappableCard = onTap == null
+        ? card
+        : StarryPressScale(onTap: onTap, child: card);
 
     if (onRemove == null) return tappableCard;
 

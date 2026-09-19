@@ -33,7 +33,9 @@ Widget mediaStarryAssetCard(BuildContext context) {
           title: 'Mountain vista',
           emptyIcon: Icons.image_outlined,
           onTap: () {},
-          media: const ColoredBox(color: Color(0xFF6B8CB0)), // hardcode-allow: Widgetbook 演示用占位色块，代表业务图片媒体，非设计语义色
+          media: const ColoredBox(
+            color: Color(0xFF6B8CB0),
+          ), // hardcode-allow: Widgetbook 演示用占位色块，代表业务图片媒体，非设计语义色
         ),
       ),
     ),

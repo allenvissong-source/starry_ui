@@ -47,14 +47,19 @@ Widget playgroundStarrySearchInput(BuildContext context) {
     child: StarrySearchInput(
       hint: context.knobs.string(label: 'Hint', initialValue: 'Search'),
       enabled: context.knobs.boolean(label: 'Enabled', initialValue: true),
-      showClearButton:
-          context.knobs.boolean(label: 'Clear button', initialValue: true),
-      debounceMs: context.knobs.doubleOrNull.slider(
-            label: 'Debounce (ms)',
-            initialValue: 300,
-            min: 0,
-            max: 1000,
-          )?.round() ??
+      showClearButton: context.knobs.boolean(
+        label: 'Clear button',
+        initialValue: true,
+      ),
+      debounceMs:
+          context.knobs.doubleOrNull
+              .slider(
+                label: 'Debounce (ms)',
+                initialValue: 300,
+                min: 0,
+                max: 1000,
+              )
+              ?.round() ??
           300,
       searchButtonText: withButton ? 'Search' : null,
       onSearch: withButton ? () {} : null,

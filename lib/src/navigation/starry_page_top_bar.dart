@@ -491,7 +491,8 @@ class _AnimatedActionIcon extends StatelessWidget {
       _ => 0,
     };
     final double turns = switch (motion) {
-      StarryTopBarIconMotion.plusHoverRotate => hovered ? _kPlusHoverTurns : 0.0,
+      StarryTopBarIconMotion.plusHoverRotate =>
+        hovered ? _kPlusHoverTurns : 0.0,
       _ => 0.0,
     };
 

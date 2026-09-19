@@ -12,9 +12,9 @@ import 'package:starry_ui/starry_ui.dart';
 // shader-asset version mismatch that breaks tap-based InkWell tests.
 
 Widget _host(Widget child) => MaterialApp(
-      theme: AppTheme.light(),
-      home: Scaffold(body: Center(child: child)),
-    );
+  theme: AppTheme.light(),
+  home: Scaffold(body: Center(child: child)),
+);
 
 StarryTokens _tokens(WidgetTester tester, Finder anchor) {
   final ctx = tester.element(anchor);
@@ -23,8 +23,9 @@ StarryTokens _tokens(WidgetTester tester, Finder anchor) {
 
 void main() {
   group('StarryButton — pressScale + layout', () {
-    testWidgets('layout enum has inline + stacked, inline is the default',
-        (tester) async {
+    testWidgets('layout enum has inline + stacked, inline is the default', (
+      tester,
+    ) async {
       expect(StarryButtonLayout.values, <StarryButtonLayout>[
         StarryButtonLayout.inline,
         StarryButtonLayout.stacked,
@@ -37,8 +38,9 @@ void main() {
       expect(b.pressScale, isFalse);
     });
 
-    testWidgets('inline (default) lays icon + label in a Row, no Column',
-        (tester) async {
+    testWidgets('inline (default) lays icon + label in a Row, no Column', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(StarryButton(label: 'A', icon: Icons.add, onPressed: () {})),
       );
@@ -60,12 +62,14 @@ void main() {
 
     testWidgets('stacked lays icon above label in a Column', (tester) async {
       await tester.pumpWidget(
-        _host(StarryButton(
-          label: 'A',
-          icon: Icons.add,
-          layout: StarryButtonLayout.stacked,
-          onPressed: () {},
-        )),
+        _host(
+          StarryButton(
+            label: 'A',
+            icon: Icons.add,
+            layout: StarryButtonLayout.stacked,
+            onPressed: () {},
+          ),
+        ),
       );
       final column = find.descendant(
         of: find.byType(StarryButton),
@@ -82,22 +86,25 @@ void main() {
       );
     });
 
-    testWidgets('pressScale wraps the button in the shared pressable AnimatedScale',
-        (tester) async {
-      await tester.pumpWidget(
-        _host(StarryButton(label: 'Go', pressScale: true, onPressed: () {})),
-      );
-      final scale = find.descendant(
-        of: find.byType(StarryButton),
-        matching: find.byType(AnimatedScale),
-      );
-      expect(scale, findsOneWidget);
-      // At rest the shared pressable scale is 1.0.
-      expect(tester.widget<AnimatedScale>(scale).scale, 1.0);
-    });
+    testWidgets(
+      'pressScale wraps the button in the shared pressable AnimatedScale',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(StarryButton(label: 'Go', pressScale: true, onPressed: () {})),
+        );
+        final scale = find.descendant(
+          of: find.byType(StarryButton),
+          matching: find.byType(AnimatedScale),
+        );
+        expect(scale, findsOneWidget);
+        // At rest the shared pressable scale is 1.0.
+        expect(tester.widget<AnimatedScale>(scale).scale, 1.0);
+      },
+    );
 
-    testWidgets('pressScale=false renders no AnimatedScale wrapper',
-        (tester) async {
+    testWidgets('pressScale=false renders no AnimatedScale wrapper', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(StarryButton(label: 'Go', onPressed: () {})),
       );
@@ -123,9 +130,12 @@ void main() {
       );
     });
 
-    testWidgets('pill defaults to true — default button is a StadiumBorder',
-        (tester) async {
-      await tester.pumpWidget(_host(StarryButton(label: 'Go', onPressed: () {})));
+    testWidgets('pill defaults to true — default button is a StadiumBorder', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(StarryButton(label: 'Go', onPressed: () {})),
+      );
       final b = tester.widget<StarryButton>(find.byType(StarryButton));
       expect(b.pill, isTrue);
       final btn = tester.widget<TextButton>(
@@ -139,8 +149,9 @@ void main() {
       expect(shape, isA<StadiumBorder>());
     });
 
-    testWidgets('pill:false renders a radius.md rounded rectangle',
-        (tester) async {
+    testWidgets('pill:false renders a radius.md rounded rectangle', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(StarryButton(label: 'Go', pill: false, onPressed: () {})),
       );
@@ -153,35 +164,33 @@ void main() {
       );
       final shape =
           btn.style!.shape!.resolve(<WidgetState>{}) as RoundedRectangleBorder;
-      expect(
-        shape.borderRadius,
-        BorderRadius.circular(t.radius.md),
-      );
+      expect(shape.borderRadius, BorderRadius.circular(t.radius.md));
     });
   });
 
   group('StarryIconButton — selected', () {
     testWidgets('selected defaults to false', (tester) async {
       await tester.pumpWidget(
-        _host(StarryIconButton(
-          icon: Icons.star,
-          tooltip: 'Star',
-          onPressed: () {},
-        )),
+        _host(
+          StarryIconButton(icon: Icons.star, tooltip: 'Star', onPressed: () {}),
+        ),
       );
-      final b =
-          tester.widget<StarryIconButton>(find.byType(StarryIconButton));
+      final b = tester.widget<StarryIconButton>(find.byType(StarryIconButton));
       expect(b.selected, isFalse);
     });
 
-    testWidgets('selected uses the brand / onBrand active pair', (tester) async {
+    testWidgets('selected uses the brand / onBrand active pair', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryIconButton(
-          icon: Icons.bookmark,
-          tooltip: 'Bookmark',
-          selected: true,
-          onPressed: () {},
-        )),
+        _host(
+          StarryIconButton(
+            icon: Icons.bookmark,
+            tooltip: 'Bookmark',
+            selected: true,
+            onPressed: () {},
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryIconButton));
       final material = tester.widget<Material>(
@@ -200,16 +209,19 @@ void main() {
       expect(icon.color, t.semantic.onBrand);
     });
 
-    testWidgets('selected wins over variant (filledTonal still reads active)',
-        (tester) async {
+    testWidgets('selected wins over variant (filledTonal still reads active)', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryIconButton(
-          icon: Icons.bookmark,
-          tooltip: 'Bookmark',
-          variant: StarryIconButtonVariant.filledTonal,
-          selected: true,
-          onPressed: () {},
-        )),
+        _host(
+          StarryIconButton(
+            icon: Icons.bookmark,
+            tooltip: 'Bookmark',
+            variant: StarryIconButtonVariant.filledTonal,
+            selected: true,
+            onPressed: () {},
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryIconButton));
       final material = tester.widget<Material>(
@@ -223,12 +235,14 @@ void main() {
 
     testWidgets('selected is surfaced to assistive tech', (tester) async {
       await tester.pumpWidget(
-        _host(StarryIconButton(
-          icon: Icons.bookmark,
-          tooltip: 'Bookmark',
-          selected: true,
-          onPressed: () {},
-        )),
+        _host(
+          StarryIconButton(
+            icon: Icons.bookmark,
+            tooltip: 'Bookmark',
+            selected: true,
+            onPressed: () {},
+          ),
+        ),
       );
       final semantics = tester
           .widgetList<Semantics>(
@@ -256,14 +270,12 @@ void main() {
           .firstWhere((c) => c.decoration is BoxDecoration);
       final radius = (container.decoration! as BoxDecoration).borderRadius!
           .resolve(TextDirection.ltr);
-      expect(
-        radius.topLeft.x,
-        t.controlMetrics.heightXs / 2,
-      );
+      expect(radius.topLeft.x, t.controlMetrics.heightXs / 2);
     });
 
-    testWidgets('pill=false uses the radius.md rounded rectangle',
-        (tester) async {
+    testWidgets('pill=false uses the radius.md rounded rectangle', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(const StarryChip(label: 'CN +86', pill: false)),
       );
@@ -283,10 +295,9 @@ void main() {
 
     testWidgets('trailing widget renders after the label', (tester) async {
       await tester.pumpWidget(
-        _host(const StarryChip(
-          label: 'CN +86',
-          trailing: Icon(Icons.expand_more),
-        )),
+        _host(
+          const StarryChip(label: 'CN +86', trailing: Icon(Icons.expand_more)),
+        ),
       );
       expect(
         find.descendant(
@@ -299,8 +310,9 @@ void main() {
   });
 
   group('StarryTag — onMedia', () {
-    testWidgets('onMedia defaults to false (tinted status surface)',
-        (tester) async {
+    testWidgets('onMedia defaults to false (tinted status surface)', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(const StarryTag(label: 'NEW', status: StarryTagStatus.success)),
       );
@@ -315,41 +327,49 @@ void main() {
       expect(deco.color, t.semantic.successBg);
     });
 
-    testWidgets('onMedia uses a translucent white scrim + light bold xs label',
-        (tester) async {
-      await tester.pumpWidget(
-        _host(const StarryTag(label: 'VIDEO', onMedia: true)),
-      );
-      final t = _tokens(tester, find.byType(StarryTag));
-      final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(StarryTag),
-          matching: find.byType(Container),
-        ),
-      );
-      final deco = container.decoration! as BoxDecoration;
-      expect(deco.color, Colors.white.withValues(alpha: t.opacity.mediaScrim));
+    testWidgets(
+      'onMedia uses a translucent white scrim + light bold xs label',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(const StarryTag(label: 'VIDEO', onMedia: true)),
+        );
+        final t = _tokens(tester, find.byType(StarryTag));
+        final container = tester.widget<Container>(
+          find.descendant(
+            of: find.byType(StarryTag),
+            matching: find.byType(Container),
+          ),
+        );
+        final deco = container.decoration! as BoxDecoration;
+        expect(
+          deco.color,
+          Colors.white.withValues(alpha: t.opacity.mediaScrim),
+        );
 
-      final text = tester.widget<Text>(
-        find.descendant(
-          of: find.byType(StarryTag),
-          matching: find.byType(Text),
-        ),
-      );
-      expect(text.style!.color, Colors.white);
-      expect(text.style!.fontWeight, FontWeight.w700);
-      // xs == labelSmall (one step below the default bodySmall).
-      expect(text.style!.fontSize, t.typography.labelSmall.size);
-    });
+        final text = tester.widget<Text>(
+          find.descendant(
+            of: find.byType(StarryTag),
+            matching: find.byType(Text),
+          ),
+        );
+        expect(text.style!.color, Colors.white);
+        expect(text.style!.fontWeight, FontWeight.w700);
+        // xs == labelSmall (one step below the default bodySmall).
+        expect(text.style!.fontSize, t.typography.labelSmall.size);
+      },
+    );
 
-    testWidgets('onMedia ignores status (always the neutral scrim)',
-        (tester) async {
+    testWidgets('onMedia ignores status (always the neutral scrim)', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const StarryTag(
-          label: 'VIDEO',
-          status: StarryTagStatus.error,
-          onMedia: true,
-        )),
+        _host(
+          const StarryTag(
+            label: 'VIDEO',
+            status: StarryTagStatus.error,
+            onMedia: true,
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryTag));
       final container = tester.widget<Container>(

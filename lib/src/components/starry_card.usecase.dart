@@ -50,7 +50,11 @@ Widget allStatesStarryCard(BuildContext context) {
         SizedBox(height: t.spacing.s4),
         StarryCard(
           onTap: () {},
-          child: _content(context, 'Interactive card', 'Keyboard and tap ready.'),
+          child: _content(
+            context,
+            'Interactive card',
+            'Keyboard and tap ready.',
+          ),
         ),
       ],
     ),
@@ -68,13 +72,18 @@ Widget playgroundStarryCard(BuildContext context) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         StarryCard(
-          elevated: context.knobs.boolean(label: 'Elevated', initialValue: true),
+          elevated: context.knobs.boolean(
+            label: 'Elevated',
+            initialValue: true,
+          ),
           onTap: interactive ? () {} : null,
           child: _content(
             context,
             context.knobs.string(label: 'Title', initialValue: 'Card title'),
-            context.knobs
-                .string(label: 'Body', initialValue: 'Card body content.'),
+            context.knobs.string(
+              label: 'Body',
+              initialValue: 'Card body content.',
+            ),
           ),
         ),
       ],

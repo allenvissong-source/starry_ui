@@ -70,7 +70,10 @@ Widget playgroundStarryNavigationPane(BuildContext context) {
     max: 360,
   );
   return Center(
-    child: SizedBox(width: width, child: _Demo(selected: selected)),
+    child: SizedBox(
+      width: width,
+      child: _Demo(selected: selected),
+    ),
   );
 }
 

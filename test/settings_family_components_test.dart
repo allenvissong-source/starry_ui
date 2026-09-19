@@ -10,8 +10,9 @@ Widget _host(Widget child) {
 }
 
 void main() {
-  testWidgets('StarrySettingsTile.navigation renders and fires onTap',
-      (tester) async {
+  testWidgets('StarrySettingsTile.navigation renders and fires onTap', (
+    tester,
+  ) async {
     var tapped = 0;
     await tester.pumpWidget(
       _host(
@@ -50,8 +51,7 @@ void main() {
     expect(value, isTrue);
   });
 
-  testWidgets('StarryGroupCard renders children with dividers',
-      (tester) async {
+  testWidgets('StarryGroupCard renders children with dividers', (tester) async {
     await tester.pumpWidget(
       _host(
         StarryGroupCard(
@@ -84,8 +84,9 @@ void main() {
     expect(tapped, 1);
   });
 
-  testWidgets('StarrySectionHeader renders title, description and child',
-      (tester) async {
+  testWidgets('StarrySectionHeader renders title, description and child', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         const StarrySectionHeader(
@@ -112,8 +113,9 @@ void main() {
     expect(find.text('高级'), findsOneWidget);
   });
 
-  testWidgets('StarryAssetCard empty state renders icon and title, taps',
-      (tester) async {
+  testWidgets('StarryAssetCard empty state renders icon and title, taps', (
+    tester,
+  ) async {
     var tapped = 0;
     await tester.pumpWidget(
       _host(
@@ -135,8 +137,9 @@ void main() {
     expect(tapped, 1);
   });
 
-  testWidgets('StarryReferenceCard renders title, typeLabel and remove',
-      (tester) async {
+  testWidgets('StarryReferenceCard renders title, typeLabel and remove', (
+    tester,
+  ) async {
     var removed = 0;
     await tester.pumpWidget(
       _host(
@@ -160,8 +163,7 @@ void main() {
     expect(removed, 1);
   });
 
-  testWidgets('StarrySegmentedControl switches segments (N=4)',
-      (tester) async {
+  testWidgets('StarrySegmentedControl switches segments (N=4)', (tester) async {
     var index = 0;
     await tester.pumpWidget(
       _host(

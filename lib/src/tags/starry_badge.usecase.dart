@@ -18,10 +18,7 @@ Widget allVariantsStarryBadge(BuildContext context) {
           count: 3,
           child: Icon(Icons.notifications_outlined, size: 32),
         ),
-        StarryBadge(
-          count: 128,
-          child: Icon(Icons.mail_outline, size: 32),
-        ),
+        StarryBadge(count: 128, child: Icon(Icons.mail_outline, size: 32)),
         StarryBadge(
           showDot: true,
           child: Icon(Icons.chat_bubble_outline, size: 32),

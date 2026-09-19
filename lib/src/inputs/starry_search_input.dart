@@ -145,16 +145,16 @@ class _StarrySearchInputState extends State<StarrySearchInput>
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
       builder: (context, value, _) {
-        final canClear = widget.showClearButton &&
-            widget.enabled &&
-            value.text.isNotEmpty;
+        final canClear =
+            widget.showClearButton && widget.enabled && value.text.isNotEmpty;
         // The clear button is the rightmost affordance only when no trailing
         // search button follows it. When it is last, pull it out of the shell's
         // end padding so its icon centers on the pill's round end.
         final hasSearchButton =
             widget.onSearch != null && widget.searchButtonText != null;
         final clearIsLast = canClear && !hasSearchButton;
-        final nudge = StarryInputShell.endCapNudge(t) *
+        final nudge =
+            StarryInputShell.endCapNudge(t) *
             (Directionality.of(context) == TextDirection.rtl ? -1 : 1);
         return StarryInputShell(
           focused: isFocused,
@@ -164,8 +164,9 @@ class _StarrySearchInputState extends State<StarrySearchInput>
           // With a real-width trailing button, collapse the end padding to the
           // concentric gap so the button nests inside the pill by real layout
           // (AGENTS.md §1.5.2) — no translate, no overflow.
-          trailingPadding:
-              hasSearchButton ? StarryInputShell.concentricGap(t) : null,
+          trailingPadding: hasSearchButton
+              ? StarryInputShell.concentricGap(t)
+              : null,
           child: Row(
             children: <Widget>[
               Icon(
@@ -186,18 +187,19 @@ class _StarrySearchInputState extends State<StarrySearchInput>
                     textInputAction: TextInputAction.search,
                     onSubmitted: _handleSubmit,
                     textAlignVertical: TextAlignVertical.center,
-                    style: t.typography.bodyMedium.textStyle
-                        .copyWith(color: s.textPrimary),
+                    style: t.typography.bodyMedium.textStyle.copyWith(
+                      color: s.textPrimary,
+                    ),
                     decoration: InputDecoration(
                       isCollapsed: true,
                       border: InputBorder.none,
                       hintText: widget.hint,
-                      hintStyle: t.typography.bodyMedium.textStyle
-                          .copyWith(
+                      hintStyle: t.typography.bodyMedium.textStyle.copyWith(
                         color: widget.soft ? s.textSecondary : s.textDisabled,
                       ),
-                      contentPadding:
-                          EdgeInsets.symmetric(vertical: t.spacing.s3),
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: t.spacing.s3,
+                      ),
                     ),
                   ),
                 ),
@@ -205,28 +207,29 @@ class _StarrySearchInputState extends State<StarrySearchInput>
               if (canClear)
                 StarryFieldClearButton(
                   onPressed: _handleClear,
-                  tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+                  tooltip: MaterialLocalizations.of(
+                    context,
+                  ).deleteButtonTooltip,
                   translateX: clearIsLast ? nudge : 0,
                 ),
-              if (hasSearchButton)
-                ...<Widget>[
-                  SizedBox(width: t.spacing.s2),
-                  // Concentric capsule-in-capsule (AGENTS.md §1.5.2): inner
-                  // height = interiorHeight − 2·gap (interior frame, inside the
-                  // 2px focus border), StadiumBorder ⇒ inner radius =
-                  // interiorHeight/2 − gap, sharing the shell's inner centers.
-                  // The shell's `trailingPadding` (= gap) places it. The
-                  // `.concentric` factory binds this reduced height to
-                  // shrinkWrap, so its layout box stays 36 and can't inflate the
-                  // pill past controlHeight — keeping all four visible gaps a
-                  // uniform `gap` (§1.5.2). The default constructor cannot take
-                  // a height, so this asymmetry trap is unrepresentable.
-                  StarryButton.concentric(
-                    label: widget.searchButtonText!,
-                    height: StarryInputShell.concentricInnerHeight(t),
-                    onPressed: widget.enabled ? widget.onSearch : null,
-                  ),
-                ],
+              if (hasSearchButton) ...<Widget>[
+                SizedBox(width: t.spacing.s2),
+                // Concentric capsule-in-capsule (AGENTS.md §1.5.2): inner
+                // height = interiorHeight − 2·gap (interior frame, inside the
+                // 2px focus border), StadiumBorder ⇒ inner radius =
+                // interiorHeight/2 − gap, sharing the shell's inner centers.
+                // The shell's `trailingPadding` (= gap) places it. The
+                // `.concentric` factory binds this reduced height to
+                // shrinkWrap, so its layout box stays 36 and can't inflate the
+                // pill past controlHeight — keeping all four visible gaps a
+                // uniform `gap` (§1.5.2). The default constructor cannot take
+                // a height, so this asymmetry trap is unrepresentable.
+                StarryButton.concentric(
+                  label: widget.searchButtonText!,
+                  height: StarryInputShell.concentricInnerHeight(t),
+                  onPressed: widget.enabled ? widget.onSearch : null,
+                ),
+              ],
             ],
           ),
         );

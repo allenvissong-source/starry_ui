@@ -730,13 +730,15 @@ abstract final class StarryControlMetricsTokens {
 /// track the active theme.
 abstract final class StarrySemanticControlMetrics {
   /// Height of a single-line interactive control (input field / capsule).
-  static const double singleLineControlHeight = StarryControlMetricsTokens.heightLg;
+  static const double singleLineControlHeight =
+      StarryControlMetricsTokens.heightLg;
 
   /// Icon size rendered inside a control.
   static const double controlIconSize = StarryControlMetricsTokens.iconMd;
 
   /// Border width for the focused/active state.
-  static const double activeBorderWidth = StarryControlMetricsTokens.borderThick;
+  static const double activeBorderWidth =
+      StarryControlMetricsTokens.borderThick;
 
   /// Thickness of a chrome divider line. Independent from any border-width
   /// role: a divider is a separator, not a control border — the equal value is

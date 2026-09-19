@@ -87,7 +87,9 @@ class _FormatterExampleRow extends StatelessWidget {
         ),
         Text(
           '→',
-          style: t.typography.bodySmall.textStyle.copyWith(color: s.textTertiary),
+          style: t.typography.bodySmall.textStyle.copyWith(
+            color: s.textTertiary,
+          ),
         ),
         SizedBox(width: t.spacing.s2),
         Text(

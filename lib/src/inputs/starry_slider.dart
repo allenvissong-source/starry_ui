@@ -45,12 +45,12 @@ class StarrySlider extends StatelessWidget {
     this.inactiveTrackColor,
     this.thumbColor,
     this.overlayColor,
-  })  : assert(min <= max, 'min must be <= max'),
-        assert(
-          secondaryTrackValue == null ||
-              (secondaryTrackValue >= min && secondaryTrackValue <= max),
-          'secondaryTrackValue must be within [min, max]',
-        );
+  }) : assert(min <= max, 'min must be <= max'),
+       assert(
+         secondaryTrackValue == null ||
+             (secondaryTrackValue >= min && secondaryTrackValue <= max),
+         'secondaryTrackValue must be within [min, max]',
+       );
 
   /// Height of the slider track.
   static const double trackHeight = 8;
@@ -103,10 +103,12 @@ class StarrySlider extends StatelessWidget {
     final s = t.semantic;
 
     final effectiveValue = value.clamp(min, max).toDouble();
-    final effectiveSecondaryTrackValue =
-        secondaryTrackValue?.clamp(min, max).toDouble();
+    final effectiveSecondaryTrackValue = secondaryTrackValue
+        ?.clamp(min, max)
+        .toDouble();
 
-    final titleStyle = titleTextStyle ??
+    final titleStyle =
+        titleTextStyle ??
         t.typography.titleSmall.textStyle.copyWith(
           color: s.textPrimary,
           fontWeight: FontWeight.w500,
@@ -122,8 +124,9 @@ class StarrySlider extends StatelessWidget {
 
     final resolvedActiveTrackColor = activeTrackColor ?? s.brand;
     final resolvedInactiveTrackColor = inactiveTrackColor ?? s.surfaceVariant;
-    final resolvedThumbColor =
-        showThumb ? (thumbColor ?? s.surface) : Colors.transparent;
+    final resolvedThumbColor = showThumb
+        ? (thumbColor ?? s.surface)
+        : Colors.transparent;
     final resolvedOverlayColor = showThumb
         ? (overlayColor ?? s.brand.withValues(alpha: t.opacity.selectedSurface))
         : Colors.transparent;
@@ -133,8 +136,9 @@ class StarrySlider extends StatelessWidget {
             elevation: thumbElevation,
           )
         : const RoundSliderThumbShape(enabledThumbRadius: 0, elevation: 0);
-    final resolvedDisabledTrackColor =
-        showThumb ? null : resolvedInactiveTrackColor;
+    final resolvedDisabledTrackColor = showThumb
+        ? null
+        : resolvedInactiveTrackColor;
 
     final slider = SliderTheme(
       data: SliderTheme.of(context).copyWith(
@@ -181,33 +185,33 @@ class StarrySlider extends StatelessWidget {
             resolvedValueText != null ||
             headerTrailing != null) ...[
           Row(
-          children: [
-            if (title != null)
-              Expanded(child: Text(title!, style: titleStyle))
-            else
-              const Spacer(),
-            if (headerTrailing != null) ...[
-              headerTrailing!,
-              SizedBox(width: t.spacing.s2),
+            children: [
+              if (title != null)
+                Expanded(child: Text(title!, style: titleStyle))
+              else
+                const Spacer(),
+              if (headerTrailing != null) ...[
+                headerTrailing!,
+                SizedBox(width: t.spacing.s2),
+              ],
+              if (resolvedValueText != null)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: t.spacing.s3,
+                    vertical: t.spacing.s1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: s.surfaceVariant,
+                    borderRadius: BorderRadius.circular(t.radius.full),
+                    border: Border.all(color: s.border),
+                  ),
+                  child: Text(
+                    resolvedValueText,
+                    semanticsLabel: valueSemanticsLabel,
+                    style: valueStyle,
+                  ),
+                ),
             ],
-            if (resolvedValueText != null)
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: t.spacing.s3,
-                  vertical: t.spacing.s1,
-                ),
-                decoration: BoxDecoration(
-                  color: s.surfaceVariant,
-                  borderRadius: BorderRadius.circular(t.radius.full),
-                  border: Border.all(color: s.border),
-                ),
-                child: Text(
-                  resolvedValueText,
-                  semanticsLabel: valueSemanticsLabel,
-                  style: valueStyle,
-                ),
-              ),
-          ],
           ),
           SizedBox(height: t.spacing.s3),
         ],

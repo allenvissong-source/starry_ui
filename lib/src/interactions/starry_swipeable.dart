@@ -125,8 +125,10 @@ class _StarrySwipeableState extends State<StarrySwipeable>
     if (!_isSwipeEnabled) {
       return;
     }
-    final shouldOpen = _dragExtent < -_maxDrag / 2 ||
-        (details.primaryVelocity ?? 0) < -StarrySwipeable.swipeVelocityThreshold;
+    final shouldOpen =
+        _dragExtent < -_maxDrag / 2 ||
+        (details.primaryVelocity ?? 0) <
+            -StarrySwipeable.swipeVelocityThreshold;
     _animateTo(shouldOpen ? -_maxDrag : 0);
   }
 
@@ -160,7 +162,9 @@ class _StarrySwipeableState extends State<StarrySwipeable>
     final content = Transform.translate(
       offset: Offset(_dragExtent, 0),
       child: GestureDetector(
-        onHorizontalDragUpdate: _isSwipeEnabled ? _onHorizontalDragUpdate : null,
+        onHorizontalDragUpdate: _isSwipeEnabled
+            ? _onHorizontalDragUpdate
+            : null,
         onHorizontalDragEnd: _isSwipeEnabled ? _onHorizontalDragEnd : null,
         onTap: widget.onTap,
         child: widget.child,

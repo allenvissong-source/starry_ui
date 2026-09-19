@@ -32,7 +32,9 @@ Widget allDensitiesStarryIdentityRow(BuildContext context) {
           name: 'Regular header',
           subtitle: '@regular',
           avatarFallbackText: 'RH',
-          badges: <Widget>[StarryTag(label: 'AI', status: StarryTagStatus.accent)],
+          badges: <Widget>[
+            StarryTag(label: 'AI', status: StarryTagStatus.accent),
+          ],
           trailing: Icon(Icons.chevron_right),
         ),
       ],
@@ -43,7 +45,10 @@ Widget allDensitiesStarryIdentityRow(BuildContext context) {
 @UseCase(name: 'Playground', type: StarryIdentityRow)
 Widget playgroundStarryIdentityRow(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
-  final hasSubtitle = context.knobs.boolean(label: 'Subtitle', initialValue: true);
+  final hasSubtitle = context.knobs.boolean(
+    label: 'Subtitle',
+    initialValue: true,
+  );
   return Padding(
     padding: EdgeInsets.all(t.spacing.s6),
     child: StarryIdentityRow(

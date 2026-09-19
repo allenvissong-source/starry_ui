@@ -38,7 +38,10 @@ Widget disabledStarryActionOptionCard(BuildContext context) {
 @UseCase(name: 'Playground', type: StarryActionOptionCard)
 Widget playgroundStarryActionOptionCard(BuildContext context) {
   final enabled = context.knobs.boolean(label: 'Enabled', initialValue: true);
-  final title = context.knobs.string(label: 'Title', initialValue: 'Import assets');
+  final title = context.knobs.string(
+    label: 'Title',
+    initialValue: 'Import assets',
+  );
   final description = context.knobs.string(
     label: 'Description',
     initialValue: 'Bring in files from your device.',

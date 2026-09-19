@@ -57,21 +57,25 @@ class StarrySelectedHighlight extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
-    final resolvedRadius =
-        borderRadius ?? BorderRadius.circular(t.radius.lg);
+    final resolvedRadius = borderRadius ?? BorderRadius.circular(t.radius.lg);
     final border = isSelected
         ? StarryControlShell.activeBorderSide(
             context,
             color: selectedBorderColor,
           )
-        : BorderSide(color: Colors.transparent, width: t.controlMetrics.focusBorderWidth);
+        : BorderSide(
+            color: Colors.transparent,
+            width: t.controlMetrics.focusBorderWidth,
+          );
 
     return AnimatedContainer(
       duration: t.motion.durationShort,
       curve: StarryControlShell.pressCurve,
       padding: padding,
       decoration: BoxDecoration(
-        color: isSelected ? (selectedColor ?? t.semantic.surface) : Colors.transparent,
+        color: isSelected
+            ? (selectedColor ?? t.semantic.surface)
+            : Colors.transparent,
         borderRadius: resolvedRadius,
         boxShadow: isSelected ? (selectedShadow ?? t.elevation.level2) : null,
         border: Border.fromBorderSide(border),

@@ -333,11 +333,7 @@ class _StarrySettingsTileState extends State<StarrySettingsTile> {
                           : t.spacing.s16 - t.spacing.s2,
                       right: t.spacing.s4,
                     ),
-                    child: Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: s.border,
-                    ),
+                    child: Divider(height: 1, thickness: 1, color: s.border),
                   ),
               ],
             ),

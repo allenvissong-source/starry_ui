@@ -271,7 +271,7 @@ class _StarrySliverPageTopBarDelegate extends SliverPersistentHeaderDelegate {
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       DefaultTextStyle(
-        style: topBarTitleStyle(context),
+                        style: topBarTitleStyle(context),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         child: titleWidget ?? const SizedBox.shrink(),

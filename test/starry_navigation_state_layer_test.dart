@@ -17,31 +17,33 @@ void main() {
       expect(StarryStateLayer.resolve(tokens), isNull);
     });
 
-    test('hover / focus / pressed / dragged map to the matching opacity step',
-        () {
-      final base = tokens.semantic.textPrimary;
-      expect(
-        StarryStateLayer.resolve(tokens, hovered: true)!.a,
-        closeTo(tokens.opacity.stateHover, 1e-6),
-      );
-      expect(
-        StarryStateLayer.resolve(tokens, focused: true)!.a,
-        closeTo(tokens.opacity.stateFocus, 1e-6),
-      );
-      expect(
-        StarryStateLayer.resolve(tokens, pressed: true)!.a,
-        closeTo(tokens.opacity.statePressed, 1e-6),
-      );
-      expect(
-        StarryStateLayer.resolve(tokens, dragged: true)!.a,
-        closeTo(tokens.opacity.stateDragged, 1e-6),
-      );
-      // All neutral overlays use the textPrimary base RGB.
-      final hover = StarryStateLayer.resolve(tokens, hovered: true)!;
-      expect(hover.r, closeTo(base.r, 1e-6));
-      expect(hover.g, closeTo(base.g, 1e-6));
-      expect(hover.b, closeTo(base.b, 1e-6));
-    });
+    test(
+      'hover / focus / pressed / dragged map to the matching opacity step',
+      () {
+        final base = tokens.semantic.textPrimary;
+        expect(
+          StarryStateLayer.resolve(tokens, hovered: true)!.a,
+          closeTo(tokens.opacity.stateHover, 1e-6),
+        );
+        expect(
+          StarryStateLayer.resolve(tokens, focused: true)!.a,
+          closeTo(tokens.opacity.stateFocus, 1e-6),
+        );
+        expect(
+          StarryStateLayer.resolve(tokens, pressed: true)!.a,
+          closeTo(tokens.opacity.statePressed, 1e-6),
+        );
+        expect(
+          StarryStateLayer.resolve(tokens, dragged: true)!.a,
+          closeTo(tokens.opacity.stateDragged, 1e-6),
+        );
+        // All neutral overlays use the textPrimary base RGB.
+        final hover = StarryStateLayer.resolve(tokens, hovered: true)!;
+        expect(hover.r, closeTo(base.r, 1e-6));
+        expect(hover.g, closeTo(base.g, 1e-6));
+        expect(hover.b, closeTo(base.b, 1e-6));
+      },
+    );
 
     test('priority is pressed > dragged > focused > hovered', () {
       final all = StarryStateLayer.resolve(
@@ -76,8 +78,11 @@ void main() {
     });
 
     test('selected uses the brand base color', () {
-      final selected =
-          StarryStateLayer.resolve(tokens, hovered: true, selected: true)!;
+      final selected = StarryStateLayer.resolve(
+        tokens,
+        hovered: true,
+        selected: true,
+      )!;
       expect(selected.r, closeTo(tokens.semantic.brand.r, 1e-6));
       expect(selected.g, closeTo(tokens.semantic.brand.g, 1e-6));
       expect(selected.b, closeTo(tokens.semantic.brand.b, 1e-6));
@@ -154,13 +159,14 @@ void main() {
 
   group('StarryDockBar', () {
     List<StarryNavItem> items() => const <StarryNavItem>[
-          StarryNavItem(label: 'Home', icon: Icons.home),
-          StarryNavItem(label: 'Search', icon: Icons.search),
-          StarryNavItem(label: 'Me', icon: Icons.person),
-        ];
+      StarryNavItem(label: 'Home', icon: Icons.home),
+      StarryNavItem(label: 'Search', icon: Icons.search),
+      StarryNavItem(label: 'Me', icon: Icons.person),
+    ];
 
-    testWidgets('renders all tabs and reports the tapped index',
-        (tester) async {
+    testWidgets('renders all tabs and reports the tapped index', (
+      tester,
+    ) async {
       var tapped = -1;
       await tester.pumpWidget(
         _host(
@@ -181,16 +187,11 @@ void main() {
       expect(tapped, 1);
     });
 
-    testWidgets('selected tab tints brand; rest tints textSecondary',
-        (tester) async {
+    testWidgets('selected tab tints brand; rest tints textSecondary', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(
-          StarryDockBar(
-            items: items(),
-            currentIndex: 0,
-            onTap: (_) {},
-          ),
-        ),
+        _host(StarryDockBar(items: items(), currentIndex: 0, onTap: (_) {})),
       );
       await tester.pumpAndSettle();
 
@@ -201,8 +202,9 @@ void main() {
       expect(restIcon.color, tokens.semantic.textSecondary);
     });
 
-    testWidgets('renders the leading affordance before the pill',
-        (tester) async {
+    testWidgets('renders the leading affordance before the pill', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           StarryDockBar(

@@ -23,11 +23,11 @@ class StarrySegmentedControl extends StatelessWidget {
     this.selectedColor,
     this.selectedTextColor,
     this.unselectedTextColor,
-  })  : assert(labels.length >= 2, 'labels must have at least 2 segments'),
-        assert(
-          selectedIndex >= 0 && selectedIndex < labels.length,
-          'selectedIndex must be within labels bounds',
-        );
+  }) : assert(labels.length >= 2, 'labels must have at least 2 segments'),
+       assert(
+         selectedIndex >= 0 && selectedIndex < labels.length,
+         'selectedIndex must be within labels bounds',
+       );
 
   final List<String> labels;
   final int selectedIndex;
@@ -58,12 +58,11 @@ class StarrySegmentedControl extends StatelessWidget {
 
     final effectiveHeight = height ?? t.controlMetrics.controlHeight;
     final effectiveBorderColor = borderColor ?? s.brand;
-    final effectiveSeparatorColor = separatorColor ??
-        s.brand.withValues(alpha: t.opacity.accentSurface);
+    final effectiveSeparatorColor =
+        separatorColor ?? s.brand.withValues(alpha: t.opacity.accentSurface);
     final effectiveSelectedColor = selectedColor ?? s.brand;
     final effectiveSelectedTextColor = selectedTextColor ?? s.onBrand;
-    final effectiveUnselectedTextColor =
-        unselectedTextColor ?? s.textSecondary;
+    final effectiveUnselectedTextColor = unselectedTextColor ?? s.textSecondary;
     final textStyle = t.typography.labelMedium.textStyle;
 
     return Container(

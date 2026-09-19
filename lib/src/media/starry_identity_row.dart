@@ -73,14 +73,20 @@ class StarryIdentityRow extends StatelessWidget {
   TextStyle _nameStyle(StarryTokens t) {
     switch (density) {
       case StarryIdentityDensity.feed:
-        return t.typography.labelMedium.textStyle
-            .copyWith(color: t.semantic.textPrimary, fontWeight: FontWeight.w600);
+        return t.typography.labelMedium.textStyle.copyWith(
+          color: t.semantic.textPrimary,
+          fontWeight: FontWeight.w600,
+        );
       case StarryIdentityDensity.compact:
-        return t.typography.bodyMedium.textStyle
-            .copyWith(color: t.semantic.textPrimary, fontWeight: FontWeight.w600);
+        return t.typography.bodyMedium.textStyle.copyWith(
+          color: t.semantic.textPrimary,
+          fontWeight: FontWeight.w600,
+        );
       case StarryIdentityDensity.regular:
-        return t.typography.bodyMedium.textStyle
-            .copyWith(color: t.semantic.textPrimary, fontWeight: FontWeight.w700);
+        return t.typography.bodyMedium.textStyle.copyWith(
+          color: t.semantic.textPrimary,
+          fontWeight: FontWeight.w700,
+        );
     }
   }
 
@@ -136,8 +142,9 @@ class StarryIdentityRow extends StatelessWidget {
                   applyHeightToFirstAscent: false,
                   applyHeightToLastDescent: false,
                 ),
-                style: t.typography.bodySmall.textStyle
-                    .copyWith(color: s.textSecondary),
+                style: t.typography.bodySmall.textStyle.copyWith(
+                  color: s.textSecondary,
+                ),
               ),
             ],
           ],

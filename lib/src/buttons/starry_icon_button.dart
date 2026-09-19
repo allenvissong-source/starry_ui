@@ -53,7 +53,7 @@ class StarryIconButton extends StatelessWidget {
     final t = Theme.of(context).extension<StarryTokens>()!;
     final effectiveSize = size < kMinInteractiveDimension
         ? kMinInteractiveDimension
-         : size;
+        : size;
     final iconSize = t.controlMetrics.iconLg;
     final effectiveOnPressed = enabled ? onPressed : null;
     final radius = BorderRadius.circular(t.radius.full);

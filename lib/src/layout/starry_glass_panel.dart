@@ -76,7 +76,9 @@ class StarryGlassPanel extends StatelessWidget {
             color: t.semantic.surface.withValues(alpha: resolvedSurfaceOpacity),
             borderRadius: radius,
             border: Border.all(
-              color: t.semantic.onMedia.withValues(alpha: resolvedBorderOpacity),
+              color: t.semantic.onMedia.withValues(
+                alpha: resolvedBorderOpacity,
+              ),
               width: resolvedBorderWidth,
             ),
             boxShadow: t.elevation.glass,

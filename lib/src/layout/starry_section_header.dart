@@ -23,9 +23,9 @@ class StarrySectionHeader extends StatelessWidget {
     this.bottomSpacing = 0,
     this.tone = StarrySectionHeaderTone.primary,
   }) : assert(
-          title != null || description != null || child != null,
-          'StarrySectionHeader requires at least one of title, description or child.',
-        );
+         title != null || description != null || child != null,
+         'StarrySectionHeader requires at least one of title, description or child.',
+       );
 
   /// Section title.
   final String? title;
@@ -96,10 +96,7 @@ class StarrySectionHeader extends StatelessWidget {
 
     if (child != null) {
       children.add(
-        Padding(
-          padding: contentPadding ?? EdgeInsets.zero,
-          child: child,
-        ),
+        Padding(padding: contentPadding ?? EdgeInsets.zero, child: child),
       );
     }
 

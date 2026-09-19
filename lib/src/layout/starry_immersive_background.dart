@@ -72,12 +72,18 @@ class StarryImmersiveBackground extends StatelessWidget {
           Positioned(
             left: _kPrimaryOrbLeft,
             bottom: _kPrimaryOrbBottom,
-            child: _StarryGlowOrb(size: _kPrimaryOrbSize, color: brand.brandGlow),
+            child: _StarryGlowOrb(
+              size: _kPrimaryOrbSize,
+              color: brand.brandGlow,
+            ),
           ),
           Positioned(
             right: _kAccentOrbRight,
             top: _kAccentOrbTop,
-            child: _StarryGlowOrb(size: _kAccentOrbSize, color: brand.accentGlow),
+            child: _StarryGlowOrb(
+              size: _kAccentOrbSize,
+              color: brand.accentGlow,
+            ),
           ),
         ],
       ],
@@ -133,8 +139,9 @@ class _StarryGlowOrb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final blurSigma =
-        Theme.of(context).extension<StarryTokens>()!.glass.blurSigma;
+    final blurSigma = Theme.of(
+      context,
+    ).extension<StarryTokens>()!.glass.blurSigma;
     return ImageFiltered(
       imageFilter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
       child: Container(

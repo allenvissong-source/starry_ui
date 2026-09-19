@@ -10,7 +10,14 @@ import '../components/starry_control_shell.dart';
 /// [StarryButtonVariant.neutral] is the same transparent fill but uses the
 /// neutral secondary-text foreground — for secondary actions that should not
 /// read as brand-colored at all.
-enum StarryButtonVariant { filled, secondary, tonal, text, neutral, destructive }
+enum StarryButtonVariant {
+  filled,
+  secondary,
+  tonal,
+  text,
+  neutral,
+  destructive,
+}
 
 /// Content layout of a [StarryButton].
 ///

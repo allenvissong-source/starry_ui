@@ -178,7 +178,8 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
       child: SizedBox(
         height: t.controlMetrics.controlHeight,
         child: Padding(
-          padding: widget.headerPadding ??
+          padding:
+              widget.headerPadding ??
               EdgeInsets.symmetric(horizontal: t.spacing.s5),
           child: Row(
             children: <Widget>[

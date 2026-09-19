@@ -128,7 +128,8 @@ class StarryStateLayer extends StatelessWidget {
     Color? baseColor,
   }) {
     if (disabled) return null;
-    final base = baseColor ?? (selected ? t.semantic.brand : t.semantic.textPrimary);
+    final base =
+        baseColor ?? (selected ? t.semantic.brand : t.semantic.textPrimary);
     final double? alpha;
     if (pressed) {
       alpha = t.opacity.statePressed;
@@ -156,7 +157,8 @@ class StarryStateLayer extends StatelessWidget {
     Color? base,
     bool selected = false,
   }) {
-    final resolved = base ?? (selected ? t.semantic.brand : t.semantic.textPrimary);
+    final resolved =
+        base ?? (selected ? t.semantic.brand : t.semantic.textPrimary);
     return WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
       if (states.contains(WidgetState.disabled)) {
         return Colors.transparent;

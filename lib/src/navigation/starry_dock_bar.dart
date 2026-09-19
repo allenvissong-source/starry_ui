@@ -136,8 +136,9 @@ class _DockTabButtonState extends State<_DockTabButton> {
 
     // Selected controls tint with brand (Starry brand deviation); neutral
     // controls use the secondary text color (MD3 onSurfaceVariant analogue).
-    final baseColor =
-        widget.isSelected ? t.semantic.brand : t.semantic.textSecondary;
+    final baseColor = widget.isSelected
+        ? t.semantic.brand
+        : t.semantic.textSecondary;
 
     return Padding(
       padding: EdgeInsets.all(t.spacing.s1),
@@ -151,24 +152,22 @@ class _DockTabButtonState extends State<_DockTabButton> {
             isPressed: _pressed,
             child: FocusableActionDetector(
               mouseCursor: SystemMouseCursors.click,
-              onShowFocusHighlight: (value) =>
-                  setState(() => _focused = value),
+              onShowFocusHighlight: (value) => setState(() => _focused = value),
               child: DecoratedBox(
                 // Focus ring stacked under the state layer so the affordance
                 // stays visible on the frosted-glass backdrop.
                 decoration: BoxDecoration(
                   borderRadius: radius,
                   border: Border.all(
-                    color: _focused
-                        ? t.semantic.brand
-                        : Colors.transparent,
+                    color: _focused ? t.semantic.brand : Colors.transparent,
                     width: t.controlMetrics.focusBorderWidth,
                   ),
                   boxShadow: _focused
                       ? <BoxShadow>[
                           BoxShadow(
-                            color: t.semantic.brand
-                                .withValues(alpha: t.focus.glowAlpha),
+                            color: t.semantic.brand.withValues(
+                              alpha: t.focus.glowAlpha,
+                            ),
                             blurRadius: t.focus.glowBlurRadius,
                             spreadRadius: t.focus.glowSpreadRadius,
                             offset: t.focus.glowOffset,
@@ -204,11 +203,7 @@ class _DockTabButtonState extends State<_DockTabButton> {
     );
   }
 
-  Widget _buildTabContent(
-    BuildContext context,
-    StarryTokens t,
-    Color color,
-  ) {
+  Widget _buildTabContent(BuildContext context, StarryTokens t, Color color) {
     final item = widget.item;
     final isSelected = widget.isSelected;
     final iconSize = widget.iconSize;

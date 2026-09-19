@@ -63,8 +63,8 @@ class StarryGroupCard extends StatelessWidget {
         padding ?? EdgeInsets.symmetric(vertical: tokens.spacing.s2);
     final effectiveDividerColor = dividerColor ?? s.border;
     final effectiveBackground = backgroundColor ?? s.surface;
-    final effectiveTint = tintColor ??
-        s.surface.withValues(alpha: tokens.opacity.accentSurface);
+    final effectiveTint =
+        tintColor ?? s.surface.withValues(alpha: tokens.opacity.accentSurface);
     final effectiveShadow =
         boxShadow ?? (elevated ? tokens.elevation.level2 : null);
 
@@ -129,8 +129,7 @@ class StarryGroupDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = Theme.of(context).extension<StarryTokens>()!;
     return Padding(
-      padding:
-          padding ?? EdgeInsets.symmetric(horizontal: tokens.spacing.s4),
+      padding: padding ?? EdgeInsets.symmetric(horizontal: tokens.spacing.s4),
       child: Divider(color: color ?? tokens.semantic.border),
     );
   }

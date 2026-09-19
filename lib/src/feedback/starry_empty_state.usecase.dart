@@ -7,10 +7,7 @@ import 'starry_empty_state.dart';
 
 @UseCase(name: 'Default', type: StarryEmptyState)
 Widget defaultStarryEmptyState(BuildContext context) {
-  return const StarryEmptyState(
-    title: '暂无数据',
-    message: '这里还什么都没有，稍后再来看看。',
-  );
+  return const StarryEmptyState(title: '暂无数据', message: '这里还什么都没有，稍后再来看看。');
 }
 
 @UseCase(name: 'With Action', type: StarryEmptyState)

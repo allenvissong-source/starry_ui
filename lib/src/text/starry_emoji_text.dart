@@ -77,12 +77,12 @@ InlineSpan buildStarryEmojiAwareSpan(
   var start = 0;
 
   TextSpan textRun(String value) => TextSpan(
-        text: value,
-        style: baseStyle.copyWith(
-          fontFamily: textFontFamily,
-          fontFamilyFallback: const <String>[],
-        ),
-      );
+    text: value,
+    style: baseStyle.copyWith(
+      fontFamily: textFontFamily,
+      fontFamilyFallback: const <String>[],
+    ),
+  );
 
   for (final match in reg.allMatches(text)) {
     if (match.start > start) {

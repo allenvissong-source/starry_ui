@@ -106,8 +106,7 @@ class _DemoState extends State<_Demo> {
                 Text(widget.label),
                 Text('selected: $_selected'),
                 TextButton(
-                  onPressed: () =>
-                      setState(() => _paneVisible = !_paneVisible),
+                  onPressed: () => setState(() => _paneVisible = !_paneVisible),
                   child: Text(_paneVisible ? 'Hide pane' : 'Show pane'),
                 ),
               ],

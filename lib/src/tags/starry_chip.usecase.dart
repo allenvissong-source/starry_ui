@@ -29,11 +29,7 @@ Widget allVariantsStarryChip(BuildContext context) {
           variant: StarryChipVariant.tonal,
         ),
         SizedBox(height: t.spacing.s3),
-        StarryChip(
-          label: 'Deletable',
-          onDelete: () {},
-          deleteTooltip: '删除',
-        ),
+        StarryChip(label: 'Deletable', onDelete: () {}, deleteTooltip: '删除'),
         SizedBox(height: t.spacing.s3),
         const StarryChip(label: 'Disabled', enabled: false),
       ],

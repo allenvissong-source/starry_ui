@@ -33,7 +33,10 @@ Widget allSizesStarryAvatar(BuildContext context) {
 Widget playgroundStarryAvatar(BuildContext context) {
   return Center(
     child: StarryAvatar(
-      fallbackText: context.knobs.string(label: 'Fallback', initialValue: 'John Doe'),
+      fallbackText: context.knobs.string(
+        label: 'Fallback',
+        initialValue: 'John Doe',
+      ),
       bordered: context.knobs.boolean(label: 'Bordered', initialValue: false),
       shape: context.knobs.boolean(label: 'Rounded', initialValue: false)
           ? StarryAvatarShape.rounded

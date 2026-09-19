@@ -13,8 +13,9 @@ void main() {
   final tokens = StarryTokens.light;
 
   group('StarryActionOptionCard', () {
-    testWidgets('renders icon, title, description and trailing chevron',
-        (tester) async {
+    testWidgets('renders icon, title, description and trailing chevron', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const SizedBox(
@@ -35,8 +36,9 @@ void main() {
       expect(find.byIcon(Icons.arrow_forward_ios), findsOneWidget);
     });
 
-    testWidgets('paints the badge with the brand color and onBrand glyph',
-        (tester) async {
+    testWidgets('paints the badge with the brand color and onBrand glyph', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(
           const SizedBox(
@@ -52,10 +54,12 @@ void main() {
       await tester.pumpAndSettle();
 
       final badge = tester.widget<Container>(
-        find.ancestor(
-          of: find.byIcon(Icons.auto_awesome),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .ancestor(
+              of: find.byIcon(Icons.auto_awesome),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       final decoration = badge.decoration! as BoxDecoration;
       expect(decoration.color, tokens.semantic.brand);
@@ -87,8 +91,9 @@ void main() {
       expect(tapped, 1);
     });
 
-    testWidgets('disabled: dims content, drops elevation and ignores taps',
-        (tester) async {
+    testWidgets('disabled: dims content, drops elevation and ignores taps', (
+      tester,
+    ) async {
       var tapped = 0;
       await tester.pumpWidget(
         _host(

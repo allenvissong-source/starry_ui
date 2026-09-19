@@ -19,9 +19,9 @@ import 'package:starry_ui/src/buttons/starry_ai_button.usecase.dart'
 // shader-asset version mismatch that breaks tap-based InkWell tests.
 
 Widget _host(Widget child) => MaterialApp(
-      theme: AppTheme.light(),
-      home: Scaffold(body: Center(child: child)),
-    );
+  theme: AppTheme.light(),
+  home: Scaffold(body: Center(child: child)),
+);
 
 StarryTokens _tokens(WidgetTester tester, Finder anchor) {
   final ctx = tester.element(anchor);
@@ -36,8 +36,9 @@ double _verticalCenter(WidgetTester tester, Finder finder) {
 bool _widgetbookTreeContainsName(WidgetbookNode node, String name) {
   if (node.name == name) return true;
   if (node is WidgetbookFolder) {
-    return (node.children ?? const <WidgetbookNode>[])
-        .any((child) => _widgetbookTreeContainsName(child, name));
+    return (node.children ?? const <WidgetbookNode>[]).any(
+      (child) => _widgetbookTreeContainsName(child, name),
+    );
   }
   return false;
 }
@@ -66,8 +67,9 @@ void main() {
 
     test('Widgetbook directories expose StarryCountFormatter by name', () {
       expect(
-        widgetbook_directories.directories
-            .any((node) => _widgetbookTreeContainsName(node, 'StarryCountFormatter')),
+        widgetbook_directories.directories.any(
+          (node) => _widgetbookTreeContainsName(node, 'StarryCountFormatter'),
+        ),
         isTrue,
       );
     });
@@ -92,78 +94,101 @@ void main() {
   });
   group('StarryAvatar', () {
     testWidgets('size enum carries the shipped diameter tiers', (tester) async {
-      expect(
-        StarryAvatarSize.values.map((s) => s.diameter).toList(),
-        <double>[24, 32, 40, 48, 64, 80],
-      );
+      expect(StarryAvatarSize.values.map((s) => s.diameter).toList(), <double>[
+        24,
+        32,
+        40,
+        48,
+        64,
+        80,
+      ]);
     });
 
-    testWidgets('no image + fallbackText paints initials (first two letters)',
-        (tester) async {
+    testWidgets('no image + fallbackText paints initials (first two letters)', (
+      tester,
+    ) async {
       await tester.pumpWidget(_host(const StarryAvatar(fallbackText: 'Alice')));
       expect(find.text('AL'), findsOneWidget);
     });
 
     testWidgets('two-token fallbackText yields each initial', (tester) async {
-      await tester
-          .pumpWidget(_host(const StarryAvatar(fallbackText: 'John Doe')));
+      await tester.pumpWidget(
+        _host(const StarryAvatar(fallbackText: 'John Doe')),
+      );
       expect(find.text('JD'), findsOneWidget);
     });
 
-    testWidgets('no image + no text falls through to the person glyph',
-        (tester) async {
+    testWidgets('no image + no text falls through to the person glyph', (
+      tester,
+    ) async {
       await tester.pumpWidget(_host(const StarryAvatar()));
       expect(find.byIcon(Icons.person), findsOneWidget);
     });
 
-    testWidgets('fallbackIcon wins over the default person glyph',
-        (tester) async {
-      await tester
-          .pumpWidget(_host(const StarryAvatar(fallbackIcon: Icons.pets)));
+    testWidgets('fallbackIcon wins over the default person glyph', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(const StarryAvatar(fallbackIcon: Icons.pets)),
+      );
       expect(find.byIcon(Icons.pets), findsOneWidget);
       expect(find.byIcon(Icons.person), findsNothing);
     });
 
-    testWidgets('bordered=false draws no ring; bordered=true draws brand ring',
-        (tester) async {
-      await tester.pumpWidget(_host(const StarryAvatar(fallbackText: 'A')));
-      final noBorder = tester
-          .widgetList<DecoratedBox>(find.descendant(
-            of: find.byType(StarryAvatar),
-            matching: find.byType(DecoratedBox),
-          ))
-          .map((d) => d.decoration as BoxDecoration)
-          .firstWhere((d) => d.border == null || d.border != null,
-              orElse: () => const BoxDecoration());
-      expect(noBorder.border, isNull);
+    testWidgets(
+      'bordered=false draws no ring; bordered=true draws brand ring',
+      (tester) async {
+        await tester.pumpWidget(_host(const StarryAvatar(fallbackText: 'A')));
+        final noBorder = tester
+            .widgetList<DecoratedBox>(
+              find.descendant(
+                of: find.byType(StarryAvatar),
+                matching: find.byType(DecoratedBox),
+              ),
+            )
+            .map((d) => d.decoration as BoxDecoration)
+            .firstWhere(
+              (d) => d.border == null || d.border != null,
+              orElse: () => const BoxDecoration(),
+            );
+        expect(noBorder.border, isNull);
 
-      await tester
-          .pumpWidget(_host(const StarryAvatar(fallbackText: 'A', bordered: true)));
-      final t = _tokens(tester, find.byType(StarryAvatar));
-      final withBorder = tester
-          .widgetList<DecoratedBox>(find.descendant(
-            of: find.byType(StarryAvatar),
-            matching: find.byType(DecoratedBox),
-          ))
-          .map((d) => d.decoration as BoxDecoration)
-          .firstWhere((d) => d.border != null);
-      expect((withBorder.border! as Border).top.color, t.semantic.brand);
-    });
+        await tester.pumpWidget(
+          _host(const StarryAvatar(fallbackText: 'A', bordered: true)),
+        );
+        final t = _tokens(tester, find.byType(StarryAvatar));
+        final withBorder = tester
+            .widgetList<DecoratedBox>(
+              find.descendant(
+                of: find.byType(StarryAvatar),
+                matching: find.byType(DecoratedBox),
+              ),
+            )
+            .map((d) => d.decoration as BoxDecoration)
+            .firstWhere((d) => d.border != null);
+        expect((withBorder.border! as Border).top.color, t.semantic.brand);
+      },
+    );
 
-    testWidgets('explicit borderColor overrides the default brand ring',
-        (tester) async {
+    testWidgets('explicit borderColor overrides the default brand ring', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const StarryAvatar(
-          fallbackText: 'A',
-          bordered: true,
-          borderColor: Colors.red,
-        )),
+        _host(
+          const StarryAvatar(
+            fallbackText: 'A',
+            bordered: true,
+            borderColor: Colors.red,
+          ),
+        ),
       );
       final withBorder = tester
-          .widgetList<DecoratedBox>(find.descendant(
-            of: find.byType(StarryAvatar),
-            matching: find.byType(DecoratedBox),
-          ))
+          .widgetList<DecoratedBox>(
+            find.descendant(
+              of: find.byType(StarryAvatar),
+              matching: find.byType(DecoratedBox),
+            ),
+          )
           .map((d) => d.decoration as BoxDecoration)
           .firstWhere((d) => d.border != null);
       expect((withBorder.border! as Border).top.color, Colors.red);
@@ -174,10 +199,12 @@ void main() {
         _host(const StarryAvatar(fallbackText: 'A', customSize: 56)),
       );
       final box = tester.widget<SizedBox>(
-        find.descendant(
-          of: find.byType(StarryAvatar),
-          matching: find.byType(SizedBox),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(StarryAvatar),
+              matching: find.byType(SizedBox),
+            )
+            .first,
       );
       expect(box.width, 56);
       expect(box.height, 56);
@@ -201,8 +228,7 @@ void main() {
         await tester.pumpWidget(
           _host(StarryIdentityRow(name: 'A', density: entry.key)),
         );
-        final avatar =
-            tester.widget<StarryAvatar>(find.byType(StarryAvatar));
+        final avatar = tester.widget<StarryAvatar>(find.byType(StarryAvatar));
         expect(avatar.customSize, entry.value);
       }
     });
@@ -223,10 +249,12 @@ void main() {
 
     testWidgets('badges render inline after the name', (tester) async {
       await tester.pumpWidget(
-        _host(const StarryIdentityRow(
-          name: 'Alice',
-          badges: <Widget>[Icon(Icons.verified)],
-        )),
+        _host(
+          const StarryIdentityRow(
+            name: 'Alice',
+            badges: <Widget>[Icon(Icons.verified)],
+          ),
+        ),
       );
       expect(
         find.descendant(
@@ -237,13 +265,16 @@ void main() {
       );
     });
 
-    testWidgets('trailing slot renders after the identity region',
-        (tester) async {
+    testWidgets('trailing slot renders after the identity region', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const StarryIdentityRow(
-          name: 'Alice',
-          trailing: Icon(Icons.chevron_right),
-        )),
+        _host(
+          const StarryIdentityRow(
+            name: 'Alice',
+            trailing: Icon(Icons.chevron_right),
+          ),
+        ),
       );
       expect(
         find.descendant(
@@ -254,57 +285,66 @@ void main() {
       );
     });
 
-    testWidgets('single-line name is centered against the avatar in every density',
-        (tester) async {
-      for (final density in StarryIdentityDensity.values) {
-        await tester.pumpWidget(
-          _host(StarryIdentityRow(name: 'Alice', density: density)),
-        );
-        expect(
-          _verticalCenter(tester, find.text('Alice')),
-          moreOrLessEquals(
-            _verticalCenter(tester, find.byType(StarryAvatar)),
-            epsilon: 1,
-          ),
-        );
-      }
-    });
+    testWidgets(
+      'single-line name is centered against the avatar in every density',
+      (tester) async {
+        for (final density in StarryIdentityDensity.values) {
+          await tester.pumpWidget(
+            _host(StarryIdentityRow(name: 'Alice', density: density)),
+          );
+          expect(
+            _verticalCenter(tester, find.text('Alice')),
+            moreOrLessEquals(
+              _verticalCenter(tester, find.byType(StarryAvatar)),
+              epsilon: 1,
+            ),
+          );
+        }
+      },
+    );
 
-    testWidgets('two-line text group is centered against the avatar in every density',
-        (tester) async {
-      for (final density in StarryIdentityDensity.values) {
-        await tester.pumpWidget(
-          _host(StarryIdentityRow(
-            name: 'Alice',
-            subtitle: '@alice',
-            density: density,
-          )),
-        );
-        final nameRect = tester.getRect(find.text('Alice'));
-        final subtitleRect = tester.getRect(find.text('@alice'));
-        final textGroupCenter = (nameRect.top + subtitleRect.bottom) / 2;
-        expect(
-          textGroupCenter,
-          moreOrLessEquals(
-            _verticalCenter(tester, find.byType(StarryAvatar)),
-            epsilon: 1,
-          ),
-        );
-      }
-    });
+    testWidgets(
+      'two-line text group is centered against the avatar in every density',
+      (tester) async {
+        for (final density in StarryIdentityDensity.values) {
+          await tester.pumpWidget(
+            _host(
+              StarryIdentityRow(
+                name: 'Alice',
+                subtitle: '@alice',
+                density: density,
+              ),
+            ),
+          );
+          final nameRect = tester.getRect(find.text('Alice'));
+          final subtitleRect = tester.getRect(find.text('@alice'));
+          final textGroupCenter = (nameRect.top + subtitleRect.bottom) / 2;
+          expect(
+            textGroupCenter,
+            moreOrLessEquals(
+              _verticalCenter(tester, find.byType(StarryAvatar)),
+              epsilon: 1,
+            ),
+          );
+        }
+      },
+    );
   });
 
   group('StarryToggleIconButton', () {
-    testWidgets('unselected shows base glyph on the neutral surface',
-        (tester) async {
+    testWidgets('unselected shows base glyph on the neutral surface', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryToggleIconButton(
-          icon: Icons.bookmark_border,
-          selectedIcon: Icons.bookmark,
-          selected: false,
-          tooltip: 'Bookmark',
-          onChanged: (_) {},
-        )),
+        _host(
+          StarryToggleIconButton(
+            icon: Icons.bookmark_border,
+            selectedIcon: Icons.bookmark,
+            selected: false,
+            tooltip: 'Bookmark',
+            onChanged: (_) {},
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryToggleIconButton));
       expect(find.byIcon(Icons.bookmark_border), findsOneWidget);
@@ -319,16 +359,19 @@ void main() {
       );
     });
 
-    testWidgets('selected swaps glyph AND tints the background brand',
-        (tester) async {
+    testWidgets('selected swaps glyph AND tints the background brand', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryToggleIconButton(
-          icon: Icons.bookmark_border,
-          selectedIcon: Icons.bookmark,
-          selected: true,
-          tooltip: 'Bookmark',
-          onChanged: (_) {},
-        )),
+        _host(
+          StarryToggleIconButton(
+            icon: Icons.bookmark_border,
+            selectedIcon: Icons.bookmark,
+            selected: true,
+            tooltip: 'Bookmark',
+            onChanged: (_) {},
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryToggleIconButton));
       expect(find.byIcon(Icons.bookmark), findsOneWidget);
@@ -344,15 +387,18 @@ void main() {
       );
     });
 
-    testWidgets('disabled uses the disabled ink and no gesture callback',
-        (tester) async {
+    testWidgets('disabled uses the disabled ink and no gesture callback', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(const StarryToggleIconButton(
-          icon: Icons.bookmark_border,
-          selectedIcon: Icons.bookmark,
-          selected: false,
-          tooltip: 'Bookmark',
-        )),
+        _host(
+          const StarryToggleIconButton(
+            icon: Icons.bookmark_border,
+            selectedIcon: Icons.bookmark,
+            selected: false,
+            tooltip: 'Bookmark',
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryToggleIconButton));
       final icon = tester.widget<Icon>(find.byIcon(Icons.bookmark_border));
@@ -368,79 +414,97 @@ void main() {
 
     testWidgets('selected state is surfaced to assistive tech', (tester) async {
       await tester.pumpWidget(
-        _host(StarryToggleIconButton(
-          icon: Icons.bookmark_border,
-          selectedIcon: Icons.bookmark,
-          selected: true,
-          tooltip: 'Bookmark',
-          onChanged: (_) {},
-        )),
+        _host(
+          StarryToggleIconButton(
+            icon: Icons.bookmark_border,
+            selectedIcon: Icons.bookmark,
+            selected: true,
+            tooltip: 'Bookmark',
+            onChanged: (_) {},
+          ),
+        ),
       );
       final semantics = tester
-          .widgetList<Semantics>(find.descendant(
-            of: find.byType(StarryToggleIconButton),
-            matching: find.byType(Semantics),
-          ))
+          .widgetList<Semantics>(
+            find.descendant(
+              of: find.byType(StarryToggleIconButton),
+              matching: find.byType(Semantics),
+            ),
+          )
           .firstWhere((s) => s.properties.selected != null);
       expect(semantics.properties.selected, isTrue);
     });
   });
 
   group('StarryMetricButton', () {
-    testWidgets('count runs through the compact formatter by default',
-        (tester) async {
+    testWidgets('count runs through the compact formatter by default', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryMetricButton(
-          icon: Icons.favorite_border,
-          count: 12345,
-          semanticLabel: 'Likes',
-          onTap: () {},
-        )),
+        _host(
+          StarryMetricButton(
+            icon: Icons.favorite_border,
+            count: 12345,
+            semanticLabel: 'Likes',
+            onTap: () {},
+          ),
+        ),
       );
       expect(find.text('1.2w'), findsOneWidget);
     });
 
-    testWidgets('countFormatter override wins over the default', (tester) async {
+    testWidgets('countFormatter override wins over the default', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryMetricButton(
-          icon: Icons.favorite_border,
-          count: 12345,
-          semanticLabel: 'Likes',
-          countFormatter: (c) => '$c',
-          onTap: () {},
-        )),
+        _host(
+          StarryMetricButton(
+            icon: Icons.favorite_border,
+            count: 12345,
+            semanticLabel: 'Likes',
+            countFormatter: (c) => '$c',
+            onTap: () {},
+          ),
+        ),
       );
       expect(find.text('12345'), findsOneWidget);
     });
 
-    testWidgets('active swaps to activeIcon and tints ink brand (surface tone)',
-        (tester) async {
-      await tester.pumpWidget(
-        _host(StarryMetricButton(
-          icon: Icons.favorite_border,
-          activeIcon: Icons.favorite,
-          count: 3,
-          active: true,
-          semanticLabel: 'Likes',
-          onTap: () {},
-        )),
-      );
-      final t = _tokens(tester, find.byType(StarryMetricButton));
-      expect(find.byIcon(Icons.favorite), findsOneWidget);
-      final icon = tester.widget<Icon>(find.byIcon(Icons.favorite));
-      expect(icon.color, t.semantic.brand);
-    });
+    testWidgets(
+      'active swaps to activeIcon and tints ink brand (surface tone)',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(
+            StarryMetricButton(
+              icon: Icons.favorite_border,
+              activeIcon: Icons.favorite,
+              count: 3,
+              active: true,
+              semanticLabel: 'Likes',
+              onTap: () {},
+            ),
+          ),
+        );
+        final t = _tokens(tester, find.byType(StarryMetricButton));
+        expect(find.byIcon(Icons.favorite), findsOneWidget);
+        final icon = tester.widget<Icon>(find.byIcon(Icons.favorite));
+        expect(icon.color, t.semantic.brand);
+      },
+    );
 
-    testWidgets('disabled dims to disabledContent opacity and blocks taps',
-        (tester) async {
+    testWidgets('disabled dims to disabledContent opacity and blocks taps', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryMetricButton(
-          icon: Icons.favorite_border,
-          count: 3,
-          disabled: true,
-          semanticLabel: 'Likes',
-          onTap: () {},
-        )),
+        _host(
+          StarryMetricButton(
+            icon: Icons.favorite_border,
+            count: 3,
+            disabled: true,
+            semanticLabel: 'Likes',
+            onTap: () {},
+          ),
+        ),
       );
       final t = _tokens(tester, find.byType(StarryMetricButton));
       final opacity = tester.widget<Opacity>(
@@ -459,17 +523,20 @@ void main() {
       expect(gesture.onTap, isNull);
     });
 
-    testWidgets('allowDisabledTap keeps the tap live while disabled',
-        (tester) async {
+    testWidgets('allowDisabledTap keeps the tap live while disabled', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryMetricButton(
-          icon: Icons.favorite_border,
-          count: 3,
-          disabled: true,
-          allowDisabledTap: true,
-          semanticLabel: 'Likes',
-          onTap: () {},
-        )),
+        _host(
+          StarryMetricButton(
+            icon: Icons.favorite_border,
+            count: 3,
+            disabled: true,
+            allowDisabledTap: true,
+            semanticLabel: 'Likes',
+            onTap: () {},
+          ),
+        ),
       );
       final gesture = tester.widget<GestureDetector>(
         find.descendant(
@@ -482,28 +549,33 @@ void main() {
 
     testWidgets('loading replaces the glyph with a spinner', (tester) async {
       await tester.pumpWidget(
-        _host(StarryMetricButton(
-          icon: Icons.favorite_border,
-          count: 3,
-          loading: true,
-          semanticLabel: 'Likes',
-          onTap: () {},
-        )),
+        _host(
+          StarryMetricButton(
+            icon: Icons.favorite_border,
+            count: 3,
+            loading: true,
+            semanticLabel: 'Likes',
+            onTap: () {},
+          ),
+        ),
       );
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.byIcon(Icons.favorite_border), findsNothing);
     });
 
-    testWidgets('onMedia tone paints white ink regardless of active',
-        (tester) async {
+    testWidgets('onMedia tone paints white ink regardless of active', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryMetricButton(
-          icon: Icons.favorite_border,
-          count: 3,
-          tone: StarryMetricTone.onMedia,
-          semanticLabel: 'Likes',
-          onTap: () {},
-        )),
+        _host(
+          StarryMetricButton(
+            icon: Icons.favorite_border,
+            count: 3,
+            tone: StarryMetricTone.onMedia,
+            semanticLabel: 'Likes',
+            onTap: () {},
+          ),
+        ),
       );
       final icon = tester.widget<Icon>(find.byIcon(Icons.favorite_border));
       expect(icon.color, Colors.white);
@@ -511,8 +583,9 @@ void main() {
   });
 
   group('StarryAiButton', () {
-    testWidgets('defaults: built-in sparkle glyph, size 48, not busy',
-        (tester) async {
+    testWidgets('defaults: built-in sparkle glyph, size 48, not busy', (
+      tester,
+    ) async {
       await tester.pumpWidget(_host(StarryAiButton(onTap: () {})));
       final b = tester.widget<StarryAiButton>(find.byType(StarryAiButton));
       expect(b.icon, Icons.auto_awesome);
@@ -523,31 +596,39 @@ void main() {
       expect(find.byIcon(Icons.auto_awesome), findsOneWidget);
     });
 
-    testWidgets('rests with a brand gradient fill + reserved glow halo',
-        (tester) async {
+    testWidgets('rests with a brand gradient fill + reserved glow halo', (
+      tester,
+    ) async {
       await tester.pumpWidget(_host(StarryAiButton(onTap: () {})));
       final t = _tokens(tester, find.byType(StarryAiButton));
       final container = tester
-          .widgetList<Container>(find.descendant(
-            of: find.byType(StarryAiButton),
-            matching: find.byType(Container),
-          ))
+          .widgetList<Container>(
+            find.descendant(
+              of: find.byType(StarryAiButton),
+              matching: find.byType(Container),
+            ),
+          )
           .firstWhere((c) => c.decoration is BoxDecoration);
       final deco = container.decoration! as BoxDecoration;
       // Brand gradient.
       final gradient = deco.gradient! as LinearGradient;
-      expect(gradient.colors,
-          <Color>[t.brand.gradientStart, t.brand.gradientEnd]);
+      expect(gradient.colors, <Color>[
+        t.brand.gradientStart,
+        t.brand.gradientEnd,
+      ]);
       // Reserved glow halo geometry from the token layer.
       final shadow = deco.boxShadow!.single;
       expect(shadow.blurRadius, t.focus.glowBlurRadius);
       expect(shadow.spreadRadius, t.focus.glowSpreadRadius);
-      expect(shadow.color,
-          t.semantic.brand.withValues(alpha: t.focus.glowAlpha));
+      expect(
+        shadow.color,
+        t.semantic.brand.withValues(alpha: t.focus.glowAlpha),
+      );
     });
 
-    testWidgets('busy twinkles the glyph instead of overlaying a spinner',
-        (tester) async {
+    testWidgets('busy twinkles the glyph instead of overlaying a spinner', (
+      tester,
+    ) async {
       await tester.pumpWidget(_host(const StarryAiButton(busy: true)));
       expect(find.byType(CircularProgressIndicator), findsNothing);
       expect(find.byIcon(Icons.auto_awesome), findsOneWidget);
@@ -568,15 +649,18 @@ void main() {
       expect(t.motion.durationSlower, const Duration(milliseconds: 1200));
     });
 
-    testWidgets('busy twinkle animates the glyph opacity over the cycle',
-        (tester) async {
+    testWidgets('busy twinkle animates the glyph opacity over the cycle', (
+      tester,
+    ) async {
       await tester.pumpWidget(_host(const StarryAiButton(busy: true)));
       final t = _tokens(tester, find.byType(StarryAiButton));
       double glyphOpacity() => tester
-          .widgetList<Opacity>(find.descendant(
-            of: find.byType(StarryPulsingWidget),
-            matching: find.byType(Opacity),
-          ))
+          .widgetList<Opacity>(
+            find.descendant(
+              of: find.byType(StarryPulsingWidget),
+              matching: find.byType(Opacity),
+            ),
+          )
           .first
           .opacity;
       // Start of the cycle sits at the dimmed end...
@@ -586,8 +670,9 @@ void main() {
       expect(glyphOpacity(), greaterThan(t.opacity.busyContent + 0.1));
     });
 
-    testWidgets('reduce motion rests the busy glyph instead of twinkling',
-        (tester) async {
+    testWidgets('reduce motion rests the busy glyph instead of twinkling', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(),
@@ -600,16 +685,19 @@ void main() {
       expect(find.byType(StarryPulsingWidget), findsNothing);
       final t = _tokens(tester, find.byType(StarryAiButton));
       final opacity = tester
-          .widgetList<Opacity>(find.descendant(
-            of: find.byType(StarryAiButton),
-            matching: find.byType(Opacity),
-          ))
+          .widgetList<Opacity>(
+            find.descendant(
+              of: find.byType(StarryAiButton),
+              matching: find.byType(Opacity),
+            ),
+          )
           .first;
       expect(opacity.opacity, t.opacity.busyContent);
     });
 
-    testWidgets('glyph uses white foreground ink in both states',
-        (tester) async {
+    testWidgets('glyph uses white foreground ink in both states', (
+      tester,
+    ) async {
       await tester.pumpWidget(_host(StarryAiButton(onTap: () {})));
       final icon = tester.widget<Icon>(find.byIcon(Icons.auto_awesome));
       expect(icon.color, Colors.white);
@@ -627,28 +715,41 @@ void main() {
       expect(find.byIcon(Icons.auto_awesome), findsNothing);
     });
 
-    testWidgets('backgroundColor override drops the gradient for a flat fill',
-        (tester) async {
+    testWidgets('backgroundColor override drops the gradient for a flat fill', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(StarryAiButton(backgroundColor: const Color(0xFF123456), onTap: () {})),
+        _host(
+          StarryAiButton(
+            backgroundColor: const Color(0xFF123456),
+            onTap: () {},
+          ),
+        ),
       );
       final container = tester
-          .widgetList<Container>(find.descendant(
-            of: find.byType(StarryAiButton),
-            matching: find.byType(Container),
-          ))
+          .widgetList<Container>(
+            find.descendant(
+              of: find.byType(StarryAiButton),
+              matching: find.byType(Container),
+            ),
+          )
           .firstWhere((c) => c.decoration is BoxDecoration);
       final deco = container.decoration! as BoxDecoration;
       expect(deco.gradient, isNull);
       expect(deco.color, const Color(0xFF123456));
     });
 
-    testWidgets('All States usecase keeps state examples at one size',
-        (tester) async {
+    testWidgets('All States usecase keeps state examples at one size', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        _host(Builder(builder: starry_ai_button_usecase.allStatesStarryAiButton)),
+        _host(
+          Builder(builder: starry_ai_button_usecase.allStatesStarryAiButton),
+        ),
       );
-      final buttons = tester.widgetList<StarryAiButton>(find.byType(StarryAiButton));
+      final buttons = tester.widgetList<StarryAiButton>(
+        find.byType(StarryAiButton),
+      );
       expect(buttons, hasLength(3));
       // Default size resolves from controlMetrics.controlHeight (48) at build
       // time, so the field is null; assert the rendered diameter is uniform.
@@ -665,8 +766,9 @@ void main() {
       expect(StarryTagStatus.values, contains(StarryTagStatus.accent));
     });
 
-    testWidgets('accent paints a brand-tinted surface with brandStrong ink',
-        (tester) async {
+    testWidgets('accent paints a brand-tinted surface with brandStrong ink', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(const StarryTag(label: 'AI', status: StarryTagStatus.accent)),
       );
@@ -693,60 +795,69 @@ void main() {
 
   group('StarrySkeletonOrContent', () {
     testWidgets('not loading + not empty renders content', (tester) async {
-      await tester.pumpWidget(_host(
-        StarrySkeletonOrContent(
-          isLoading: false,
-          isEmpty: false,
-          skeletonBuilder: (_) => const Text('SKELETON'),
-          contentBuilder: (_) => const Text('CONTENT'),
+      await tester.pumpWidget(
+        _host(
+          StarrySkeletonOrContent(
+            isLoading: false,
+            isEmpty: false,
+            skeletonBuilder: (_) => const Text('SKELETON'),
+            contentBuilder: (_) => const Text('CONTENT'),
+          ),
         ),
-      ));
+      );
       expect(find.text('CONTENT'), findsOneWidget);
       expect(find.text('SKELETON'), findsNothing);
     });
 
     testWidgets('empty renders emptyBuilder over content', (tester) async {
-      await tester.pumpWidget(_host(
-        StarrySkeletonOrContent(
-          isLoading: false,
-          isEmpty: true,
-          skeletonBuilder: (_) => const Text('SKELETON'),
-          contentBuilder: (_) => const Text('CONTENT'),
-          emptyBuilder: (_) => const Text('EMPTY'),
+      await tester.pumpWidget(
+        _host(
+          StarrySkeletonOrContent(
+            isLoading: false,
+            isEmpty: true,
+            skeletonBuilder: (_) => const Text('SKELETON'),
+            contentBuilder: (_) => const Text('CONTENT'),
+            emptyBuilder: (_) => const Text('EMPTY'),
+          ),
         ),
-      ));
+      );
       expect(find.text('EMPTY'), findsOneWidget);
       expect(find.text('CONTENT'), findsNothing);
     });
 
     testWidgets('error branch wins over every other state', (tester) async {
-      await tester.pumpWidget(_host(
-        StarrySkeletonOrContent(
-          isLoading: true,
-          isEmpty: true,
-          error: 'boom',
-          skeletonBuilder: (_) => const Text('SKELETON'),
-          contentBuilder: (_) => const Text('CONTENT'),
-          emptyBuilder: (_) => const Text('EMPTY'),
-          errorBuilder: (_, e) => Text('ERROR:$e'),
+      await tester.pumpWidget(
+        _host(
+          StarrySkeletonOrContent(
+            isLoading: true,
+            isEmpty: true,
+            error: 'boom',
+            skeletonBuilder: (_) => const Text('SKELETON'),
+            contentBuilder: (_) => const Text('CONTENT'),
+            emptyBuilder: (_) => const Text('EMPTY'),
+            errorBuilder: (_, e) => Text('ERROR:$e'),
+          ),
         ),
-      ));
+      );
       expect(find.text('ERROR:boom'), findsOneWidget);
       expect(find.text('SKELETON'), findsNothing);
       expect(find.text('EMPTY'), findsNothing);
     });
 
-    testWidgets('skeleton appears after appearDelay while loading',
-        (tester) async {
-      await tester.pumpWidget(_host(
-        StarrySkeletonOrContent(
-          isLoading: true,
-          isEmpty: false,
-          appearDelay: const Duration(milliseconds: 50),
-          skeletonBuilder: (_) => const Text('SKELETON'),
-          contentBuilder: (_) => const Text('CONTENT'),
+    testWidgets('skeleton appears after appearDelay while loading', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          StarrySkeletonOrContent(
+            isLoading: true,
+            isEmpty: false,
+            appearDelay: const Duration(milliseconds: 50),
+            skeletonBuilder: (_) => const Text('SKELETON'),
+            contentBuilder: (_) => const Text('CONTENT'),
+          ),
         ),
-      ));
+      );
       // Before the delay elapses the skeleton is withheld (anti-flicker).
       expect(find.text('SKELETON'), findsNothing);
       await tester.pump(const Duration(milliseconds: 60));
@@ -755,8 +866,9 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
     });
 
-    testWidgets('Widgetbook directories expose StarrySkeletonOrContent',
-        (tester) async {
+    testWidgets('Widgetbook directories expose StarrySkeletonOrContent', (
+      tester,
+    ) async {
       expect(
         widgetbook_directories.directories.any(
           (node) =>
@@ -769,51 +881,57 @@ void main() {
 
   group('StarrySliverSkeletonOrContent', () {
     Widget sliverHost(Widget sliver) => MaterialApp(
-          theme: AppTheme.light(),
-          home: Scaffold(
-            body: CustomScrollView(slivers: <Widget>[sliver]),
-          ),
-        );
+      theme: AppTheme.light(),
+      home: Scaffold(body: CustomScrollView(slivers: <Widget>[sliver])),
+    );
 
-    testWidgets('not loading + not empty renders content sliver',
-        (tester) async {
-      await tester.pumpWidget(sliverHost(
-        StarrySliverSkeletonOrContent(
-          isLoading: false,
-          isEmpty: false,
-          skeletonSliverBuilder: (_) =>
-              const SliverToBoxAdapter(child: Text('SKELETON')),
-          contentSliverBuilder: (_) =>
-              const SliverToBoxAdapter(child: Text('CONTENT')),
+    testWidgets('not loading + not empty renders content sliver', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        sliverHost(
+          StarrySliverSkeletonOrContent(
+            isLoading: false,
+            isEmpty: false,
+            skeletonSliverBuilder: (_) =>
+                const SliverToBoxAdapter(child: Text('SKELETON')),
+            contentSliverBuilder: (_) =>
+                const SliverToBoxAdapter(child: Text('CONTENT')),
+          ),
         ),
-      ));
+      );
       expect(find.text('CONTENT'), findsOneWidget);
       expect(find.text('SKELETON'), findsNothing);
     });
 
     testWidgets('empty renders empty sliver over content', (tester) async {
-      await tester.pumpWidget(sliverHost(
-        StarrySliverSkeletonOrContent(
-          isLoading: false,
-          isEmpty: true,
-          skeletonSliverBuilder: (_) =>
-              const SliverToBoxAdapter(child: Text('SKELETON')),
-          contentSliverBuilder: (_) =>
-              const SliverToBoxAdapter(child: Text('CONTENT')),
-          emptySliverBuilder: (_) =>
-              const SliverToBoxAdapter(child: Text('EMPTY')),
+      await tester.pumpWidget(
+        sliverHost(
+          StarrySliverSkeletonOrContent(
+            isLoading: false,
+            isEmpty: true,
+            skeletonSliverBuilder: (_) =>
+                const SliverToBoxAdapter(child: Text('SKELETON')),
+            contentSliverBuilder: (_) =>
+                const SliverToBoxAdapter(child: Text('CONTENT')),
+            emptySliverBuilder: (_) =>
+                const SliverToBoxAdapter(child: Text('EMPTY')),
+          ),
         ),
-      ));
+      );
       expect(find.text('EMPTY'), findsOneWidget);
       expect(find.text('CONTENT'), findsNothing);
     });
 
-    testWidgets('Widgetbook directories expose StarrySliverSkeletonOrContent',
-        (tester) async {
+    testWidgets('Widgetbook directories expose StarrySliverSkeletonOrContent', (
+      tester,
+    ) async {
       expect(
         widgetbook_directories.directories.any(
           (node) => _widgetbookTreeContainsName(
-              node, 'StarrySliverSkeletonOrContent'),
+            node,
+            'StarrySliverSkeletonOrContent',
+          ),
         ),
         isTrue,
       );

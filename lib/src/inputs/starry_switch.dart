@@ -67,7 +67,9 @@ class _StarrySwitchState extends State<StarrySwitch> {
   void didUpdateWidget(StarrySwitch oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.focusNode != widget.focusNode) {
-      (oldWidget.focusNode ?? _internalNode)?.removeListener(_handleFocusChange);
+      (oldWidget.focusNode ?? _internalNode)?.removeListener(
+        _handleFocusChange,
+      );
       _focusNode.addListener(_handleFocusChange);
       _handleFocusChange();
     }

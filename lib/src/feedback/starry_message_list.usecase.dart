@@ -5,7 +5,8 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 import '../theme/starry_tokens.dart';
 import 'starry_message_list.dart';
 
-List<StarryMessageListItemData> _demoItems(StarryTokens t) => <StarryMessageListItemData>[
+List<StarryMessageListItemData> _demoItems(StarryTokens t) =>
+    <StarryMessageListItemData>[
       StarryMessageListItemData(
         id: 1,
         title: 'Nova Assistant',
@@ -84,12 +85,18 @@ Widget emptyStarryMessageList(BuildContext context) {
 @UseCase(name: 'Playground', type: StarryMessageList)
 Widget playgroundStarryMessageList(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
-  final showItems = context.knobs.boolean(label: 'Show items', initialValue: true);
+  final showItems = context.knobs.boolean(
+    label: 'Show items',
+    initialValue: true,
+  );
   return Padding(
     padding: const EdgeInsets.all(16),
     child: StarryMessageList(
       title: context.knobs.string(label: 'Title', initialValue: '消息'),
-      badgeLabel: context.knobs.stringOrNull(label: 'Badge', initialValue: '3 条未读'),
+      badgeLabel: context.knobs.stringOrNull(
+        label: 'Badge',
+        initialValue: '3 条未读',
+      ),
       emptyLabel: '暂无消息',
       items: showItems ? _demoItems(t) : const <StarryMessageListItemData>[],
     ),

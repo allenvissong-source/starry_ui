@@ -12,10 +12,7 @@ void main() {
 
       test('just below threshold($columns) drops one column', () {
         final threshold = masonryFeedMinGridWidthForColumns(columns);
-        expect(
-          masonryFeedColumnCountForWidth(threshold - 1),
-          columns - 1,
-        );
+        expect(masonryFeedColumnCountForWidth(threshold - 1), columns - 1);
       });
     }
 
@@ -64,8 +61,7 @@ void main() {
     });
 
     test('narrow content (<= outerInset*2) produces no negative values', () {
-      final metrics =
-          MasonryFeedMetrics.resolve(masonryFeedOuterInset * 2 - 1);
+      final metrics = MasonryFeedMetrics.resolve(masonryFeedOuterInset * 2 - 1);
       expect(metrics.gridInset, greaterThanOrEqualTo(0));
       expect(metrics.frameInset, greaterThanOrEqualTo(0));
       expect(metrics.gridWidth, greaterThanOrEqualTo(0));
@@ -82,8 +78,10 @@ void main() {
       'nan': double.nan,
     }.entries) {
       test('${entry.key} input', () {
-        expect(() => masonryFeedColumnCountForWidth(entry.value),
-            returnsNormally);
+        expect(
+          () => masonryFeedColumnCountForWidth(entry.value),
+          returnsNormally,
+        );
         expect(masonryFeedColumnCountForWidth(entry.value), 2);
 
         expect(() => MasonryFeedMetrics.resolve(entry.value), returnsNormally);

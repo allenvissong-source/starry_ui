@@ -26,8 +26,9 @@ void main() {
   final tokens = StarryTokens.light;
 
   group('StarrySurface primitive', () {
-    testWidgets('paints radius.lg + solid border + level2 by default',
-        (tester) async {
+    testWidgets('paints radius.lg + solid border + level2 by default', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _host(const StarrySurface(child: SizedBox(width: 40, height: 40))),
       );
@@ -55,8 +56,9 @@ void main() {
       expect(deco.boxShadow, isNull);
     });
 
-    testWidgets('wraps in a button-semantic InkWell when onTap is set',
-        (tester) async {
+    testWidgets('wraps in a button-semantic InkWell when onTap is set', (
+      tester,
+    ) async {
       var taps = 0;
       await tester.pumpWidget(
         _host(
