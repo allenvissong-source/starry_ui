@@ -11,18 +11,34 @@
 
 ## 0. 环境与工具铁律(先看这条,能省一半时间)
 
-- **禁止用 shell 跑 `flutter`。** 所有 analyze / reload / 设备管理走 dart MCP:
-  `mcp__proxy__codex-mcp__mcp__dart_analyze_files`、`...hot_reload`、
-  `...list_running_apps`、`...connect_dart_tooling_daemon`。
-- **写文件走 `apply_patch`**(一次一个文件,绝对路径 + 正斜杠,如
-  `D:/Starry-1.07/starry_ui/lib/src/tags/starry_chip.dart`;patch 末尾要有换行)。
-  **读/搜/跑命令走 `shell_command`**(PowerShell,读文件用
-  `Get-Content -Encoding UTF8`)。不要用 shell 重定向写文件。
-- **Web 真机验证不可省、也不能标"未完成"。** 见 §8。
-- 桥接工具偶发返回 "No such tool available" 或 apply_patch "last line must be
-  '*** End Patch'" —— 原样重试同一调用即可成功(后者确保 patch 文本结尾带换行)。
-- 本包物理路径:Windows `D:/Starry-1.07/starry_ui` == WSL `/mnt/d/Starry-1.07/starry_ui`。
-  主工程源码在 WSL `/home/allen/projects/starry/Starry-Flutter-Frontend/lib`。
+- **本包物理路径:`D:\Starry-1.07\starry_ui`**,与主工程
+  `D:\Starry-1.07\Starry-Flutter-Frontend` 是**同级兄弟目录**。主工程用
+  `path: ../starry_ui` 依赖本包,两者相对位置不能改(CI 也依赖这个布局:它把
+  五个兄弟仓 checkout 到主仓的上一级再 `pub get`)。
+- **验证命令直接在 PowerShell 里跑**,工作目录设为本包根:
+  - `flutter test` —— 全量(当前 27 个测试文件)
+  - `flutter test test/xxx_test.dart` —— 单文件
+  - `flutter analyze` / `dart format .`
+
+  改完组件后**至少跑一次全量 `flutter test`**:本包有多道源码门禁以测试形式
+  存在(§1.5.2 的 `no_padded_tap_target_in_inputs_test`、
+  `button_density_guard_test`,§7.1 的 `no_hardcoded_colors_test`),
+  它们只在测试里生效,`analyze` 发现不了。
+- **golden 基线不在本机生成。** 唯一真源是主工程
+  `.github/workflows/golden-baselines.yml` 的 ubuntu 渲染器。Windows 与 Linux
+  的 Skia 对文字/图标光栅化不同(实测文字类 golden 差异约 4.4%),所以本地
+  `--update-goldens` 只用来确认"差异是否符合预期",**生成的图不要提交**。
+- **PowerShell 的两个实测坑**:
+  1. `git` 把进度写进 stderr,PowerShell 会判为错误——命令末尾加 `exit 0`
+     或 `| Out-Null`,不要据此认为 git 失败。
+  2. .NET 的 `[IO.File]::ReadAllLines()` 等 API **不跟随 `Set-Location`**,
+     用的是进程工作目录。一律传绝对路径。
+- **改动影响主工程时,回主工程验证。** 本包测试全绿不代表主工程能编译:
+  新增或重命名公开 API 后,到主工程跑 `flutter analyze`;涉及 Web 的改动跑
+  `flutter build web --release`——它能抓出 `dart:io` 误用这类只在 Web 炸的问题
+  (主工程 persona 编辑器曾因 `Platform.isX` 在 Web 崩溃)。
+- **不要在工作区根目录 `D:\Starry-1.07` 下创建任何文件**(日志、截图、临时
+  脚本)。根目录是多仓工作区、不属于任何仓库;临时产物规则见根目录 `AGENTS.md`。
 
 ---
 
@@ -68,8 +84,8 @@ Primitive(原始色阶) → Semantic(语义角色) → Component(组件私有常
 
 ### 1.3 其余令牌族
 
-- **`t.radius`**(StarryRadius):`none0=0, xs4=4, sm8=8, md12=12, lg16=16,
-  xl20=20, xxl28=28, full999=999`(胶囊/圆用 `full999` 或直接 `height/2`)。
+- **`t.radius`**(StarryRadius):`none=0, xs=4, sm=8, md=12, lg=16, xl=20,
+  xxl=28, full=999`(胶囊/圆用 `full` 或直接 `height/2`)。字段名不带数字后缀。
 - **`t.spacing`**(StarrySpacing):`s0=0, s1=4, s2=8, s3=12, s4=16, s5=20,
   s6=24, s8=32, s10=40, s12=48, s16=64`。**所有 padding/gap 走这里**,对齐
   ui-ux 的 4pt/8dp 间距系统。**仅限"元素之间的空"(padding/gap/margin)**;
@@ -98,11 +114,15 @@ Primitive(原始色阶) → Semantic(语义角色) → Component(组件私有常
 - **`t.elevation`**(StarryElevation,light/dark 各一套):`level1 … level4`,
   已是可直接用的 `List<BoxShadow>`。
 - **`t.motion`**(StarryMotion.standard):`durationShort=150ms`、
-  `durationMedium=300ms`、`durationLong=500ms`;`easingStandard` ==
-  `easingEmphasized` == `Cubic(0.2, 0, 0, 1)`。**动画时长/曲线只从这里取。**
-- **`t.chart`**:8 个分类色,给图表用(对齐 ui-ux §10 无障碍配色)。
-- **`t.brand`**(StarryBrandColors):`brandGold, characterCardBg, feedCardBg,
-  feedDivider, gradientStart, gradientEnd` —— 业务专用品牌资产。
+  `durationMedium=300ms`、`durationLong=500ms`、`durationSlow=800ms`、
+  `durationSlower=1200ms`;两条曲线**不相等**——`easingStandard = Cubic(0.2,0,0,1)`,
+  `easingEmphasized = Cubic(0.05,0.7,0.1,1.0)`(减速尾更陡)。另有 `pressedScale=0.95`。
+  **动画时长/曲线只从这里取。**
+- **`t.brand`**(StarryBrandColors):`gradientStart, gradientEnd, primaryPale,
+  primaryTint50, accentGradientEnd, brandGlow, accentGlow` —— 沉浸式渐变与
+  光晕的品牌资产。
+- 另有 `t.opacity`、`t.focus`、`t.glass`、`t.letterSpacing`、`t.breakpoints`
+  五族,用法以 `starry_tokens.dart` 为准,本文不重复列举。
 
 ### 1.4 AppTheme 颜色装配:唯一字面量 = seed,其余派生自 token
 
@@ -515,8 +535,13 @@ return content;
 - `@UseCase(name: 'Playground', type: StarryXxx)` — 用 `context.knobs.*`
   (string/boolean/object.dropdown)暴露关键参数,供交互调参。
 
-改完 use-case 或注解后需重新生成:通过 dart MCP 跑 build_runner(**不要** shell
-`flutter`),再 hot reload。`main.directories.g.dart` 是生成物,不要手改。
+改完 use-case 或注解后需重新生成:
+
+```powershell
+dart run build_runner build --delete-conflicting-outputs
+```
+
+`main.directories.g.dart` 是生成物,不要手改。
 
 ---
 
@@ -612,7 +637,7 @@ return content;
      (b) 行级放行 `Colors.transparent`(平台"无填充"哨兵,无设计语义);
      (c) 行级尾注 `// hardcode-allow: <理由>` 转义阀门(如 `app_theme.dart` 的
      `seed`),新增时必须写清理由。采用"全量扫描 + 白名单"而非目录清单,
-     新增组件目录自动纳入,无需改门禁。此门禁随 `run_tests` 自动执行,
+     新增组件目录自动纳入,无需改门禁。此门禁随 `flutter test` 自动执行,
      组件颜色硬编码复查以它为准;其余维度(尺寸/间距/时长/双写等)仍按上述手工扫描。
 
 ### 7.2 完成状态与跟踪表
@@ -629,35 +654,28 @@ return content;
 
 每次改动完成后,按顺序做且给出证据:
 
-1. **静态分析**:dart MCP `analyze_files` → 必须 `No issues found`。
-   共享分析服务器偶发被其它 root(如 `Starry-Flutter-Frontend`、`X:` / `Z:`)
-   的历史诊断污染,starry_ui 自身零诊断被淹没时,以 `run_tests`(真实编译)
-   为权威编译证据;先 `remove_roots` 再 `add_roots file:///D:/Starry-1.07/starry_ui`
-   可缩小重发现范围。
-2. **测试**:dart MCP `run_tests` 跑相关测试;已有测试失败不得跳过或用 Web 画面替代。
-3. **热重载/重启**:先 `list_running_apps`;普通实现改动用 `hot_reload`。若删除 const 类字段、
-   修改构造结构等导致 reload 被拒绝,必须停止旧实例并用 dart MCP 重新 `launch_app`,
-   不能拿旧画布作为新实现证据。
-4. **Web 真机无障碍树验收(CanvasKit 专用方法,不可跳过、不可标"未完成")**:
-   - Flutter Web 用 CanvasKit 把文字画进 WebGL canvas,DOM 里没有文本,
-     `getBoundingClientRect()` 返回 0。
-   - 先点击 `flt-semantics-placeholder` / `[aria-label="Enable accessibility"]`
-     开启无障碍树,再读 `document.getElementsByTagName('flt-semantics')`:
-     从 `aria-label` / `role` / `flt-tappable` 及 CSS `style.width/height` +
-     `transform: matrix(...)`(下标 4,5 为 x,y)拿到位置与尺寸作为证据。
-   - **Widgetbook 路由怪癖**:客户端 hash 切换/reload 不会重绘 Flutter 画布,
-     reload 会回到上一次完整导航的 URL。要看目标 use-case 就用
-     `new_page` 打开带目标路由的完整 URL(提交一次全新导航)。localStorage 为空,
-     不是持久化来源。
+1. **静态分析**:`flutter analyze` → 必须 `No issues found`。
+2. **测试**:`flutter test` 跑全量(改动面小可先跑单文件,但提交前至少全量一次)。
+   已有测试失败不得跳过,也不得用"界面看起来对"替代。
+3. **格式**:只格式化你改过的文件 —— `dart format lib/src/<你改的文件>.dart`。
+   **不要跑 `dart format .`**:本仓代码由更早版本的 dart 格式化,Dart 3.12.2 的
+   tall-style 会重排 **79/149 个文件**(实测),把无关改动混进 diff;而主仓 CI
+   没有 format 步骤,拦不住。全量重排需要单独立项并 pin SDK 版本,不要顺手做。
+4. **视觉回归**:涉及渲染的改动,以 `test/` 下的 widget 测试与 golden 为准。
+   golden 基线由主工程 `golden-baselines.yml` 的 ubuntu 渲染器生成(见 §0),
+   本地跑出的差异先判断是否符合预期,不要直接提交本地生成的图。
    - **CanvasKit 无法做像素回读**:`canvas.getContext('webgl')` 返回 null
-     (CanvasKit 未开 `preserveDrawingBuffer`),故不能用画布取色验证颜色。
-     颜色契约(如 `secondary` 是否等于某 token)改用 Dart 层 `run_tests`
-     断言 `ColorScheme` / token 值,比像素采样更强、更稳。
-   - **截图**:`take_screenshot` 的 `filePath` 走 chrome-devtools 自己的
-     workspace root(D:/ 与 home/allen 路径都会被拒),用 inline(不给
-     filePath)+ 小视口(`resize_page` 800×600)控制内联体积最稳。
-5. **污染门禁复核**:执行 §7.1 的 token diff、硬编码扫描、重复符号统计和 barrel 检查。
-6. **收尾用语**:逐项验证全过 → 结尾写 `✅ 已全部完成`;有未过项 →
+     (未开 `preserveDrawingBuffer`),所以不能靠浏览器画布取色验证颜色。
+     颜色契约(如 `secondary` 是否等于某 token)一律用 Dart 层测试断言
+     `ColorScheme` / token 值,比像素采样更强也更稳。
+   - **需要量"图标偏没偏"这类像素问题**时,走 widget 测试:加载真实
+     `materialicons-regular.otf`(而非 flutter_test 默认的 Ahem 占位字体),
+     用 `RepaintBoundary.toImage(pixelRatio: 4)` 光栅化后量墨迹包围盒。
+     `toImage`/`toByteData` 必须包在 `tester.runAsync()` 里,否则 fake-async
+     不驱动真异步会挂死(§1.5.8 实测方法)。
+5. **跨仓影响**:改动涉及公开 API 或 Web 行为时,按 §0 最后一条回主工程验证。
+6. **污染门禁复核**:执行 §7.1 的 token diff、硬编码扫描、重复符号统计和 barrel 检查。
+7. **收尾用语**:逐项验证全过 → 结尾写 `✅ 已全部完成`;有未过项 →
    `⚠️ 未全部完成`;被环境阻塞 → `⛔ 阻塞`。**绝不在未逐项验证时声称完成。**
 
 > 已验证范例(留作基线):Chip 删除键 `role=button, tappable, 28×28`;
