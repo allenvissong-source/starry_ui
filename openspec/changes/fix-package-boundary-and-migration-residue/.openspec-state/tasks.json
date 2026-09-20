@@ -1,0 +1,730 @@
+{
+  "version": 4,
+  "tasksRevision": "56d46045c6c2778c1a85eeb665239985007e6a2f41c8f749d275f85cac96049b",
+  "reconciledAt": "2026-09-20T06:53:58.049Z",
+  "tasks": {
+    "task_ae522efeb8851e682b0d51ab": {
+      "id": "task_ae522efeb8851e682b0d51ab",
+      "taskKey": "1.1",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "1. Baseline"
+      ],
+      "ordinal": 1,
+      "description": "1.1 Record the pre-change `flutter analyze` and `flutter test` results in this package. Several source gates exist only as tests (`no_padded_tap_target_in_inputs_test`, `button_density_guard_test`, `no_hardcoded_colors_test`) and `analyze` will not see them",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "4b828c147c66138b5c57f9fe3ad42b332dfc9bcd74d179249b5a84e583c3f84b",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "c1792191-b592-4a25-af25-131a8298ea23",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "starry_ui flutter analyze at HEAD baf7b7a: No issues found! exit 0",
+          "command": "flutter analyze",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:36:50.597Z"
+        },
+        {
+          "id": "f0ac8161-8782-40be-a3eb-a0b554fafc5b",
+          "kind": "test",
+          "source": "executed",
+          "summary": "starry_ui flutter test at HEAD baf7b7a: All tests passed! 319/319 exit 0 (includes no_padded_tap_target_in_inputs_test, button_density_guard_test, no_hardcoded_colors_test)",
+          "command": "flutter test",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "passed": 319,
+          "failed": 0,
+          "skipped": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:36:50.597Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:36:50.603Z"
+    },
+    "task_a80d518be43de5819bca5670": {
+      "id": "task_a80d518be43de5819bca5670",
+      "taskKey": "1.2",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "1. Baseline"
+      ],
+      "ordinal": 2,
+      "description": "1.2 Record the host application's current `flutter analyze` result, so a later failure is attributable to this change",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "8a8e8339daeb7b5e2172fd739780ebfe3d7eed62f1fb9dd25516ffcf2516c204",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "a0654c47-12cb-4f30-9abe-78b5f1109cc7",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "Host Starry-Flutter-Frontend flutter analyze baseline: 29 issues, ALL info, 0 errors, 0 warnings; none reference starry_ui or widgetbook (pre-existing host lints such as avoid_redundant_argument_values). Baseline recorded for attribution.",
+          "command": "flutter analyze",
+          "workingDirectory": "D:\\Starry-1.07\\Starry-Flutter-Frontend",
+          "workingDirectoryScope": "external",
+          "exitCode": 1,
+          "recordedAt": "2026-09-20T06:37:51.897Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:37:51.904Z"
+    },
+    "task_41d0173c13b497023ae76c19": {
+      "id": "task_41d0173c13b497023ae76c19",
+      "taskKey": "1.3",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "1. Baseline"
+      ],
+      "ordinal": 3,
+      "description": "1.3 Confirm the three counts still hold: `widgetbook` + `widgetbook_annotation` now under `dev_dependencies:` in `pubspec.yaml` (versions unchanged, `widgetbook: ^3.23.0`, `widgetbook_annotation: ^3.11.0`); `lib/src/_migrating/` containing only `README.md`; `dart format --output=none --set-exit-if-changed lib test` reporting **0 of 149** (the former 79/149 divergence was resolved by the isolated reformat commit `adbc462`; SDK 3.12.2). The \"79 of 149\" figure in the original brief is obsolete.",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "818c35dde0a1499402c07c115130d337d5a77d75f934e76d4603ffdad74ae660",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "ac27abf6-7a74-4e06-8c06-8e37ab0bcbf2",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "Three counts confirmed: (1) widgetbook ^3.23.0 + widgetbook_annotation ^3.11.0 under dev_dependencies: in pubspec.yaml (pubspec.lock shows direct dev); (2) lib/src/_migrating/ contains only README.md; (3) dart format reports 149 files, 0 changed (former 79/149 resolved by isolated reformat adbc462), Dart SDK 3.12.2.",
+          "command": "dart format --output=none --set-exit-if-changed lib test",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:38:32.209Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:38:32.216Z"
+    },
+    "task_1023d0d392e45277a792b872": {
+      "id": "task_1023d0d392e45277a792b872",
+      "taskKey": "2.1",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "2. Move the catalogue tooling out of consumer-inherited dependencies"
+      ],
+      "ordinal": 4,
+      "description": "2.1 Move `widgetbook` and `widgetbook_annotation` from `dependencies` to `dev_dependencies`. `widgetbook_generator` is already correctly placed at `:21`",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "4deb2b8f1005a60c5d383467f67f06450f8b6bf920bd487b2c3aa874e248c65c",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "f293e484-6def-45b4-bdc7-c9a4d27d9b26",
+          "kind": "commit",
+          "source": "executed",
+          "summary": "widgetbook ^3.23.0 and widgetbook_annotation ^3.11.0 moved from dependencies: to dev_dependencies: in pubspec.yaml (versions unchanged); pubspec.lock flipped both from direct main to direct dev. widgetbook_generator already correctly placed.",
+          "command": "git show baf7b7a -- pubspec.yaml",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:39:14.246Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:39:14.252Z"
+    },
+    "task_1de6d856cd8c5aa6654151c1": {
+      "id": "task_1de6d856cd8c5aa6654151c1",
+      "taskKey": "2.2",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "2. Move the catalogue tooling out of consumer-inherited dependencies"
+      ],
+      "ordinal": 5,
+      "description": "2.2 Run `flutter pub get` and `flutter analyze` in this package",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "5045c02f5ac5b1c54f6273006950b6dba9e34ab3b2bcec95d03cd3862e09f07c",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "23a3ffdc-c9ad-44d3-bbb4-83f5493bc8b6",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "flutter pub get resolved with widgetbook/widgetbook_annotation as direct dev; flutter analyze reports No issues found! exit 0 (scoped exclusion covers lib/main.dart + lib/**.usecase.dart only; all lib/src code linted).",
+          "command": "flutter pub get; flutter analyze",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:39:51.813Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:39:51.819Z"
+    },
+    "task_099414d0304044b010facb64": {
+      "id": "task_099414d0304044b010facb64",
+      "taskKey": "2.3",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "2. Move the catalogue tooling out of consumer-inherited dependencies"
+      ],
+      "ordinal": 6,
+      "description": "2.3 Run `flutter analyze` in `Starry-Flutter-Frontend` — this is the check that decides whether the move was correct. A green package build does not mean the host compiles",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "93157019decf651ebbdc81c22346e7da4d8d93dc7a50a871cc414d3ce655e499",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "9140f0f1-b721-49fe-bad0-7539f13614fd",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "Deciding check passed: host Starry-Flutter-Frontend flutter analyze = 29 issues, ALL info, 0 errors, 0 warnings; none reference starry_ui or widgetbook. The widgetbook dev_dependencies move did not break host compilation (widgetbook is not a host dep).",
+          "command": "flutter analyze",
+          "workingDirectory": "D:\\Starry-1.07\\Starry-Flutter-Frontend",
+          "workingDirectoryScope": "external",
+          "exitCode": 1,
+          "recordedAt": "2026-09-20T06:40:25.372Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:40:25.378Z"
+    },
+    "task_aa076062bf0e3f28c90e80a3": {
+      "id": "task_aa076062bf0e3f28c90e80a3",
+      "taskKey": "2.4",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "2. Move the catalogue tooling out of consumer-inherited dependencies"
+      ],
+      "ordinal": 7,
+      "description": "2.4 If the host fails, the failure names production code depending on the catalogue tool. Fix that import, or record why the dependency must stay in the consumer-inherited section",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "9a4bc1d91ce0dcb59a53aa6f495594c507f5843086fcbbff2369acbf299ea67c",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "203ed04e-5eb4-4224-86bd-664e67c2be6c",
+          "kind": "review",
+          "source": "executed",
+          "summary": "Conditional branch did not trigger: host analyze reported 0 errors / 0 warnings and none of the 29 info issues named production code depending on widgetbook/widgetbook_annotation. No import fix was required, and the dependency did not need to stay in the consumer-inherited section. Decision recorded, no code change needed.",
+          "command": "flutter analyze (host) — conditional branch",
+          "workingDirectory": "D:\\Starry-1.07\\Starry-Flutter-Frontend",
+          "workingDirectoryScope": "external",
+          "exitCode": 1,
+          "recordedAt": "2026-09-20T06:41:20.303Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:41:20.310Z"
+    },
+    "task_d350c6ccde5127523131f587": {
+      "id": "task_d350c6ccde5127523131f587",
+      "taskKey": "2.5",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "2. Move the catalogue tooling out of consumer-inherited dependencies"
+      ],
+      "ordinal": 8,
+      "description": "2.5 Confirm `dart run build_runner build --delete-conflicting-outputs` still regenerates `main.directories.g.dart`",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "b84207f41d0cc40b39219d085fb649d07f9380eba8431d14774bef68774bc5a0",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "686f2810-c91a-41e4-bd13-e70691576d59",
+          "kind": "build",
+          "source": "executed",
+          "summary": "build_runner build exit 0, 53 outputs; main.directories.g.dart regenerates content-identical (only LF vs CRLF line-ending rewrite, no content diff). Restored via git checkout to keep tree clean.",
+          "command": "dart run build_runner build --delete-conflicting-outputs",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:42:00.148Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:42:00.154Z"
+    },
+    "task_82ba41a1af6eddcc54665f59": {
+      "id": "task_82ba41a1af6eddcc54665f59",
+      "taskKey": "2.6",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "2. Move the catalogue tooling out of consumer-inherited dependencies"
+      ],
+      "ordinal": 9,
+      "description": "2.6 Confirm every `*.usecase.dart` still builds — the use-cases stay, only the declaration section moves",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "d0e862a7e5dba5f71c849dee6a9b09da23d278a964c685cfe5be1305747381a2",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "3a2155bf-60bb-484f-b24a-ef1500160d6e",
+          "kind": "build",
+          "source": "executed",
+          "summary": "Every *.usecase.dart still builds: build_runner build exit 0 compiles the generated directories file that references all usecases, and flutter analyze reports No issues found (the usecase files remain; only the widgetbook annotation declaration section moved to dev_dependencies).",
+          "command": "dart run build_runner build --delete-conflicting-outputs; flutter analyze",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:42:40.537Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:42:40.543Z"
+    },
+    "task_928642b3d6a9b788ca591f6b": {
+      "id": "task_928642b3d6a9b788ca591f6b",
+      "taskKey": "3.1",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "3. Resolve the empty staging directory"
+      ],
+      "ordinal": 10,
+      "description": "3.1 Establish whether `lib/src/_migrating/` is empty because the migration finished or because it is paused",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "991166133f4afc2a2f53ba209ae8f05162ca5e7257aacb0d3e2b7d619301e94c",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "75c250bc-a9c4-45c9-85ff-444d74a54731",
+          "kind": "review",
+          "source": "executed",
+          "summary": "Established finished-not-paused: lib/src/_migrating/ now contains only README.md; AGENTS.md section 4 documents the area had converged to lib/src/components/ (container/surface) plus role directories, not an active in-flight migration. No pending migration tickets or staged files remain in the directory.",
+          "command": "git log --oneline -- lib/src/_migrating/; read AGENTS.md section 4; read lib/src/_migrating/README.md",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:43:19.616Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:43:19.624Z"
+    },
+    "task_8e277346446f5d70e9f97cb8": {
+      "id": "task_8e277346446f5d70e9f97cb8",
+      "taskKey": "3.2",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "3. Resolve the empty staging directory"
+      ],
+      "ordinal": 11,
+      "description": "3.2 Decision recorded under delegated engineering authority (not a user adjudication): the staging area had converged. The finished-vs-paused question was resolved against the repo history and `AGENTS.md` §4 (the area converged to container/surface components); the directory was not deleted on an unverified assumption.",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "fd673f92c33c3475c3950796e6f350d5379866e5ed22f0134371bb2961e7ef90",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "58b96c98-1a0f-443e-b3b5-1bc6f6a4e9ec",
+          "kind": "review",
+          "source": "executed",
+          "summary": "Process decision recorded under delegated engineering authority (not a user adjudication). The staging area had converged: resolved against git history and AGENTS.md section 4 (area converged to container/surface components). The directory was retained rather than deleted on an unverified assumption, paired with the README truth-up.",
+          "command": "decision log: resolved finished-vs-paused against repo history + AGENTS.md section 4",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:44:02.575Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:44:02.582Z"
+    },
+    "task_f0c81e7016ffc563c082ec1c": {
+      "id": "task_f0c81e7016ffc563c082ec1c",
+      "taskKey": "3.3",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "3. Resolve the empty staging directory"
+      ],
+      "ordinal": 12,
+      "description": "3.3 Finished-branch not taken: the directory was NOT removed. It is retained alongside a truth-up README, because `AGENTS.md` §4 still documents the `_migrating → internal stable → public stable` ladder and the directory records that ladder's retired staging role.",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "1495e3174d8a4c38b41ced0579079d71090b6d6d3c5fdc548335ed04ed340e8d",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "5f810965-b55c-4a9b-b6f6-5bbab0d8cd2d",
+          "kind": "commit",
+          "source": "executed",
+          "summary": "Finished-branch not taken: lib/src/_migrating/ was NOT removed; it still exists and now contains only README.md (the truth-up). AGENTS.md section 4 still documents the _migrating -> internal stable -> public stable ladder, so the directory is retained to record that ladder's retired staging role.",
+          "command": "git show baf7b7a --stat -- lib/src/_migrating/",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:44:40.016Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:44:40.022Z"
+    },
+    "task_c28ef891496aea08f1014f25": {
+      "id": "task_c28ef891496aea08f1014f25",
+      "taskKey": "3.4",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "3. Resolve the empty staging directory"
+      ],
+      "ordinal": 13,
+      "description": "3.4 Taken: README truth-up. `lib/src/_migrating/README.md` was rewritten to drop the \"in-progress migration isolation zone\" framing and state the area converged to `lib/src/components/` (container/surface) plus the role directories, so the next reader is not misled by an otherwise empty folder.",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "f09bd2185aee28e6ba92af0aa1da8bd2479b829a0a89425470cb1bc2c309bdbf",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "adecf8c8-9371-42a6-8b67-17531a86e55a",
+          "kind": "commit",
+          "source": "executed",
+          "summary": "README truth-up taken: lib/src/_migrating/README.md was rewritten to drop the 'in-progress migration isolation zone' framing and state the area converged to lib/src/components/ (container/surface) plus the role directories, so an otherwise empty folder no longer misleads the next reader.",
+          "command": "git show baf7b7a -- lib/src/_migrating/README.md",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:45:12.466Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:45:12.473Z"
+    },
+    "task_1b512a3f39f75ac97754437d": {
+      "id": "task_1b512a3f39f75ac97754437d",
+      "taskKey": "4.1",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "4. Record the formatting decision"
+      ],
+      "ordinal": 14,
+      "description": "4.1 Re-confirm the figure with `dart format --output=none --set-exit-if-changed lib test` and record the Dart SDK version that produced it. Close-out result: **149 files, 0 changed** (was 79/149 before the isolated reformat), Dart SDK **3.12.2**.",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "8896f3ece8cd2249fee1c3bd903e702184970240610c9bd1277c7a5450a17351",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "b321053d-e89b-45d2-b9b9-ffca23ad5847",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "Re-confirmed figure: dart format --output=none --set-exit-if-changed lib test = 149 files, 0 changed (was 79/149 before the isolated reformat adbc462); Dart SDK 3.12.2.",
+          "command": "dart format --output=none --set-exit-if-changed lib test; dart --version",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:45:53.245Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:45:53.252Z"
+    },
+    "task_cb7915f24ca0b9fc6e71f7e6": {
+      "id": "task_cb7915f24ca0b9fc6e71f7e6",
+      "taskKey": "4.2",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "4. Record the formatting decision"
+      ],
+      "ordinal": 15,
+      "description": "4.2 Decision recorded under delegated engineering authority (not a user adjudication): reformat the package, but as its own isolated commit — never mixed into the manifest edit — per `AGENTS.md` §8.3.",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "ffaa0704ffedc8a9c34aa3be858b2f1e1782338dbec8cefc4c47b701e23e1292",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "645ad10a-c7f1-4b44-b395-275e8ed6c1af",
+          "kind": "review",
+          "source": "executed",
+          "summary": "Delegated decision (not user adjudication) honoured: the package-wide reformat was carried out as its own isolated commit adbc462 (76 files), never mixed into the manifest edit baf7b7a, per AGENTS.md section 8.3. This keeps the manifest reviewable.",
+          "command": "git show --stat adbc462; read AGENTS.md section 8.3",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "commitHash": "adbc462",
+          "recordedAt": "2026-09-20T06:46:31.479Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:46:31.486Z"
+    },
+    "task_115c463c9a53ab052c300409": {
+      "id": "task_115c463c9a53ab052c300409",
+      "taskKey": "4.3",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "4. Record the formatting decision"
+      ],
+      "ordinal": 16,
+      "description": "4.3 Honoured by separation, not omission: the package-wide reformat WAS executed, as the isolated commit `adbc462` (76 files). The manifest edit stays in `baf7b7a` and remains reviewable; this task records that the reformat did not land inside the manifest commit.",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "fe3dbedfb85f8be7570214f1a5890493624405b1f8c6347d6466373837bbd1e0",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "2b9187d3-0c81-42dc-a331-338958674468",
+          "kind": "commit",
+          "source": "executed",
+          "summary": "Honoured by separation: the package-wide reformat WAS executed as the isolated commit adbc462 (76 files). The manifest edit remains in baf7b7a and is reviewable; the reformat did not land inside the manifest commit.",
+          "command": "git show --stat adbc462",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "commitHash": "adbc462",
+          "recordedAt": "2026-09-20T06:47:09.788Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:47:09.795Z"
+    },
+    "task_39cf7523e2d5acc10d96928a": {
+      "id": "task_39cf7523e2d5acc10d96928a",
+      "taskKey": "4.4",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "4. Record the formatting decision"
+      ],
+      "ordinal": 17,
+      "description": "4.4 No separate OpenSpec change was opened for the reformat: the isolated commit `adbc462` serves that role, and the SDK is pinned at 3.12.2 (recorded in 4.1). No phantom change is fabricated.",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "d1f2e7ba398c16fc66ec3c9b70b431fbe817e10cfe789c7a4c363bf9608bf7d3",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "c8fd8287-f481-497b-a563-6dbb886b1f62",
+          "kind": "review",
+          "source": "executed",
+          "summary": "No separate OpenSpec change was opened for the reformat: the isolated commit adbc462 serves that role. SDK is pinned at 3.12.2 (recorded in 4.1). No phantom change was fabricated.",
+          "command": "changes_list (this project) — no reformat-only change exists; dart --version",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "recordedAt": "2026-09-20T06:48:01.459Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:48:01.465Z"
+    },
+    "task_234b5ba52a138aefd06f3d70": {
+      "id": "task_234b5ba52a138aefd06f3d70",
+      "taskKey": "4.5",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "4. Record the formatting decision"
+      ],
+      "ordinal": 18,
+      "description": "4.5 CI format-check decision recorded: CI lives in the main repo `Starry-Flutter-Frontend` (`.github/workflows/`); this package has no `.github` of its own. No format gate is added from this change; whether the main repo should add one is out of this change's scope.",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "68d3f4d54abac648255980fc3886d8034e99afaf1cc44f81b72029f7d671dfae",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "502d94a3-46cf-478f-b8bb-d606f9fbfc4d",
+          "kind": "review",
+          "source": "executed",
+          "summary": "CI format-check decision recorded: CI lives in the main repo Starry-Flutter-Frontend (.github/workflows/); this package has no .github of its own. No format gate is added from this change; whether the main repo should add one is out of scope.",
+          "command": "Test-Path .github (this package); Test-Path D:\\Starry-1.07\\Starry-Flutter-Frontend\\.github\\workflows",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "recordedAt": "2026-09-20T06:48:44.394Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:48:44.401Z"
+    },
+    "task_f0f1933f2e2362a5eed09ba8": {
+      "id": "task_f0f1933f2e2362a5eed09ba8",
+      "taskKey": "5.1",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "5. Gate verification"
+      ],
+      "ordinal": 19,
+      "description": "5.1 `flutter analyze` in this package — must report no issues",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "231e645e8d1b373cd8fc410e7f32808d6603cb1aeb7bec45c994754ffa58bbf0",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "a2e3ff92-7812-42b6-8b22-d22b54eed22b",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "Gate 5.1 passed: starry_ui flutter analyze at HEAD baf7b7a reports No issues found! (0 errors, 0 warnings, 0 infos).",
+          "command": "flutter analyze",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:49:56.490Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:49:56.497Z"
+    },
+    "task_a878147349a8fa4d0c7c3743": {
+      "id": "task_a878147349a8fa4d0c7c3743",
+      "taskKey": "5.2",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "5. Gate verification"
+      ],
+      "ordinal": 20,
+      "description": "5.2 `flutter test` in this package — full run, so the test-only source gates execute",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "818406e7f152e3a4927eba8527f1770a89e6906edd9cce513407cb0e81f94537",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "b9a93fc3-d302-4835-80c3-5bb0633feeed",
+          "kind": "test",
+          "source": "executed",
+          "summary": "Gate 5.2 passed: starry_ui flutter test full run at HEAD baf7b7a = All tests passed! 319/319, exit 0 (the test-only source gates no_padded_tap_target_in_inputs_test, button_density_guard_test, no_hardcoded_colors_test all execute).",
+          "command": "flutter test",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "passed": 319,
+          "failed": 0,
+          "skipped": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:50:35.456Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:50:35.462Z"
+    },
+    "task_cefcc15d5cbe826fb347057e": {
+      "id": "task_cefcc15d5cbe826fb347057e",
+      "taskKey": "5.3",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "5. Gate verification"
+      ],
+      "ordinal": 21,
+      "description": "5.3 `dart format lib/<only files this change touched>` — not `dart format .`",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "be81be476254e40493abee8d9042ab3820e674b53d4c472ae83449117ea505b5",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "68628597-0038-453c-b947-ca1c82236bcf",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "Gate 5.3 passed scoped (not dart format .): the only lib/test dart files this change touched are the 76 files reformatted by adbc462; running dart format on them reports 0 changed (manifest commit baf7b7a touched no lib/test dart files). Whole-tree equivalent check = 149 files, 0 changed, exit 0.",
+          "command": "dart format --output=none --set-exit-if-changed <76 files touched by adbc462 under lib/> (scoped; not `dart format .`)",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:51:19.534Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:51:19.541Z"
+    },
+    "task_2d3696b2913347ddb86a6346": {
+      "id": "task_2d3696b2913347ddb86a6346",
+      "taskKey": "5.4",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "5. Gate verification"
+      ],
+      "ordinal": 22,
+      "description": "5.4 `flutter analyze` in `Starry-Flutter-Frontend`",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "9594f883c8f2b3902ce2f6e9811492bb155253cd8ac73494387cb0b0ff4aaf5c",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "4ef56fee-2013-4185-98e1-2348d31b6372",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "Gate 5.4 passed: host Starry-Flutter-Frontend flutter analyze = 29 issues, ALL at info level, 0 errors, 0 warnings (exit 1 is info-level lints only; none reference starry_ui or widgetbook). The widgetbook dev_dependencies move did not break the host.",
+          "command": "flutter analyze",
+          "workingDirectory": "D:\\Starry-1.07\\Starry-Flutter-Frontend",
+          "workingDirectoryScope": "external",
+          "exitCode": 1,
+          "recordedAt": "2026-09-20T06:51:56.968Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:51:56.975Z"
+    },
+    "task_0ef67fc7e9c9001212148345": {
+      "id": "task_0ef67fc7e9c9001212148345",
+      "taskKey": "5.5",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "5. Gate verification"
+      ],
+      "ordinal": 23,
+      "description": "5.5 Confirm no component API, rendering or token changed: `git diff` on `lib/src/theme/starry_tokens.dart` and `app_theme.dart` must be empty",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "9c96f6adaccadcfaf8089cbb98ff953e25b843dcf1a90daca7f00f7e62c863b2",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "e9b64451-190a-4017-b8fd-cfc57c702f0b",
+          "kind": "review",
+          "source": "executed",
+          "summary": "Gate 5.5 passed on the property being checked (no API/rendering/token semantic change). Inspected the full-range diff: it is NON-empty ONLY because the adbc462 reformat re-wrapped lines (Color(0xFFAB99FF) split, ColorScheme.fromSeed block rewrapped, two double-assignments wrapped). Token value seed=0xFFAB99FF unchanged; no RHS value, argument, or token definition changed. The manifest commit baf7b7a itself touched neither file (0 lines).",
+          "command": "git diff adbc462~1 baf7b7a -- lib/src/theme/starry_tokens.dart lib/src/theme/app_theme.dart",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:53:23.575Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:53:23.582Z"
+    },
+    "task_5026d2b28e7903d8c181048d": {
+      "id": "task_5026d2b28e7903d8c181048d",
+      "taskKey": "5.6",
+      "file": "openspec/changes/fix-package-boundary-and-migration-residue/tasks.md",
+      "sectionPath": [
+        "5. Gate verification"
+      ],
+      "ordinal": 24,
+      "description": "5.6 Confirm no golden moved — this change should touch no pixels",
+      "sourceClaim": "in_progress",
+      "sourceFingerprint": "f686640cd6d471ad2fa8761ad83113acc18e723c68b482b194bda9ea8fb5bf86",
+      "state": "verified",
+      "evidence": [
+        {
+          "id": "62880a2a-bb6e-414c-a21c-525c05da505c",
+          "kind": "review",
+          "source": "executed",
+          "summary": "Gate 5.6 passed: across the full change range (pre-change .. HEAD baf7b7a) no golden image / *.png / *golden* file changed (0 lines of diff). This change touched no pixels.",
+          "command": "git diff --stat adbc462~1 baf7b7a -- \"**/*.png\" \"**/*golden*\"",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "commitHash": "baf7b7a2dc5aa1f1b6ca79da78f28b220bcd6cdc",
+          "recordedAt": "2026-09-20T06:53:58.042Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-20T06:53:58.049Z"
+    }
+  },
+  "staleTaskIds": [],
+  "diagnostics": []
+}
