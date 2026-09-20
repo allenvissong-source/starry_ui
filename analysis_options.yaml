@@ -1,1 +1,11 @@
 include: package:flutter_lints/flutter.yaml
+
+# Widgetbook catalogue sources are dev-only tooling (the component browser),
+# not part of the public library surface. `widgetbook` / `widgetbook_annotation`
+# live in dev_dependencies, so depend_on_referenced_packages would otherwise flag
+# every lib/ file that imports them. Exclude only these catalogue entrypoints;
+# the lint stays active for all real library code under lib/src.
+analyzer:
+  exclude:
+    - lib/main.dart
+    - "lib/**.usecase.dart"

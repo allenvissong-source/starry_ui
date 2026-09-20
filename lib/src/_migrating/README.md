@@ -1,10 +1,14 @@
-# _migrating — 迁移中隔离区
+# _migrating
 
-从主项目迁入、但**尚未稳定、尚未纳入公共 API** 的组件暂存于此。
+原「迁移中隔离区」已随迁移收敛完成而停用,不再作为活动暂存区使用。
 
-成熟度状态机:`_migrating -> internal stable -> public stable`。
+现状:
 
-规则:
-- 本目录内组件**不得**出现在 `lib/starry_ui.dart` barrel 中,消费方不可直接 import。
-- 组件达到 internal stable 后移出本目录进入 `lib/src/<category>/`;达到 public stable 后再加入 barrel 导出。
-- 每次晋升伴随库侧独立提交,验收标准见 `docs/migration/`。
+- 组件不再经此暂存,而是按角色直接归位到 `lib/src/` 下的专属目录(见 `AGENTS.md` §4)。
+- 容器 / 表面类组件(card、surface、control shell、expandable / masonry /
+  action option card 等)统一位于 `lib/src/components/`。
+- 其余组件按族归入 `buttons/`、`inputs/`、`tags/`、`feedback/`、`layout/`、
+  `navigation/`、`media/`、`interactions/`、`text/` 等目录。
+
+本目录当前仅保留本说明文件,无迁移中的组件滞留。若未来重启迁移暂存流程,
+以 `AGENTS.md` §4 的成熟度阶梯与 `docs/migration/` 为准。
