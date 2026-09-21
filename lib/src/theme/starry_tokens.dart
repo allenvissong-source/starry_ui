@@ -100,6 +100,10 @@ class StarrySemanticColors {
     required this.infoBg,
     required this.info,
     required this.infoStrong,
+    required this.scrim,
+    required this.shadow,
+    required this.inverseSurface,
+    required this.onInverseSurface,
   });
 
   final Color brand;
@@ -141,6 +145,22 @@ class StarrySemanticColors {
   final Color info;
   final Color infoStrong;
 
+  /// Modal / dialog barrier scrim painted behind a modal route. Distinct from
+  /// [mediaOverlayEnd] (which is the bottom gradient end over photographic
+  /// media): this is the flat barrier dim used by `ColorScheme.scrim`.
+  final Color scrim;
+
+  /// Default elevation shadow colour used by `ColorScheme.shadow` (the single
+  /// fallback Material reads; the per-level shadows live on [StarryElevation]).
+  final Color shadow;
+
+  /// Surface inverted against the active theme (e.g. snackbar / tooltip
+  /// background): the opposite theme's surface. Pairs with [onInverseSurface].
+  final Color inverseSurface;
+
+  /// Content colour painted on [inverseSurface].
+  final Color onInverseSurface;
+
   static StarrySemanticColors lerp(
     StarrySemanticColors a,
     StarrySemanticColors b,
@@ -177,6 +197,10 @@ class StarrySemanticColors {
       infoBg: l(a.infoBg, b.infoBg),
       info: l(a.info, b.info),
       infoStrong: l(a.infoStrong, b.infoStrong),
+      scrim: l(a.scrim, b.scrim),
+      shadow: l(a.shadow, b.shadow),
+      inverseSurface: l(a.inverseSurface, b.inverseSurface),
+      onInverseSurface: l(a.onInverseSurface, b.onInverseSurface),
     );
   }
 }
@@ -999,10 +1023,15 @@ class StarryBrandColors {
     required this.accentGradientEnd,
     required this.brandGlow,
     required this.accentGlow,
+    required this.accentPurple,
   });
 
   final Color gradientStart;
   final Color gradientEnd;
+
+  /// Fixed brand accent purple (e.g. the search capsule / login gradient
+  /// anchor). A brand-accent role, not a rung of the primary ramp.
+  final Color accentPurple;
 
   /// Pale primary tint — the top-left anchor of the immersive gradient
   /// fallback / atmosphere overlay.
@@ -1032,6 +1061,7 @@ class StarryBrandColors {
       gradientEnd: l(a.gradientEnd, b.gradientEnd),
       primaryPale: l(a.primaryPale, b.primaryPale),
       primaryTint50: l(a.primaryTint50, b.primaryTint50),
+      accentPurple: l(a.accentPurple, b.accentPurple),
       accentGradientEnd: l(a.accentGradientEnd, b.accentGradientEnd),
       brandGlow: l(a.brandGlow, b.brandGlow),
       accentGlow: l(a.accentGlow, b.accentGlow),
@@ -1223,6 +1253,7 @@ class StarryTokens extends ThemeExtension<StarryTokens> {
     accentGradientEnd: Color(0xFFB567F1),
     brandGlow: Color(0x3D7F53EE),
     accentGlow: Color(0x47FFB7E8),
+    accentPurple: Color(0xFF8D67F1),
   );
 
   static const StarryBrandColors _darkBrand = StarryBrandColors(
@@ -1233,6 +1264,7 @@ class StarryTokens extends ThemeExtension<StarryTokens> {
     accentGradientEnd: Color(0xFFB567F1),
     brandGlow: Color(0x3D7F53EE),
     accentGlow: Color(0x47FFB7E8),
+    accentPurple: Color(0xFFB7A9FF),
   );
 
   static const StarrySemanticColors _lightSemantic = StarrySemanticColors(
@@ -1265,6 +1297,10 @@ class StarryTokens extends ThemeExtension<StarryTokens> {
     infoBg: Color(0xFFCFFAFE),
     info: Color(0xFF0891B2),
     infoStrong: Color(0xFF0E7490),
+    scrim: Color(0x66000000),
+    shadow: Color(0x1A000000),
+    inverseSurface: Color(0xFF1E1E26),
+    onInverseSurface: Color(0xFFCCCCCC),
   );
 
   static const StarrySemanticColors _darkSemantic = StarrySemanticColors(
@@ -1297,6 +1333,10 @@ class StarryTokens extends ThemeExtension<StarryTokens> {
     infoBg: Color(0xFF08303A),
     info: Color(0xFF22D3EE),
     infoStrong: Color(0xFF67E8F9),
+    scrim: Color(0x99000000),
+    shadow: Color(0x40000000),
+    inverseSurface: Color(0xFFFFFFFF),
+    onInverseSurface: Color(0xFF333333),
   );
 
   static const StarryTokens light = StarryTokens(

@@ -51,9 +51,16 @@
 final t = Theme.of(context).extension<StarryTokens>()!;
 ```
 
-`StarryTokens` 是 `ThemeExtension<StarryTokens>`,已接入 `AppTheme`,提供
-`StarryTokens.light` / `StarryTokens.dark` 两个静态实例,`lerp`/`copyWith` 已实现
-(主题切换与动画插值开箱即用)。
+`StarryTokens` 是基础设计值的唯一真源,提供 `StarryTokens.light` / `StarryTokens.dark`
+两个静态实例,`lerp`/`copyWith` 已实现。`StarryApplicationTokens` 是同包内从
+`StarryTokens` 派生的组件角色图(surface/text/interaction/chrome/feed/media/code/
+metric/status),不得拥有另一套独立色板;应用只负责把这两个根扩展装配进
+`ThemeData`,不得在应用仓重新定义通用视觉 token。运行时入口:
+
+```dart
+final t = context.starryTokens;
+final app = context.starryApplicationTokens;
+```
 
 ### 1.1 三层令牌架构(与 ui-ux-design 技能一致)
 

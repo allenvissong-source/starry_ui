@@ -8,6 +8,7 @@ library;
 
 // Theme & design tokens.
 export 'src/theme/starry_tokens.dart';
+export 'src/theme/starry_application_tokens.dart';
 export 'src/theme/app_theme.dart';
 export 'src/theme/starry_responsive.dart';
 
@@ -65,6 +66,7 @@ export 'src/interactions/starry_swipeable.dart';
 // Layout.
 export 'src/layout/masonry_feed_metrics.dart';
 export 'src/layout/sliver_masonry_feed.dart';
+export 'src/layout/starry_ambient_background.dart';
 export 'src/layout/starry_desktop_window_frame.dart';
 export 'src/layout/starry_glass_panel.dart';
 export 'src/layout/starry_gradient_fallback.dart';

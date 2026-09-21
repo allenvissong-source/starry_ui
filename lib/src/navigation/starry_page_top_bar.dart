@@ -102,6 +102,7 @@ class StarryPageTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.height = defaultHeight,
     this.bottomPadding,
     this.backgroundColor,
+    this.foregroundColor,
     this.centerTitle = true,
     this.leading,
     this.systemOverlayStyle,
@@ -157,6 +158,17 @@ class StarryPageTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// Background fill. Defaults to `semantic.surface`.
   final Color? backgroundColor;
+
+  /// Optional override for the title and action-icon foreground colour.
+  ///
+  /// The title always adopts this when non-null. The leading/trailing action
+  /// glyphs adopt it **only in `flat` style**: an `elevated` action owns an
+  /// opaque `surface` shell and keeps the token `textPrimary` glyph regardless
+  /// of this value (contrast protection - a white overlay glyph on a white
+  /// elevated shell is 1:1). Defaults to null so existing callers are
+  /// unchanged; the collapsing sliver bar passes it (with `flat` actions) to
+  /// keep its icons legible over an expanded backdrop.
+  final Color? foregroundColor;
 
   /// Whether to center the title within the toolbar.
   final bool centerTitle;
@@ -281,7 +293,7 @@ class StarryPageTopBar extends StatelessWidget implements PreferredSizeWidget {
       }
       return child;
     }
-    return _TopBarActionButton(item: item);
+    return _TopBarActionButton(item: item, foregroundColor: foregroundColor);
   }
 
   /// Builds the default back affordance injected when [showDefaultBack] is set
@@ -357,9 +369,10 @@ class _TopBarActionStrip extends StatelessWidget {
 }
 
 class _TopBarActionButton extends StatefulWidget {
-  const _TopBarActionButton({required this.item});
+  const _TopBarActionButton({required this.item, this.foregroundColor});
 
   final StarryTopBarActionItem item;
+  final Color? foregroundColor;
 
   @override
   State<_TopBarActionButton> createState() => _TopBarActionButtonState();
@@ -379,8 +392,19 @@ class _TopBarActionButtonState extends State<_TopBarActionButton> {
     final isElevated = item.style == StarryTopBarActionStyle.elevated;
     final opacity = isEnabled ? 1.0 : t.opacity.disabledContent;
 
+    // Pair the glyph with whatever backing actually sits behind it:
+    //  * An [elevated] action owns an opaque `surface` shell, so its glyph must
+    //    be the token `textPrimary` that pairs with that shell. It must NOT
+    //    blindly adopt an overlay foreground — doing so renders e.g. a white
+    //    glyph on a white surface shell (1:1) whenever the overlay is chosen for
+    //    the floating chrome.
+    //  * A [flat] action has no shell of its own: it floats directly over the
+    //    bar's backing, so it may adopt the overlay foreground (when supplied).
+    final Color iconColor = isElevated
+        ? s.textPrimary
+        : (widget.foregroundColor ?? s.textPrimary);
     final Widget icon = IconTheme(
-      data: IconThemeData(color: s.textPrimary, size: t.controlMetrics.iconLg),
+      data: IconThemeData(color: iconColor, size: t.controlMetrics.iconLg),
       child: _AnimatedActionIcon(
         motion: item.motion,
         hovered: _hovered,
