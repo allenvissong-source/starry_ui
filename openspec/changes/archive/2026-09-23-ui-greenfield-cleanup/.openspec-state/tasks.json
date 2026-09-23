@@ -1,0 +1,177 @@
+{
+  "version": 4,
+  "tasksRevision": "completed",
+  "reconciledAt": "2026-09-23T13:00:00.000Z",
+  "tasks": {
+    "task_1": {
+      "id": "task_1",
+      "taskKey": "1.1",
+      "file": "openspec/changes/ui-greenfield-cleanup/tasks.md",
+      "ordinal": 1,
+      "description": "1.1 `git rm --cached .diag/colors_now.png`; confirm `git ls-files .diag/` returns empty and the file still exists on disk",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "a1b2c3d4-0001-4000-8000-000000000001",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "git rm --cached .diag/colors_now.png removed the index entry; git ls-files .diag/ now returns empty; the file still exists on disk (Test-Path = True).",
+          "command": "git rm --cached .diag/colors_now.png; git ls-files .diag/; Test-Path .diag/colors_now.png",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T13:00:00.000Z"
+        }
+      ]
+    },
+    "task_2": {
+      "id": "task_2",
+      "taskKey": "1.2",
+      "file": "openspec/changes/ui-greenfield-cleanup/tasks.md",
+      "ordinal": 2,
+      "description": "1.2 Confirm `.gitignore` still covers `.diag/` (line 49) so the file does not get re-tracked",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "a1b2c3d4-0002-4000-8000-000000000002",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": ".gitignore:49 reads `.diag/` under the `# Local diagnostics / scratch (do not commit)` header at :48, so the untracked screenshot will not be re-added.",
+          "command": "Select-String -Path .gitignore -Pattern 'diag'",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T13:00:00.000Z"
+        }
+      ]
+    },
+    "task_3": {
+      "id": "task_3",
+      "taskKey": "2.1",
+      "file": "openspec/changes/ui-greenfield-cleanup/tasks.md",
+      "ordinal": 3,
+      "description": "2.1 `git rm -r lib/src/_migrating/`; confirm the directory no longer exists in the index or on disk",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "a1b2c3d4-0003-4000-8000-000000000003",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "git rm -r lib/src/_migrating/ removed lib/src/_migrating/README.md; Test-Path lib/src/_migrating = False; git ls-files lib/src/_migrating/ returns empty.",
+          "command": "git rm -r lib/src/_migrating/; Test-Path lib/src/_migrating; git ls-files lib/src/_migrating/",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T13:00:00.000Z"
+        }
+      ]
+    },
+    "task_4": {
+      "id": "task_4",
+      "taskKey": "3.1",
+      "file": "openspec/changes/ui-greenfield-cleanup/tasks.md",
+      "ordinal": 4,
+      "description": "3.1 Rewrite `README.md` with a real package description (no \"A new Flutter project.\" residue)",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "a1b2c3d4-0004-4000-8000-000000000004",
+          "kind": "review",
+          "source": "executed",
+          "summary": "README.md rewritten to describe the design-system package (Starry* widgets, StarryTokens, bundled fonts, Widgetbook catalogue, boundary, usage, dev commands). Select-String for 'A new Flutter project' across README.md + pubspec.yaml returns no matches.",
+          "command": "Write README.md; Select-String -Path README.md,pubspec.yaml -Pattern 'A new Flutter project' -SimpleMatch",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T13:00:00.000Z"
+        }
+      ]
+    },
+    "task_5": {
+      "id": "task_5",
+      "taskKey": "3.2",
+      "file": "openspec/changes/ui-greenfield-cleanup/tasks.md",
+      "ordinal": 5,
+      "description": "3.2 Set `pubspec.yaml` `description` to a real package description",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "a1b2c3d4-0005-4000-8000-000000000005",
+          "kind": "review",
+          "source": "executed",
+          "summary": "pubspec.yaml:2 description changed from \"A new Flutter project.\" to the real design-system description.",
+          "command": "Edit pubspec.yaml line 2",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T13:00:00.000Z"
+        }
+      ]
+    },
+    "task_6": {
+      "id": "task_6",
+      "taskKey": "4.1",
+      "file": "openspec/changes/ui-greenfield-cleanup/tasks.md",
+      "ordinal": 6,
+      "description": "4.1 Update the Widgetbook bullet in `openspec/project.md`: Widgetbook lives in `dev_dependencies`, not `dependencies`",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "a1b2c3d4-0006-4000-8000-000000000006",
+          "kind": "review",
+          "source": "executed",
+          "summary": "openspec/project.md:24-25 now states widgetbook/widgetbook_annotation/widgetbook_generator sit in dev_dependencies (pubspec.yaml:19-21), so not a transitive host dependency.",
+          "command": "Edit openspec/project.md Widgetbook bullet",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T13:00:00.000Z"
+        }
+      ]
+    },
+    "task_7": {
+      "id": "task_7",
+      "taskKey": "4.2",
+      "file": "openspec/changes/ui-greenfield-cleanup/tasks.md",
+      "ordinal": 7,
+      "description": "4.2 Drop the now-false `lib/src/_migrating/` bullet from `openspec/project.md` (the directory was removed in 2.1)",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "a1b2c3d4-0007-4000-8000-000000000007",
+          "kind": "review",
+          "source": "executed",
+          "summary": "openspec/project.md:26-27 replaced the stale '_migrating contains only a README' bullet with a note that the directory was removed in ui-greenfield-cleanup and the migration converged into lib/src/components/ and the role directories.",
+          "command": "Edit openspec/project.md _migrating bullet",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T13:00:00.000Z"
+        }
+      ]
+    },
+    "task_8": {
+      "id": "task_8",
+      "taskKey": "5.1",
+      "file": "openspec/changes/ui-greenfield-cleanup/tasks.md",
+      "ordinal": 8,
+      "description": "5.1 `flutter analyze` in this package (fallback: `dart analyze`) — no new issues introduced",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "a1b2c3d4-0008-4000-8000-000000000008",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "flutter analyze: No issues found! (ran in 9.1s), exit 0. flutter pub get resolved dependencies first.",
+          "command": "flutter analyze",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T13:00:00.000Z"
+        }
+      ]
+    }
+  },
+  "staleTaskIds": [],
+  "diagnostics": []
+}
