@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starry_ui/starry_ui.dart';
+import 'package:starry_ui/src/feedback/starry_looping_animations.dart';
 // StarryInputShell is an internal shell (not in the public barrel); import it
 // directly to assert the soft variant threads through to the shared shell.
 import 'package:starry_ui/src/inputs/input_shell.dart';

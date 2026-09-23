@@ -18,16 +18,13 @@ export 'src/buttons/starry_text_button.dart';
 export 'src/buttons/starry_button.dart';
 export 'src/buttons/starry_toggle_icon_button.dart';
 export 'src/buttons/starry_metric_button.dart';
-export 'src/buttons/starry_ai_button.dart';
 export 'src/buttons/starry_primary_action_button.dart';
 
 // Foundations.
 export 'src/foundations/starry_count_formatter.dart';
 
 // Media.
-export 'src/media/starry_asset_card.dart';
 export 'src/media/starry_avatar.dart';
-export 'src/media/starry_identity_row.dart';
 export 'src/media/starry_media_stage.dart';
 export 'src/media/starry_reference_card.dart';
 
@@ -42,9 +39,7 @@ export 'src/components/starry_surface.dart';
 // Feedback.
 export 'src/feedback/starry_message_list.dart';
 export 'src/feedback/starry_empty_state.dart';
-export 'src/feedback/starry_error_widget.dart';
 export 'src/feedback/starry_loading_indicator.dart';
-export 'src/feedback/starry_looping_animations.dart';
 export 'src/feedback/starry_skeleton_or_content.dart';
 export 'src/feedback/starry_sliver_skeleton_or_content.dart';
 
@@ -59,7 +54,6 @@ export 'src/inputs/starry_textarea.dart';
 // Interactions.
 export 'src/interactions/starry_press_scale.dart';
 export 'src/interactions/starry_selected_highlight.dart';
-export 'src/interactions/starry_state_layer.dart';
 export 'src/interactions/starry_slidable_drawer.dart';
 export 'src/interactions/starry_swipeable.dart';
 
@@ -72,7 +66,6 @@ export 'src/layout/starry_glass_panel.dart';
 export 'src/layout/starry_gradient_fallback.dart';
 export 'src/layout/starry_immersive_background.dart';
 export 'src/layout/starry_master_detail_layout.dart';
-export 'src/layout/starry_page_wrapper.dart';
 export 'src/layout/starry_group_card.dart';
 export 'src/layout/starry_section_header.dart';
 export 'src/layout/starry_settings_tile.dart';
@@ -82,12 +75,9 @@ export 'src/navigation/starry_dock_bar.dart';
 export 'src/navigation/starry_navigation_pane.dart';
 export 'src/navigation/starry_page_top_bar.dart';
 export 'src/navigation/starry_round_action_button.dart';
-export 'src/navigation/starry_segmented_control.dart';
 export 'src/navigation/starry_sliver_page_top_bar.dart';
 
 // Tags.
 export 'src/tags/starry_badge.dart';
 export 'src/tags/starry_chip.dart';
 export 'src/tags/starry_tag.dart';
-// Text.
-export 'src/text/starry_emoji_text.dart';

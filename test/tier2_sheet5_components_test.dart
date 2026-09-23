@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starry_ui/main.directories.g.dart' as widgetbook_directories;
 import 'package:starry_ui/starry_ui.dart';
+import 'package:starry_ui/src/feedback/starry_looping_animations.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+// Internal-only primitives no longer surfaced on the public barrel; tested here
+// via their implementation libraries (same-package access).
+import 'package:starry_ui/src/buttons/starry_ai_button.dart';
+import 'package:starry_ui/src/media/starry_identity_row.dart';
 import 'package:starry_ui/src/buttons/starry_ai_button.usecase.dart'
     as starry_ai_button_usecase;
 

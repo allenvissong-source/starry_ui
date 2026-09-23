@@ -3,6 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starry_ui/starry_ui.dart';
+import 'package:starry_ui/src/feedback/starry_looping_animations.dart';
+
+// Internal-only primitives, tested via their implementation libraries.
+import 'package:starry_ui/src/layout/starry_page_wrapper.dart';
+import 'package:starry_ui/src/text/starry_emoji_text.dart';
 
 Widget _host(Widget child) {
   return MaterialApp(

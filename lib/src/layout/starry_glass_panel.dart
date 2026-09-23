@@ -21,6 +21,7 @@ class StarryGlassPanel extends StatelessWidget {
     this.surfaceOpacity,
     this.borderOpacity,
     this.borderWidth,
+    this.boxShadow,
     super.key,
   });
 
@@ -57,6 +58,14 @@ class StarryGlassPanel extends StatelessWidget {
   /// Defaults to `controlMetrics.borderThin` (1) when null.
   final double? borderWidth;
 
+  /// Drop shadow painted under the panel.
+  ///
+  /// Defaults to `elevation.glass` (the diffuse floating-glass tier) when null.
+  /// Pass an empty list to render a flat, shadowless panel — e.g. a subtle
+  /// hairline card sitting on a solid page background where a drop shadow would
+  /// read as noise rather than depth.
+  final List<BoxShadow>? boxShadow;
+
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
@@ -81,7 +90,7 @@ class StarryGlassPanel extends StatelessWidget {
               ),
               width: resolvedBorderWidth,
             ),
-            boxShadow: t.elevation.glass,
+            boxShadow: boxShadow ?? t.elevation.glass,
           ),
           child: Padding(padding: resolvedPadding, child: child),
         ),
