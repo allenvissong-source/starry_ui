@@ -21,6 +21,7 @@ Shared Flutter design-system package for the Starry product family.
   not an accepted task.
 - 22 barrel-exported public widgets currently have zero production consumption in the host app;
   5 of them are still instantiated inside the package.
-- `lib/src/_migrating/` contains only a README.
-- Widgetbook sits in `dependencies` (not `dev_dependencies`), so it is a transitive dependency of
-  the host application.
+- Widgetbook (`widgetbook`, `widgetbook_annotation`, `widgetbook_generator`) sits in
+  `dev_dependencies`, so it is not a transitive dependency of the host application.
+  (`lib/src/_migrating/` was removed in `ui-greenfield-cleanup`; the migration it staged has
+  converged into `lib/src/components/` and the role directories.)

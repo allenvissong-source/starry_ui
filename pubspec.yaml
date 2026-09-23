@@ -1,5 +1,5 @@
 name: starry_ui
-description: "A new Flutter project."
+description: "Shared Flutter design-system package for Starry: Starry* widgets, StarryTokens theme extension, bundled fonts, and a Widgetbook component catalogue."
 publish_to: 'none'
 version: 0.1.0
 
