@@ -34,6 +34,11 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# NOTE: lib/main.directories.g.dart is a build_runner-generated file but is
+# intentionally TRACKED in git (see AGENTS.md §5.1). Do NOT add a *.g.dart
+# exclusion here. CI verifies reproducibility via
+# .github/workflows/generated-files-check.yml.
+
 # Symbolication related
 app.*.symbols
 

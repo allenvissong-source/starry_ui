@@ -550,6 +550,19 @@ dart run build_runner build --delete-conflicting-outputs
 
 `main.directories.g.dart` 是生成物,不要手改。
 
+### 5.1 生成文件策略(硬性)
+
+| 文件 | 生成器 | 生成命令 | 是否跟踪 | 理由 |
+|---|---|---|---|---|
+| `lib/main.directories.g.dart` | `widgetbook_generator` | `dart run build_runner build --delete-conflicting-outputs` | **是,已跟踪** | Widgetbook 目录文件必须跨 clone 稳定;消费方和 CI 不跑 build_runner;提交的文件是可审查的产物 |
+
+- **不要手改 `main.directories.g.dart`**——它是 `// GENERATED CODE - DO NOT MODIFY BY HAND`。
+- **不要在 `.gitignore` 中排除 `*.g.dart`**——本仓刻意跟踪 `main.directories.g.dart`。
+- **CI 可复现门禁**:`.github/workflows/generated-files-check.yml` 在每次 push / PR 时
+  跑 `dart run build_runner build --delete-conflicting-outputs` 后接 `git diff --exit-code`。
+  如果生成物与提交的版本不一致(即有人改了 `@UseCase` 注解但忘了重新生成),CI 会 fail。
+- 改完任何 `*.usecase.dart` 的注解后,**必须**本地跑一次生成命令并提交 diff。
+
 ---
 
 ## 6. 代码风格与 lint
