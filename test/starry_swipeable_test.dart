@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starry_ui/starry_ui.dart';
+// StarrySwipeable is an internal primitive; only StarrySwipeAction is public.
+import 'package:starry_ui/src/interactions/starry_swipeable.dart';
 
 Widget _host(Widget child) {
   return MaterialApp(

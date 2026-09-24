@@ -141,7 +141,13 @@ void main() {
   group('StarryChip', () {
     testWidgets('delete action exposes its tooltip', (tester) async {
       await tester.pumpWidget(
-        _host(const StarryChip(label: 'Tag', onDelete: _noop, deleteTooltip: 'Remove')),
+        _host(
+          const StarryChip(
+            label: 'Tag',
+            onDelete: _noop,
+            deleteTooltip: 'Remove',
+          ),
+        ),
       );
 
       expect(find.byTooltip('Remove'), findsOneWidget);

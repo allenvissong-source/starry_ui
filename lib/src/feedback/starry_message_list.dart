@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/starry_tokens.dart';
 import '../components/starry_surface.dart';
+import '../interactions/starry_swipe_action.dart';
 import '../interactions/starry_swipeable.dart';
 
 /// A single swipe action attached to a [StarryMessageListItemData].

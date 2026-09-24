@@ -1,122 +1,62 @@
-# Barrel export audit — why the zero-consumption exports stay
+# Barrel export audit — public surface decisions
 
-Measured 2026-09-20 on this workspace. Every number here is counted by
-`_agent_logs/g3p3_twin_census.py` (census) and
-`_agent_logs/g3p3_barrel_filter.py` (in-file filter), both re-runnable.
+Measured 2026-09-24 on the current workspace with:
 
-This file exists because "22 barrel exports have zero consumers" reads as a
-deletion list and is not one. The per-component reason lives here rather than in
-a commit message, so a future audit finds it (task 4.3).
+```powershell
+python D:\Starry-1.07\_agent_logs\g3p3_twin_census.py `
+  D:\Starry-1.07\Starry-Flutter-Frontend `
+  D:\Starry-1.07\starry_ui --barrel
+```
 
-## Method, so the numbers can be re-derived
+This document records the decision boundary rather than treating every name with
+no direct app reference as dead code.
 
-`lib/starry_ui.dart` carries **61 export directives**, through which **120
-public names** are reachable.
+## Method
 
-A *consumer* is a reference to the name that is not in the declaring file, not
-an `import` / `export` / `part` directive, and not a line comment. Self-reference
-is not consumption.
+A *consumer* is a reference outside the declaring file. Import/export/part
+statements and line comments do not count. The census keeps these scopes apart:
 
-The count is taken **three** times, and keeping them apart is the whole point:
-
-| Scope | What it answers |
+| Scope | Question answered |
 | --- | --- |
-| main repo `lib/` | does the app use it? |
-| `starry_ui/lib/` excluding the declaring file | does the package use it elsewhere? |
-| `starry_ui/lib/` declaring file only | is it load-bearing where it is declared? |
+| main app `lib/` | Does the application name this API directly? |
+| `starry_ui/lib/` outside the declaring file | Does another package component compose it? |
+| declaring file | Is the type required by its own public fields, switches, or extensions? |
 
-Windows note: ripgrep output is parsed with an anchored regex, because paths
-start with a drive letter and splitting on `:` silently misfiles every hit.
+A zero in the first scope is not sufficient evidence for deletion. Token types,
+parameter enums, extension names, and lower-level primitives can be load-bearing
+without being named by the app.
 
-## Result
+## Current result
 
-| Bucket | Count |
-| --- | --- |
-| public names reachable via the barrel | 120 |
-| zero consumers in the main repo | 52 |
-| — of which still instantiated inside `starry_ui/lib` | 36 |
-| — of which zero outside their own declaring file | 16 |
-| — of those 16, load-bearing inside their declaring file | 15 |
-| — of those 16, referenced nowhere in `lib/` at all | **1** |
+| Measure | Count |
+| --- | ---: |
+| barrel export directives | 54 |
+| public names reachable through the barrel | 121 |
+| names with zero direct main-app references | 26 |
+| of those, composed elsewhere in `starry_ui/lib` | 8 |
+| of those, with no cross-file reference | 18 |
+| deletable after declaring-file inspection | **0** |
 
-**Deletable: none.** The single name with no reference anywhere under `lib/`,
-`StarryBreathingDot`, has a dedicated test group
-(`test/tier1_capability_additions_test.dart:269-311`, 2 tests over 11 lines of
-assertions). Deleting the class means deleting those tests, and deleting tests is
-not on the table. It is a *published capability with proven behaviour and no
-current caller* — which is a deliberate export, not residue.
+The 18 cross-file-zero names are required inside their declaring files: examples
+include token classes stored by `StarryTokens`, enum values exhaustively switched
+by their component, builder typedefs used by public fields, and
+`StarryApplicationTokensContext`, whose extension getters are the API even though
+the extension name itself is never referenced.
 
-The audit figure of 22 is not reproducible under any of the three scopes
-(52 / 16 / 1). Stated as a divergence rather than reconciled by picking whichever
-scope lands on 22.
+## Swipe public boundary
 
-## Per-component reasons
+`StarrySwipeAction` remains public because the main app and public composite
+widgets construct action lists with it. `StarrySwipeable` is an implementation
+primitive used by `StarryMessageList` and `StarrySlidableDrawer`; it is no longer
+exported from `lib/starry_ui.dart` and is imported relatively by those internal
+components.
 
-### The 36 with zero main-repo consumers but live in-package use
+This keeps the action data contract public while preventing callers from binding
+to the lower-level drag/settle implementation.
 
-Deleting any of these breaks `starry_ui` itself. They fall into three groups:
+## Decision
 
-- **Composed by another Starry component.** `StarryAvatarSize` /
-  `StarryIdentityDensity` (used by `StarryIdentityRow`), `StarryStateLayer`
-  (used by `StarryDockBar`), `StarrySwipeable` (used by `StarryMessageList` and
-  `StarrySlidableDrawer`), `StarrySwitch` (used by `StarrySettingsTile`),
-  `StarryBrandColors` (used by `StarryImmersiveBackground`), `StarryTypography`
-  (used by `StarryEmojiText` and `AppTheme`), `StarrySemanticColors` (31 uses).
-  These are the design system working as intended: the app consumes the
-  composite, the package consumes the part.
-- **Enum / data types of a live component.** `StarryAvatarShape`,
-  `StarryBadgePosition`, `StarryChipVariant`, `StarryIconButtonVariant`,
-  `StarryMessageListAction`, `StarryMessageListItemData`, `StarryTextFieldState`,
-  `StarryTopBarActionStyle`. A parameter type with no direct app reference is
-  still the only way to pass that parameter.
-- **Exercised by the Widgetbook catalogue.** `StarryAiButton`, `StarryAssetCard`,
-  `StarryBadge`, `StarryChip`, `StarryEmojiText`, `StarryErrorWidget`,
-  `StarryIconButton`, `StarryIdentityRow`, `StarryMessageList`,
-  `StarryPageWrapper`, `StarryPulsingWidget`, `StarryRotatingWidget`,
-  `StarryScalingWidget`, `StarrySearchInput`, `StarrySegmentedControl`,
-  `StarrySkeletonOrContent`, `StarrySliverSkeletonOrContent`. Each has a
-  `*.usecase.dart` and an entry in `main.directories.g.dart`. The catalogue is
-  the package's shop window; an unconsumed-by-the-app component is exactly what
-  a catalogue is for.
-
-### The 15 with no external reference that are still load-bearing
-
-All 15 are referenced only inside their own declaring file, which the census
-excludes by design (a class is not its own consumer). That exclusion is right for
-"does anything else use this" and wrong for "can this be deleted":
-
-| Name | Why deleting it breaks the build |
-| --- | --- |
-| `StarrySpacing` | `starry_tokens.dart:1108` — `final StarrySpacing spacing;` on `StarryTokens` |
-| `StarryRadius` | `:1098` — `final StarryRadius radius;` |
-| `StarryMotion` | `:1120` — `final StarryMotion motion;` |
-| `StarryOpacity` | `:1126` — `final StarryOpacity opacity;` |
-| `StarryElevation` | field of `StarryTokens`, plus `foundations.dart` |
-| `StarryGlass` | `:1089` — constructor default `const StarryGlass()` |
-| `StarryIndicator` | `:1117` — `final StarryIndicator indicator;` |
-| `StarryLetterSpacing` | `:1132` — `final StarryLetterSpacing letterSpacing;` |
-| `StarryFocusMetrics` | `:1129` — `final StarryFocusMetrics focus;` |
-| `StarryControlMetrics` | `:1111` — `final StarryControlMetrics controlMetrics;` |
-| `StarryControlMetricsTokens` | 16 uses — the primitive layer `StarrySemanticControlMetrics` maps onto |
-| `StarrySwitchSize` | `starry_switch.dart:33,42,96,98` — the `size` parameter, exhaustively switched |
-| `StarryMasterDetailMode` | `starry_master_detail_layout.dart:82-85` — the mode it switches on |
-| `StarryExpandableCard` | its own `State` class references it (`:94,97`) |
-| `StarryResponsiveWidgetBuilder` | `starry_responsive.dart:53` — the `builder` field's type |
-| `StarryWindowDragAreaBuilder` | `starry_desktop_window_frame.dart:77,220` |
-
-These are token classes and parameter types. They are exported because a consumer
-that reads `tokens.spacing.s4` needs `StarrySpacing` to be a nameable type. Their
-"zero consumers" figure is an artefact of the measurement, not a property of the
-code — which is precisely why the three scopes are reported separately instead of
-collapsed into one number.
-
-## Decision (task 4.1)
-
-For all 52: **recorded as deliberately exported.** None gains a consumer in this
-change and none is withdrawn from the barrel.
-
-Withdrawing the 36 would break the package. Withdrawing the 15 token types would
-make `StarryTokens`' own public fields unnameable by consumers. Withdrawing
-`StarryBreathingDot` would orphan a passing test suite. The honest outcome of
-this audit is that the zero-consumption figure was measuring the wrong thing,
-and the list it produced contains nothing that should go.
+- Keep the current 121 public names; this audit found no name safe to remove.
+- Do not infer deletability from direct app-consumer counts alone.
+- Re-run the census after any barrel change and inspect declaring-file use before
+  removing a zero-consumer name.

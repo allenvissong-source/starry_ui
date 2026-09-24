@@ -55,7 +55,7 @@ export 'src/inputs/starry_textarea.dart';
 export 'src/interactions/starry_press_scale.dart';
 export 'src/interactions/starry_selected_highlight.dart';
 export 'src/interactions/starry_slidable_drawer.dart';
-export 'src/interactions/starry_swipeable.dart';
+export 'src/interactions/starry_swipe_action.dart';
 
 // Layout.
 export 'src/layout/masonry_feed_metrics.dart';

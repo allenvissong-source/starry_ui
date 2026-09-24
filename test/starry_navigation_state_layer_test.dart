@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starry_ui/starry_ui.dart';
 
+// Internal-only interaction primitive, tested via its implementation library.
+import 'package:starry_ui/src/interactions/starry_state_layer.dart';
+
 Widget _host(Widget child) {
   return MaterialApp(
     theme: AppTheme.light(),

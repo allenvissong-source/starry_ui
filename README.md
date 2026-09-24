@@ -15,6 +15,12 @@ Shared Flutter design-system package for the Starry product family.
 
 - Consumed by `Starry-Flutter-Frontend` through a `path: ../starry_ui` dependency.
 - One-way dependency rule: this package must never import `package:starry/`.
+- **Public API surface = the barrel.** The only supported entry point is
+  `package:starry_ui/starry_ui.dart` (`lib/starry_ui.dart`); whatever it exports is the stable
+  public contract. Everything under `lib/src/` is internal implementation.
+- Consumers must never import `package:starry_ui/src/...` directly. A component that still ships
+  only under `lib/src/` (implementation, tests, and `*.usecase.dart` may all exist) is internal-only
+  by design; it becomes public only when its `export` line is added to the barrel.
 - Colors and spacing come from tokens; hardcoded literals are gated by `custom_lint` rules plus
   repo checkers in the host application.
 

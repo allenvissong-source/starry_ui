@@ -1,26 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/starry_tokens.dart';
-
-/// A single swipe-revealed action.
-///
-/// Shared by [StarrySwipeable] and every widget built on top of it
-/// (e.g. `StarryMessageList` rows and `StarrySlidableDrawer`).
-class StarrySwipeAction {
-  const StarrySwipeAction({
-    required this.label,
-    required this.icon,
-    required this.onTap,
-    required this.backgroundColor,
-    required this.foregroundColor,
-  });
-
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-  final Color backgroundColor;
-  final Color foregroundColor;
-}
+import 'starry_swipe_action.dart';
 
 /// Swipe-to-reveal container: drags [child] horizontally to expose a trailing
 /// row of [actions].

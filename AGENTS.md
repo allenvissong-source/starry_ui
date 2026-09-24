@@ -510,23 +510,19 @@ return content;
 
 ---
 
-## 4. 成熟度阶梯与 barrel 导出策略
+## 4. 公共 API 边界与 barrel 导出策略
 
-状态机:`_migrating → internal stable → public stable`。
+**`lib/starry_ui.dart`(barrel)是唯一权威的公共 API 清单。** barrel 导出什么,公共契约就是
+什么;不要在本文档复制组件清单或数量——清单随每次加/减 export 漂移,一切以 barrel 为准。
 
-- 迁移中的组件先放 `lib/src/_migrating/`,视为私有,**不得**出现在
-  `lib/starry_ui.dart` 且**不得**被消费方直接 import。
-- 只有到达 **public stable** 才在 `lib/starry_ui.dart` 加一行 `export`。
-- 当前已 public-stable 并导出:icon_button / text_button / button / card /
-  text_field / textarea / switch / message_list / badge / chip / tag,以及
-  theme(tokens + app_theme)。
-- 目录约定(按角色收敛):`buttons/`(按钮族:icon_button / text_button / button)、
-  `inputs/`(表单输入控件:text_field / textarea / switch，附 `input_border.dart` 共用 helper)、
-  `tags/`(标签徽标:badge / chip / tag)、`feedback/`(反馈类:message_list)、
-  `components/`(容器/表面类通用组件,当前仅 card)、`overlays/`(浮层背景)、
-  `foundations/`(基础演示页)、`theme/`(令牌与主题)。
-  `components/` 已从「半迁移暂存区」收敛为「容器/表面类组件区」,其余组件按角色归入
-  上述专属目录,不再作为过渡堆放地。
+- 公共入口只有 `package:starry_ui/starry_ui.dart`。`lib/src/` 下全部是内部实现,
+  消费方(主应用 / Widgetbook)**禁止** `import 'package:starry_ui/src/...'` 越界。
+- 一个符号成为公共 API 的唯一动作,就是在 barrel 里保留/新增一行 `export`;barrel 中没有的
+  文件即视为内部组件。
+- 内部组件可以同时拥有实现文件、包内测试和 `*.usecase.dart`(Widgetbook 目录树),但只要
+  没在 barrel 导出,就不属于公共 API——这是有意收窄,不是缺失;将来需要暴露时再往 barrel 加一行。
+- 历史上的 `lib/src/_migrating/` 暂存目录与 `_migrating → internal → public` 状态机已废弃
+  (该目录已不存在),不再使用。新增或收敛组件直接落在 `lib/src/<角色>/` 下,按角色分目录组织即可。
 
 ---
 

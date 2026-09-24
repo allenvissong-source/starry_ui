@@ -3,6 +3,7 @@ import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 
 import '../theme/starry_tokens.dart';
 import 'starry_slidable_drawer.dart';
+import 'starry_swipe_action.dart';
 import 'starry_swipeable.dart';
 
 @UseCase(name: 'Default', type: StarrySlidableDrawer)

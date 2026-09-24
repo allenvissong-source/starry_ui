@@ -37,30 +37,29 @@ void main() {
     });
   }
 
-  testWidgets('context exposes one foundational and one application token graph', (
-    tester,
-  ) async {
-    late StarryTokens foundational;
-    late StarryApplicationTokens application;
-    const base = StarryTokens.light;
-    final app = StarryApplicationTokens.from(base, Brightness.light);
+  testWidgets(
+    'context exposes one foundational and one application token graph',
+    (tester) async {
+      late StarryTokens foundational;
+      late StarryApplicationTokens application;
+      const base = StarryTokens.light;
+      final app = StarryApplicationTokens.from(base, Brightness.light);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData(
-          extensions: <ThemeExtension<dynamic>>[base, app],
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: <ThemeExtension<dynamic>>[base, app]),
+          home: Builder(
+            builder: (context) {
+              foundational = context.starryTokens;
+              application = context.starryApplicationTokens;
+              return const SizedBox.shrink();
+            },
+          ),
         ),
-        home: Builder(
-          builder: (context) {
-            foundational = context.starryTokens;
-            application = context.starryApplicationTokens;
-            return const SizedBox.shrink();
-          },
-        ),
-      ),
-    );
+      );
 
-    expect(foundational, same(base));
-    expect(application, same(app));
-  });
+      expect(foundational, same(base));
+      expect(application, same(app));
+    },
+  );
 }

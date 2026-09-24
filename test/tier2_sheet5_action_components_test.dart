@@ -6,6 +6,9 @@ import 'package:starry_ui/main.directories.g.dart' as widgetbook_directories;
 import 'package:starry_ui/starry_ui.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+// Internal-only primitive, tested via its implementation library.
+import 'package:starry_ui/src/feedback/starry_error_widget.dart';
+
 // Positive-evidence coverage for the Sheet5 action/feedback sedimentation:
 //   • StarryErrorWidget        — full-surface error state with token retry CTA
 //   • StarryPrimaryActionButton — thin full-width filled CTA wrapper
