@@ -5,7 +5,7 @@ Shared Flutter design-system package for the Starry product family.
 ## Boundary
 
 - Owns every `Starry*` public widget and the `StarryTokens` theme extension family.
-- Consumed by `Starry-Flutter-Frontend` through a `path: ../starry_ui` dependency.
+- Consumed by `starry` through a `path: ../starry_ui` dependency.
 - Has a strict one-way dependency rule: this package must never import `package:starry/`.
 
 ## Conventions

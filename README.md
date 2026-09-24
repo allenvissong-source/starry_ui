@@ -13,7 +13,7 @@ Shared Flutter design-system package for the Starry product family.
 
 ## Boundary
 
-- Consumed by `Starry-Flutter-Frontend` through a `path: ../starry_ui` dependency.
+- Consumed by `starry` through a `path: ../starry_ui` dependency.
 - One-way dependency rule: this package must never import `package:starry/`.
 - **Public API surface = the barrel.** The only supported entry point is
   `package:starry_ui/starry_ui.dart` (`lib/starry_ui.dart`); whatever it exports is the stable

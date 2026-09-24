@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 $dest = 'D:\Starry-1.07\starry_ui\fonts'
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
 
-$mainFonts = '\\wsl.localhost\Ubuntu\home\allen\projects\starry\Starry-Flutter-Frontend\assets\fonts'
+$mainFonts = '\\wsl.localhost\Ubuntu\home\allen\projects\starry\starry\assets\fonts'
 Copy-Item -Force (Join-Path $mainFonts 'MiSans-VF.ttf') (Join-Path $dest 'MiSans-VF.ttf')
 Copy-Item -Force (Join-Path $mainFonts 'Twemoji.ttf')   (Join-Path $dest 'Twemoji.ttf')
 

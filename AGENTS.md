@@ -12,7 +12,7 @@
 ## 0. 环境与工具铁律(先看这条,能省一半时间)
 
 - **本包物理路径:`D:\Starry-1.07\starry_ui`**,与主工程
-  `D:\Starry-1.07\Starry-Flutter-Frontend` 是**同级兄弟目录**。主工程用
+  `D:\Starry-1.07\starry` 是**同级兄弟目录**。主工程用
   `path: ../starry_ui` 依赖本包,两者相对位置不能改(CI 也依赖这个布局:它把
   五个兄弟仓 checkout 到主仓的上一级再 `pub get`)。
 - **验证命令直接在 PowerShell 里跑**,工作目录设为本包根:

@@ -4,7 +4,7 @@ Measured 2026-09-24 on the current workspace with:
 
 ```powershell
 python D:\Starry-1.07\_agent_logs\g3p3_twin_census.py `
-  D:\Starry-1.07\Starry-Flutter-Frontend `
+  D:\Starry-1.07\starry `
   D:\Starry-1.07\starry_ui --barrel
 ```
 
