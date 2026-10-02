@@ -155,7 +155,12 @@ class StarryReferenceCard extends StatelessWidget {
     final s = t.semantic;
     Widget child;
     if (coverImage != null) {
-      child = Image(image: coverImage!, fit: BoxFit.cover);
+      child = Image(
+        image: coverImage!,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) =>
+            Icon(leadingIcon, color: s.brand, size: t.spacing.s6),
+      );
     } else if ((coverUrl ?? '').trim().isNotEmpty) {
       child = Image.network(
         coverUrl!,

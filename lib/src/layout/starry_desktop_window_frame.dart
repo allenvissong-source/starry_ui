@@ -46,6 +46,8 @@ class StarryDesktopWindowFrame extends StatelessWidget {
     required this.child,
     super.key,
     this.title,
+    this.leading,
+    this.actions,
   });
 
   static const ValueKey<String> frameKey = ValueKey<String>(
@@ -77,6 +79,14 @@ class StarryDesktopWindowFrame extends StatelessWidget {
   final StarryWindowDragAreaBuilder dragAreaBuilder;
   final Widget child;
   final Widget? title;
+
+  /// Application-provided content anchored to the title bar's leading edge.
+  /// The frame owns only placement; the host owns semantics and behavior.
+  final Widget? leading;
+
+  /// Application-provided actions placed immediately before the native window
+  /// controls on Windows, or after them on macOS.
+  final Widget? actions;
 
   @override
   Widget build(BuildContext context) {
@@ -156,22 +166,18 @@ class StarryDesktopWindowFrame extends StatelessWidget {
             children: <Widget>[
               SizedBox(
                 height: tokens.controlMetrics.heightLg,
-                child: Overlay.wrap(
-                  // Mounted above the app navigator, the title bar needs its
-                  // own bounded overlay for tooltips. Application content must
-                  // stay outside the overlay boundary so it keeps resolving
-                  // the navigator overlay and the root View used by EditableText.
-                  child: _DesktopTitleBar(
-                    platform: platform,
-                    visualState: visualState,
-                    isFocused: isFocused,
-                    labels: labels,
-                    onMinimize: onMinimize,
-                    onToggleMaximize: onToggleMaximize,
-                    onClose: onClose,
-                    dragAreaBuilder: dragAreaBuilder,
-                    title: title,
-                  ),
+                child: _DesktopTitleBar(
+                  platform: platform,
+                  visualState: visualState,
+                  isFocused: isFocused,
+                  labels: labels,
+                  onMinimize: onMinimize,
+                  onToggleMaximize: onToggleMaximize,
+                  onClose: onClose,
+                  dragAreaBuilder: dragAreaBuilder,
+                  title: title,
+                  leading: leading,
+                  actions: actions,
                 ),
               ),
               Expanded(
@@ -208,6 +214,8 @@ class _DesktopTitleBar extends StatelessWidget {
     required this.onClose,
     required this.dragAreaBuilder,
     required this.title,
+    required this.leading,
+    required this.actions,
   });
 
   final StarryDesktopPlatform platform;
@@ -219,6 +227,8 @@ class _DesktopTitleBar extends StatelessWidget {
   final VoidCallback onClose;
   final StarryWindowDragAreaBuilder dragAreaBuilder;
   final Widget? title;
+  final Widget? leading;
+  final Widget? actions;
 
   @override
   Widget build(BuildContext context) {
@@ -272,10 +282,17 @@ class _DesktopTitleBar extends StatelessWidget {
       StarryDesktopPlatform.linux => const <Widget>[],
     };
 
-    final controlsRow = Padding(
+    final nativeControls = Padding(
       // Keeps the controls off the rounded outer edge of the surround.
       padding: EdgeInsets.symmetric(horizontal: tokens.spacing.s1),
       child: Row(mainAxisSize: MainAxisSize.min, children: controls),
+    );
+    final applicationActions = actions ?? const SizedBox.shrink();
+    final trailingControls = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: platform == StarryDesktopPlatform.macOS
+          ? <Widget>[nativeControls, applicationActions]
+          : <Widget>[applicationActions, nativeControls],
     );
     final titleStyle = tokens.typography.labelMedium.textStyle.copyWith(
       color: isFocused
@@ -303,13 +320,19 @@ class _DesktopTitleBar extends StatelessWidget {
               ),
             ),
           ),
-          if (controls.isNotEmpty)
+          if (leading != null)
             Align(
               alignment: platform == StarryDesktopPlatform.macOS
-                  ? Alignment.centerLeft
-                  : Alignment.centerRight,
-              child: controlsRow,
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              child: leading,
             ),
+          Align(
+            alignment: platform == StarryDesktopPlatform.macOS
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
+            child: trailingControls,
+          ),
         ],
       ),
     );
@@ -349,49 +372,47 @@ class _WindowsControlButtonState extends State<_WindowsControlButton> {
         ? tokens.semantic.onError
         : tokens.semantic.textPrimary;
 
-    return Tooltip(
-      message: widget.tooltip,
-      child: Semantics(
-        button: true,
-        label: widget.tooltip,
-        child: SizedBox.square(
-          dimension: tokens.controlMetrics.heightLg,
-          child: Material(
-            color: background,
-            // Rounded so the hover fill sits inside the surround instead of
-            // reading as a square notch cut out of it.
+    return Semantics(
+      button: true,
+      label: widget.tooltip,
+      excludeSemantics: true,
+      child: SizedBox.square(
+        dimension: tokens.controlMetrics.heightLg,
+        child: Material(
+          color: background,
+          // Rounded so the hover fill sits inside the surround instead of
+          // reading as a square notch cut out of it.
+          borderRadius: BorderRadius.circular(tokens.radius.sm),
+          child: InkWell(
             borderRadius: BorderRadius.circular(tokens.radius.sm),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(tokens.radius.sm),
-              onTap: widget.onPressed,
-              onHover: (value) => setState(() => _hovered = value),
-              onFocusChange: (value) => setState(() => _focused = value),
-              hoverColor: Colors.transparent,
-              focusColor: Colors.transparent,
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              // Pressed feedback only: hover/focus already paint their own
-              // opaque fill on the Material above. Scoping the overlay to the
-              // pressed state keeps those layers untouched and stacks the MD3
-              // pressed step (statePressed) over them instead.
-              overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
-                if (states.contains(WidgetState.pressed)) {
-                  return tokens.semantic.textPrimary.withValues(
-                    alpha: tokens.opacity.statePressed,
-                  );
-                }
-                return Colors.transparent;
-              }),
-              child: Icon(
-                switch (widget.kind) {
-                  _WindowControlKind.minimize => Icons.minimize,
-                  _WindowControlKind.maximize => Icons.crop_square,
-                  _WindowControlKind.restore => Icons.filter_none,
-                  _WindowControlKind.close => Icons.close,
-                },
-                color: foreground,
-                size: tokens.controlMetrics.iconSm,
-              ),
+            onTap: widget.onPressed,
+            onHover: (value) => setState(() => _hovered = value),
+            onFocusChange: (value) => setState(() => _focused = value),
+            hoverColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            // Pressed feedback only: hover/focus already paint their own
+            // opaque fill on the Material above. Scoping the overlay to the
+            // pressed state keeps those layers untouched and stacks the MD3
+            // pressed step (statePressed) over them instead.
+            overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+              if (states.contains(WidgetState.pressed)) {
+                return tokens.semantic.textPrimary.withValues(
+                  alpha: tokens.opacity.statePressed,
+                );
+              }
+              return Colors.transparent;
+            }),
+            child: Icon(
+              switch (widget.kind) {
+                _WindowControlKind.minimize => Icons.minimize,
+                _WindowControlKind.maximize => Icons.crop_square,
+                _WindowControlKind.restore => Icons.filter_none,
+                _WindowControlKind.close => Icons.close,
+              },
+              color: foreground,
+              size: tokens.controlMetrics.iconSm,
             ),
           ),
         ),
@@ -436,61 +457,59 @@ class _MacControlButtonState extends State<_MacControlButton> {
     };
     final showGlyph = _hovered || _focused;
 
-    return Tooltip(
-      message: widget.tooltip,
-      child: Semantics(
-        button: true,
-        label: widget.tooltip,
-        child: SizedBox.square(
-          dimension: tokens.controlMetrics.heightLg,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: widget.onPressed,
-              onHover: (value) => setState(() => _hovered = value),
-              onFocusChange: (value) => setState(() => _focused = value),
-              hoverColor: Colors.transparent,
-              focusColor: Colors.transparent,
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
-                if (states.contains(WidgetState.pressed)) {
-                  return tokens.semantic.textPrimary.withValues(
-                    alpha: tokens.opacity.statePressed,
-                  );
-                }
-                return Colors.transparent;
-              }),
-              child: Center(
-                child: AnimatedContainer(
+    return Semantics(
+      button: true,
+      label: widget.tooltip,
+      excludeSemantics: true,
+      child: SizedBox.square(
+        dimension: tokens.controlMetrics.heightLg,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: widget.onPressed,
+            onHover: (value) => setState(() => _hovered = value),
+            onFocusChange: (value) => setState(() => _focused = value),
+            hoverColor: Colors.transparent,
+            focusColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+              if (states.contains(WidgetState.pressed)) {
+                return tokens.semantic.textPrimary.withValues(
+                  alpha: tokens.opacity.statePressed,
+                );
+              }
+              return Colors.transparent;
+            }),
+            child: Center(
+              child: AnimatedContainer(
+                duration: duration,
+                curve: tokens.motion.easingStandard,
+                width: tokens.indicator.dotMd,
+                height: tokens.indicator.dotMd,
+                decoration: BoxDecoration(
+                  color: fill,
+                  shape: BoxShape.circle,
+                  border: _focused
+                      ? Border.all(
+                          color: tokens.semantic.textPrimary,
+                          width: tokens.controlMetrics.borderThin,
+                        )
+                      : null,
+                ),
+                child: AnimatedOpacity(
                   duration: duration,
-                  curve: tokens.motion.easingStandard,
-                  width: tokens.indicator.dotMd,
-                  height: tokens.indicator.dotMd,
-                  decoration: BoxDecoration(
-                    color: fill,
-                    shape: BoxShape.circle,
-                    border: _focused
-                        ? Border.all(
-                            color: tokens.semantic.textPrimary,
-                            width: tokens.controlMetrics.borderThin,
-                          )
-                        : null,
-                  ),
-                  child: AnimatedOpacity(
-                    duration: duration,
-                    opacity: showGlyph ? 1 : 0,
-                    child: Icon(
-                      switch (widget.kind) {
-                        _WindowControlKind.close => Icons.close,
-                        _WindowControlKind.minimize => Icons.remove,
-                        _WindowControlKind.maximize => Icons.add,
-                        _WindowControlKind.restore => Icons.unfold_less,
-                      },
-                      color: tokens.semantic.textPrimary,
-                      size: tokens.controlMetrics.iconXs,
-                    ),
+                  opacity: showGlyph ? 1 : 0,
+                  child: Icon(
+                    switch (widget.kind) {
+                      _WindowControlKind.close => Icons.close,
+                      _WindowControlKind.minimize => Icons.remove,
+                      _WindowControlKind.maximize => Icons.add,
+                      _WindowControlKind.restore => Icons.unfold_less,
+                    },
+                    color: tokens.semantic.textPrimary,
+                    size: tokens.controlMetrics.iconXs,
                   ),
                 ),
               ),

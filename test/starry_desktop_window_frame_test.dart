@@ -18,6 +18,8 @@ Widget _host({
   VoidCallback? onMinimize,
   VoidCallback? onToggleMaximize,
   VoidCallback? onClose,
+  Widget? leading,
+  Widget? actions,
 }) {
   final Widget body = StarryDesktopWindowFrame(
     platform: platform,
@@ -29,6 +31,8 @@ Widget _host({
     onClose: onClose ?? () {},
     dragAreaBuilder: (context, child) => child,
     title: const Text('Starry'),
+    leading: leading,
+    actions: actions,
     child: const SizedBox.expand(key: ValueKey<String>('content')),
   );
   final Widget frame;
@@ -87,6 +91,30 @@ void main() {
     expect(minimize.dx, lessThan(maximize.dx));
     expect(maximize.dx, lessThan(close.dx));
     expect(close.dx, greaterThan(700));
+  });
+
+  testWidgets('application slots flank the draggable title area', (
+    tester,
+  ) async {
+    const leadingKey = ValueKey<String>('application-leading');
+    const actionsKey = ValueKey<String>('application-actions');
+    await tester.pumpWidget(
+      _host(
+        platform: StarryDesktopPlatform.windows,
+        leading: const SizedBox(key: leadingKey, width: 120),
+        actions: const SizedBox(key: actionsKey, width: 160),
+      ),
+    );
+
+    final leading = tester.getRect(find.byKey(leadingKey));
+    final actions = tester.getRect(find.byKey(actionsKey));
+    final minimize = tester.getRect(
+      find.byKey(StarryDesktopWindowFrame.minimizeKey),
+    );
+
+    expect(leading.left, 0);
+    expect(actions.right, lessThanOrEqualTo(minimize.left));
+    expect(leading.center.dy, actions.center.dy);
   });
 
   testWidgets('macOS controls are left aligned and ordered', (tester) async {
@@ -340,9 +368,10 @@ void main() {
     handle.dispose();
   });
 
-  testWidgets('control tooltips work when mounted above the app navigator', (
+  testWidgets('controls expose semantics without hover tooltips', (
     tester,
   ) async {
+    final semantics = tester.ensureSemantics();
     await tester.pumpWidget(
       _appLevelHost(platform: StarryDesktopPlatform.windows),
     );
@@ -357,8 +386,17 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.text('Close window'), findsOneWidget);
+    expect(find.byType(Tooltip), findsNothing);
+    expect(find.text('Close window'), findsNothing);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Semantics && widget.properties.label == 'Close window',
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
+    semantics.dispose();
   });
 
   testWidgets('app-level frame preserves text input inherited widgets', (
@@ -386,11 +424,8 @@ void main() {
     expect(controller.text, 'starry');
   });
 
-  testWidgets('frame overlay stays hidden from the application subtree', (
-    tester,
-  ) async {
+  testWidgets('title bar reuses the application overlay', (tester) async {
     late OverlayState appRootOverlay;
-    late OverlayState frameOverlay;
 
     await tester.pumpWidget(
       _appLevelHost(
@@ -404,22 +439,11 @@ void main() {
       ),
     );
 
-    frameOverlay = tester.state<OverlayState>(
-      find
-          .ancestor(
-            of: find.byKey(StarryDesktopWindowFrame.closeKey),
-            matching: find.byType(Overlay),
-          )
-          .first,
-    );
-
-    // The app keeps resolving its own root overlay, so toasts and dialogs are
-    // unaffected by the frame's private overlay.
-    expect(appRootOverlay, isNot(same(frameOverlay)));
+    expect(appRootOverlay.mounted, isTrue);
     expect(
       find.descendant(
-        of: find.byWidget(appRootOverlay.widget),
-        matching: find.byKey(StarryDesktopWindowFrame.closeKey),
+        of: find.byKey(StarryDesktopWindowFrame.titleBarKey),
+        matching: find.byType(Overlay),
       ),
       findsNothing,
     );

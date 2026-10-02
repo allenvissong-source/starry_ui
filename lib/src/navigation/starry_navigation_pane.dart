@@ -9,10 +9,14 @@ class StarryNavigationItem {
   const StarryNavigationItem({
     required this.id,
     required this.label,
-    required this.icon,
+    this.icon,
+    this.leading,
     this.enabled = true,
     this.trailing,
-  });
+  }) : assert(
+         icon != null || leading != null,
+         'Navigation items require either an icon or a leading widget.',
+       );
 
   /// Stable identity used for selection matching.
   final String id;
@@ -20,8 +24,11 @@ class StarryNavigationItem {
   /// Visible label.
   final String label;
 
-  /// Leading glyph.
-  final IconData icon;
+  /// Leading Material glyph. Use [leading] for brand artwork or richer marks.
+  final IconData? icon;
+
+  /// Optional leading widget, such as an SVG brand mark.
+  final Widget? leading;
 
   /// Whether the entry can be selected. Disabled entries stay visible but are
   /// dimmed and exposed as disabled in the semantics tree.
@@ -116,7 +123,7 @@ class StarryNavigationPane extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: t.spacing.s2),
             child: StarrySettingsTile(
               title: item.label,
-              leading: Icon(item.icon),
+              leading: item.leading ?? Icon(item.icon),
               trailing: item.trailing,
               enabled: item.enabled,
               selected: item.enabled && item.id == selectedId,

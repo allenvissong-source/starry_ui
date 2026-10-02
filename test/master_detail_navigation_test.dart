@@ -332,6 +332,38 @@ void main() {
       expect(find.text('模型服务'), findsOneWidget);
     });
 
+    testWidgets('renders a custom brand leading widget', (tester) async {
+      const brandKey = Key('brand-leading');
+      await _pumpAt(
+        tester,
+        const Size(400, 800),
+        child: StarryNavigationPane(
+          sections: const [
+            StarryNavigationSection(
+              items: [
+                StarryNavigationItem(
+                  id: 'brand',
+                  label: '品牌应用',
+                  leading: SizedBox.square(key: brandKey, dimension: 24),
+                ),
+              ],
+            ),
+          ],
+          selectedId: 'brand',
+          onItemSelected: (_) {},
+        ),
+      );
+
+      expect(find.byKey(brandKey), findsOneWidget);
+      final tile = tester.widget<StarrySettingsTile>(
+        find.ancestor(
+          of: find.text('品牌应用'),
+          matching: find.byType(StarrySettingsTile),
+        ),
+      );
+      expect(tile.leading, isA<SizedBox>());
+    });
+
     testWidgets('marks the selected item and never renders a chevron', (
       tester,
     ) async {
