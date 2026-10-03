@@ -4,7 +4,6 @@ import 'package:starry_ui/starry_ui.dart';
 
 // Internal-only primitives, tested via their implementation libraries.
 import 'package:starry_ui/src/media/starry_asset_card.dart';
-import 'package:starry_ui/src/navigation/starry_segmented_control.dart';
 
 Widget _host(Widget child) {
   return MaterialApp(
