@@ -169,9 +169,15 @@ void main() {
                 matching: find.byType(DecoratedBox),
               ),
             )
-            .map((d) => d.decoration as BoxDecoration)
-            .firstWhere((d) => d.border != null);
-        expect((withBorder.border! as Border).top.color, t.semantic.brand);
+            .firstWhere(
+              (box) => (box.decoration as BoxDecoration).border != null,
+            );
+        final borderDecoration = withBorder.decoration as BoxDecoration;
+        expect(
+          (borderDecoration.border! as Border).top.color,
+          t.semantic.brand,
+        );
+        expect(withBorder.position, DecorationPosition.foreground);
       },
     );
 
@@ -194,9 +200,12 @@ void main() {
               matching: find.byType(DecoratedBox),
             ),
           )
-          .map((d) => d.decoration as BoxDecoration)
-          .firstWhere((d) => d.border != null);
-      expect((withBorder.border! as Border).top.color, Colors.red);
+          .firstWhere(
+            (box) => (box.decoration as BoxDecoration).border != null,
+          );
+      final borderDecoration = withBorder.decoration as BoxDecoration;
+      expect((borderDecoration.border! as Border).top.color, Colors.red);
+      expect(withBorder.position, DecorationPosition.foreground);
     });
 
     testWidgets('customSize overrides the preset diameter', (tester) async {

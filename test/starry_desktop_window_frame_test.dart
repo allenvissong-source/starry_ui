@@ -90,7 +90,17 @@ void main() {
 
     expect(minimize.dx, lessThan(maximize.dx));
     expect(maximize.dx, lessThan(close.dx));
+    expect(minimize.dy, maximize.dy);
+    expect(maximize.dy, close.dy);
     expect(close.dx, greaterThan(700));
+    expect(
+      find.descendant(
+        of: find.byKey(StarryDesktopWindowFrame.minimizeKey),
+        matching: find.byIcon(Icons.remove),
+      ),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.minimize), findsNothing);
   });
 
   testWidgets('application slots flank the draggable title area', (

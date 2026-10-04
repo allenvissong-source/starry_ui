@@ -199,7 +199,7 @@ class StarryDesktopWindowFrame extends StatelessWidget {
     // Deliberately unpadded. An outer gutter over a transparent window
     // background is not empty space, it is a hole: the desktop shows straight
     // through it, which reads as a detached ring around the app.
-    return frame;
+    return Directionality(textDirection: TextDirection.ltr, child: frame);
   }
 }
 
@@ -404,15 +404,17 @@ class _WindowsControlButtonState extends State<_WindowsControlButton> {
               }
               return Colors.transparent;
             }),
-            child: Icon(
-              switch (widget.kind) {
-                _WindowControlKind.minimize => Icons.minimize,
-                _WindowControlKind.maximize => Icons.crop_square,
-                _WindowControlKind.restore => Icons.filter_none,
-                _WindowControlKind.close => Icons.close,
-              },
-              color: foreground,
-              size: tokens.controlMetrics.iconSm,
+            child: Center(
+              child: Icon(
+                switch (widget.kind) {
+                  _WindowControlKind.minimize => Icons.remove,
+                  _WindowControlKind.maximize => Icons.crop_square,
+                  _WindowControlKind.restore => Icons.filter_none,
+                  _WindowControlKind.close => Icons.close,
+                },
+                color: foreground,
+                size: tokens.controlMetrics.iconSm,
+              ),
             ),
           ),
         ),

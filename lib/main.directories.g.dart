@@ -104,6 +104,8 @@ import 'package:starry_ui/src/navigation/starry_round_action_button.usecase.dart
     as _starry_ui_src_navigation_starry_round_action_button_usecase;
 import 'package:starry_ui/src/navigation/starry_segmented_control.usecase.dart'
     as _starry_ui_src_navigation_starry_segmented_control_usecase;
+import 'package:starry_ui/src/navigation/starry_side_navigation_rail.usecase.dart'
+    as _starry_ui_src_navigation_starry_side_navigation_rail_usecase;
 import 'package:starry_ui/src/navigation/starry_sliver_page_top_bar.usecase.dart'
     as _starry_ui_src_navigation_starry_sliver_page_top_bar_usecase;
 import 'package:starry_ui/src/tags/starry_badge.usecase.dart'
@@ -1058,6 +1060,23 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'Two segments',
             builder: _starry_ui_src_navigation_starry_segmented_control_usecase
                 .twoStarrySegmentedControl,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'StarrySideNavigationRail',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder:
+                _starry_ui_src_navigation_starry_side_navigation_rail_usecase
+                    .allVariantsStarrySideNavigationRail,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder:
+                _starry_ui_src_navigation_starry_side_navigation_rail_usecase
+                    .playgroundStarrySideNavigationRail,
           ),
         ],
       ),

@@ -155,31 +155,34 @@ class StarryAvatar extends StatelessWidget {
     );
 
     Widget content = DecoratedBox(
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: borderRadius,
-        border: bordered
-            ? Border.all(
-                color: borderColor ?? s.brand,
-                width: borderWidth ?? t.controlMetrics.borderThin,
-              )
-            : null,
-      ),
-      child: ClipRRect(
-        borderRadius: borderRadius,
-        child: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            fallback,
-            if (imageProvider != null)
-              Image(
-                image: imageProvider!,
-                fit: BoxFit.cover,
-                // On decode error we simply keep the fallback layer painted
-                // beneath — returning an empty box reveals it.
-                errorBuilder: (_, _, _) => const SizedBox.shrink(),
-              ),
-          ],
+      decoration: BoxDecoration(color: bg, borderRadius: borderRadius),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          border: bordered
+              ? Border.all(
+                  color: borderColor ?? s.brand,
+                  width: borderWidth ?? t.controlMetrics.borderThin,
+                )
+              : null,
+        ),
+        position: DecorationPosition.foreground,
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              fallback,
+              if (imageProvider != null)
+                Image(
+                  image: imageProvider!,
+                  fit: BoxFit.cover,
+                  // On decode error we simply keep the fallback layer painted
+                  // beneath — returning an empty box reveals it.
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                ),
+            ],
+          ),
         ),
       ),
     );
