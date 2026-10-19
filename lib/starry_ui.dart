@@ -29,6 +29,9 @@ export 'src/media/starry_media_stage.dart';
 export 'src/media/starry_reference_card.dart';
 
 // Containers / surfaces.
+export 'src/components/starry_action_item.dart';
+export 'src/components/starry_action_list.dart';
+export 'src/components/starry_action_surface.dart';
 export 'src/components/starry_action_option_card.dart';
 export 'src/components/starry_card.dart';
 export 'src/components/starry_expandable_card.dart';

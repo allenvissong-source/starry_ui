@@ -24,8 +24,12 @@ import 'package:starry_ui/src/buttons/starry_text_button.usecase.dart'
     as _starry_ui_src_buttons_starry_text_button_usecase;
 import 'package:starry_ui/src/buttons/starry_toggle_icon_button.usecase.dart'
     as _starry_ui_src_buttons_starry_toggle_icon_button_usecase;
+import 'package:starry_ui/src/components/starry_action_list.usecase.dart'
+    as _starry_ui_src_components_starry_action_list_usecase;
 import 'package:starry_ui/src/components/starry_action_option_card.usecase.dart'
     as _starry_ui_src_components_starry_action_option_card_usecase;
+import 'package:starry_ui/src/components/starry_action_surface.usecase.dart'
+    as _starry_ui_src_components_starry_action_surface_usecase;
 import 'package:starry_ui/src/components/starry_card.usecase.dart'
     as _starry_ui_src_components_starry_card_usecase;
 import 'package:starry_ui/src/components/starry_control_shell.usecase.dart'
@@ -241,6 +245,16 @@ final directories = <_widgetbook.WidgetbookNode>[
     name: 'components',
     children: [
       _widgetbook.WidgetbookComponent(
+        name: 'StarryActionList',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'Grouped With States',
+            builder: _starry_ui_src_components_starry_action_list_usecase
+                .groupedStarryActionList,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
         name: 'StarryActionOptionCard',
         useCases: [
           _widgetbook.WidgetbookUseCase(
@@ -257,6 +271,16 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'Playground',
             builder: _starry_ui_src_components_starry_action_option_card_usecase
                 .playgroundStarryActionOptionCard,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryActionSurfaceDemo',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'Anchored With Sub-page',
+            builder: _starry_ui_src_components_starry_action_surface_usecase
+                .anchoredStarryActionSurface,
           ),
         ],
       ),
