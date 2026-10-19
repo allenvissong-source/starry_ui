@@ -35,6 +35,7 @@ class StarryInputShell extends StatelessWidget {
     this.pill = false,
     this.trailingPadding,
     this.soft = false,
+    this.controlHeight,
   });
 
   final Widget child;
@@ -49,6 +50,11 @@ class StarryInputShell extends StatelessWidget {
   /// color/width tokens — no manufactured alpha — so it stays fully
   /// token-driven. Defaults to false, leaving the standard shell unchanged.
   final bool soft;
+
+  /// Visual height of this input shell. Null keeps the standard
+  /// [StarryControlMetrics.controlHeight]; compact input variants pass another
+  /// named control-height token rather than a literal value.
+  final double? controlHeight;
 
   /// Corner radius token for the shell. When null the shell falls back to
   /// `radius.lg`. A fixed-height control passed `radius.full` renders as a
@@ -88,9 +94,11 @@ class StarryInputShell extends StatelessWidget {
   /// center is at `controlHeight / 2`. The difference below reclaims exactly
   /// that gap and stays correct if the touch-target / control heights ever
   /// diverge.
-  static double endCapNudge(StarryTokens t) =>
+  static double endCapNudge(StarryTokens t, {double? controlHeight}) =>
       endPadding(t) +
-      (t.controlMetrics.minTouchTarget - t.controlMetrics.controlHeight) / 2;
+      (t.controlMetrics.minTouchTarget -
+              (controlHeight ?? t.controlMetrics.controlHeight)) /
+          2;
 
   /// Uniform gap for a real-width trailing capsule button nested concentrically
   /// inside the pill shell (AGENTS.md §1.5.2 胶囊套胶囊). The button is inset by
@@ -105,8 +113,9 @@ class StarryInputShell extends StatelessWidget {
   /// Any concentric-inset math must reason in this frame or the visible white
   /// channel ends up narrower vertically than the horizontal [trailingPadding]
   /// (which is itself applied inside the border).
-  static double interiorHeight(StarryTokens t) =>
-      t.controlMetrics.controlHeight - 2 * t.controlMetrics.focusBorderWidth;
+  static double interiorHeight(StarryTokens t, {double? controlHeight}) =>
+      (controlHeight ?? t.controlMetrics.controlHeight) -
+      2 * t.controlMetrics.focusBorderWidth;
 
   /// Visual height of a capsule button nested concentrically inside the pill
   /// shell: `interiorHeight − 2·gap`. Measured in the shell's *interior* frame
@@ -115,8 +124,10 @@ class StarryInputShell extends StatelessWidget {
   /// [trailingPadding] (= gap), which is likewise applied inside the border.
   /// With [StadiumBorder] this yields inner radius `interiorHeight/2 − gap`,
   /// exactly concentric with the shell's inner (visible) edge.
-  static double concentricInnerHeight(StarryTokens t) =>
-      interiorHeight(t) - 2 * concentricGap(t);
+  static double concentricInnerHeight(
+    StarryTokens t, {
+    double? controlHeight,
+  }) => interiorHeight(t, controlHeight: controlHeight) - 2 * concentricGap(t);
 
   /// Diameter of a *circle* nested concentrically inside the pill shell with a
   /// uniform [concentricGap] on all four sides (AGENTS.md §1.5.2 胶囊套圆). A
@@ -162,7 +173,10 @@ class StarryInputShell extends StatelessWidget {
       shellBorderRadius: pill
           ? null
           : BorderRadius.circular(borderRadius ?? t.radius.lg),
-      constraints: BoxConstraints(minHeight: t.controlMetrics.controlHeight),
+      height: controlHeight,
+      constraints: BoxConstraints(
+        minHeight: controlHeight ?? t.controlMetrics.controlHeight,
+      ),
       padding: EdgeInsetsDirectional.only(start: endPadding(t), end: end),
       child: child,
     );

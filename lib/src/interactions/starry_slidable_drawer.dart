@@ -20,6 +20,7 @@ class StarrySlidableDrawer extends StatelessWidget {
     this.actionWidth = _defaultActionWidth,
     this.borderRadius,
     this.actionBorderRadius,
+    this.backgroundColor,
   });
 
   /// Default per-action chip width. Matches the legacy drawer's `actionWidth`.
@@ -36,6 +37,11 @@ class StarrySlidableDrawer extends StatelessWidget {
   /// Per-chip corner radius. Defaults to `radius.lg`.
   final BorderRadius? actionBorderRadius;
 
+  /// Opaque underlay shared with the closed child surface. This prevents the
+  /// trailing actions and row-level effects from leaking through rounded-edge
+  /// anti-aliasing while the drawer is closed.
+  final Color? backgroundColor;
+
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
@@ -51,6 +57,7 @@ class StarrySlidableDrawer extends StatelessWidget {
         vertical: t.spacing.s1,
       ),
       actionBorderRadius: chipRadius,
+      backgroundColor: backgroundColor,
       child: child,
     );
   }

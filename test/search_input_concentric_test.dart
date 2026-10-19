@@ -23,11 +23,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _host(
-        StarrySearchInput(
-          hint: '输入关键词',
-          searchButtonText: '搜索',
-          onSearch: () {},
-        ),
+        StarrySearchInput(hint: '搜索', searchButtonText: '搜索', onSearch: () {}),
       ),
     );
     await tester.pumpAndSettle();
@@ -82,6 +78,83 @@ void main() {
     expect((gapTop - gapBottom).abs(), lessThan(0.6));
     expect((gapTop - gapRight).abs(), lessThan(0.6));
   });
+
+  testWidgets('compact search uses heightMd and stays concentric', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        StarrySearchInput(
+          hint: '搜索',
+          searchButtonText: '搜索',
+          onSearch: () {},
+          size: StarrySearchInputSize.compact,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final BuildContext ctx = tester.element(find.byType(StarrySearchInput));
+    final StarryTokens t = Theme.of(ctx).extension<StarryTokens>()!;
+    final shell = tester.getRect(find.byType(AnimatedContainer));
+    final button = tester.getRect(
+      find.descendant(
+        of: find.byType(StarryButton),
+        matching: find.byType(Material),
+      ),
+    );
+    final border = t.controlMetrics.focusBorderWidth;
+    final gap = StarryInputShell.concentricGap(t);
+
+    expect(
+      shell.height,
+      moreOrLessEquals(t.controlMetrics.heightMd, epsilon: 0.6),
+    );
+    expect(
+      button.top - (shell.top + border),
+      moreOrLessEquals(gap, epsilon: 0.6),
+    );
+    expect(
+      (shell.bottom - border) - button.bottom,
+      moreOrLessEquals(gap, epsilon: 0.6),
+    );
+    expect(
+      (shell.right - border) - button.right,
+      moreOrLessEquals(gap, epsilon: 0.6),
+    );
+  });
+
+  testWidgets(
+    'bounded narrow search hides optional trailing button without overflow',
+    (tester) async {
+      var searches = 0;
+      await tester.pumpWidget(
+        _host(
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: 96,
+              child: StarrySearchInput(
+                hint: '搜索',
+                searchButtonText: '搜索',
+                onSearch: () => searches += 1,
+                size: StarrySearchInputSize.compact,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(StarryButton), findsNothing);
+      expect(find.byType(TextField), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'query');
+      await tester.testTextInput.receiveAction(TextInputAction.search);
+      expect(searches, 1);
+    },
+  );
 
   testWidgets(
     'trailing Search button stays concentric with clear button shown',

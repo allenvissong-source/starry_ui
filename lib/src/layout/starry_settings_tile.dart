@@ -309,16 +309,17 @@ class _StarrySettingsTileState extends State<StarrySettingsTile> {
                         ),
                         SizedBox(width: t.spacing.s3),
                         if (trailingWidget != null)
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth:
-                                  (MediaQuery.sizeOf(context).width * 0.45)
-                                      .clamp(160.0, 320.0),
-                            ),
+                          Flexible(
                             child: Align(
                               alignment: Alignment.centerRight,
-                              widthFactor: 1,
-                              child: trailingWidget,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth:
+                                      (MediaQuery.sizeOf(context).width * 0.45)
+                                          .clamp(160.0, 320.0),
+                                ),
+                                child: trailingWidget,
+                              ),
                             ),
                           ),
                       ],
@@ -383,15 +384,19 @@ class _StarrySettingsTileState extends State<StarrySettingsTile> {
     if (widget.trailing != null) {
       children.add(widget.trailing!);
     } else if ((widget.trailingText ?? '').isNotEmpty) {
+      // The value shares the bounded trailing strip; let it wrap/ellipsize
+      // instead of measuring an unbounded single line that overflows the row.
       children.add(
-        Text(
-          widget.trailingText!,
-          maxLines: 1,
-          softWrap: false,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.right,
-          style: t.typography.bodySmall.textStyle.copyWith(
-            color: secondaryForeground,
+        Flexible(
+          child: Text(
+            widget.trailingText!,
+            maxLines: 2,
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+            style: t.typography.bodySmall.textStyle.copyWith(
+              color: secondaryForeground,
+            ),
           ),
         ),
       );
@@ -401,6 +406,7 @@ class _StarrySettingsTileState extends State<StarrySettingsTile> {
       if (children.isNotEmpty) {
         children.add(SizedBox(width: t.spacing.s2));
       }
+      // Chevron keeps its fixed hitbox; Flexible above never shrinks it.
       children.add(
         Icon(
           Icons.chevron_right_rounded,

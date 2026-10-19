@@ -26,8 +26,8 @@ class StarrySideNavigationItem {
 /// The design-system component owns rail geometry and destination-row visuals;
 /// the app adapter (e.g. `AppShellSideRail`) owns routing, auth, localization,
 /// and feature visibility. When [collapsed] the rail collapses to zero width
-/// (the hidden/compact band); when expanded it renders a fixed-width scrollable
-/// list whose width is [widthFor].
+/// (the hidden/compact band); when expanded it renders the product's narrow
+/// icon-over-label rail whose width is [widthFor].
 class StarrySideNavigationRail extends StatelessWidget {
   const StarrySideNavigationRail({
     required this.collapsed,
@@ -54,10 +54,12 @@ class StarrySideNavigationRail extends StatelessWidget {
   /// actions, settings, theme toggle).
   final Widget? footer;
 
-  /// Expanded rail width. Derived from the spacing/icon scale so it is identical
-  /// across light/dark token instances.
-  static double widthFor(StarryTokens tokens) =>
-      tokens.spacing.s16 * 3 + tokens.controlMetrics.iconXl;
+  /// Expanded rail width. This is a product chrome dimension rather than a
+  /// composition of spacing tokens: changing a spacing step must not silently
+  /// triple the width of the primary navigation.
+  static const double expandedWidth = 72;
+
+  static double widthFor(StarryTokens tokens) => expandedWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -68,24 +70,32 @@ class StarrySideNavigationRail extends StatelessWidget {
       child: SizedBox(
         width: widthFor(t),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            ListView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(vertical: t.spacing.s2),
-              children: <Widget>[
-                for (final item in items)
-                  _RailTile(
-                    item: item,
-                    selected: item.id == selectedId,
-                    tokens: t,
-                    onTap: () => onItemSelected(item.id),
-                  ),
-              ],
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.symmetric(vertical: t.spacing.s2),
+                children: <Widget>[
+                  for (final item in items)
+                    _RailTile(
+                      item: item,
+                      selected: item.id == selectedId,
+                      tokens: t,
+                      onTap: () => onItemSelected(item.id),
+                    ),
+                ],
+              ),
             ),
-            ?footer,
+            if (footer case final footer?)
+              Padding(
+                key: const Key('starry-side-navigation-footer'),
+                padding: EdgeInsets.only(
+                  bottom: t.spacing.s4,
+                  left: t.spacing.s2,
+                  right: t.spacing.s2,
+                ),
+                child: footer,
+              ),
           ],
         ),
       ),
@@ -113,37 +123,34 @@ class _RailTile extends StatelessWidget {
         : tokens.semantic.textSecondary;
     return InkWell(
       onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: tokens.spacing.s4,
-          vertical: tokens.spacing.s3,
-        ),
-        child: Row(
-          children: <Widget>[
-            SizedBox(
-              width: tokens.controlMetrics.iconLg,
-              height: tokens.controlMetrics.iconLg,
-              child: IconTheme(
-                data: IconThemeData(
-                  color: color,
-                  size: tokens.controlMetrics.iconLg,
-                ),
+      child: SizedBox(
+        height: tokens.controlMetrics.heightXl + tokens.spacing.s4,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: tokens.spacing.s2,
+            vertical: tokens.spacing.s1,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              SizedBox(
+                width: tokens.controlMetrics.iconLg,
+                height: tokens.controlMetrics.iconLg,
                 child: item.icon,
               ),
-            ),
-            SizedBox(width: tokens.spacing.s3),
-            Expanded(
-              child: Text(
+              SizedBox(height: tokens.spacing.s1),
+              Text(
                 item.label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
                 style: tokens.typography.labelSmall.textStyle.copyWith(
                   color: color,
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

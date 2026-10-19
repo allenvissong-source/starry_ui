@@ -24,6 +24,7 @@ class StarryFieldClearButton extends StatelessWidget {
     required this.onPressed,
     required this.tooltip,
     this.translateX = 0,
+    this.controlHeight,
   });
 
   /// Invoked when the affordance is tapped.
@@ -38,6 +39,9 @@ class StarryFieldClearButton extends StatelessWidget {
   /// inset / rounded end. Zero inserts no `Transform`.
   final double translateX;
 
+  /// Height of the containing input control. Null keeps the standard height.
+  final double? controlHeight;
+
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
@@ -51,7 +55,10 @@ class StarryFieldClearButton extends StatelessWidget {
       // (AGENTS.md §1.5.2「可视高 ≠ 布局高」).
       constraints: BoxConstraints.tightFor(
         width: t.controlMetrics.minTouchTarget,
-        height: StarryInputShell.interiorHeight(t),
+        height: StarryInputShell.interiorHeight(
+          t,
+          controlHeight: controlHeight,
+        ),
       ),
       // The default IconButton tap target is `padded`, which adds 48×48 hit
       // padding *outside* `constraints` and would force the shell past

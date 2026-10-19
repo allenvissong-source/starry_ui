@@ -54,6 +54,66 @@ void main() {
     expect(value, isTrue);
   });
 
+  testWidgets(
+    'StarrySettingsTile.toggle keeps the switch at the right edge on desktop',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        _host(
+          StarrySettingsTile.toggle(
+            title: '自动启动',
+            value: false,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tileRect = tester.getRect(find.byType(StarrySettingsTile));
+      final switchRect = tester.getRect(find.byType(StarrySwitch));
+      // s4 = 16px horizontal content padding; the control hugs the right edge.
+      expect(
+        (switchRect.right - (tileRect.right - 16)).abs(),
+        lessThanOrEqualTo(3.0),
+      );
+      // It must sit in the right half, not the row center.
+      expect(switchRect.center.dx, greaterThan(tileRect.right - 120));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'StarrySettingsTile.toggle right-aligns without overflow on narrow width',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 720);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        _host(
+          StarrySettingsTile.toggle(
+            title: '自动更新',
+            value: true,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tileRect = tester.getRect(find.byType(StarrySettingsTile));
+      final switchRect = tester.getRect(find.byType(StarrySwitch));
+      expect(
+        (switchRect.right - (tileRect.right - 16)).abs(),
+        lessThanOrEqualTo(3.0),
+      );
+      expect(switchRect.right, lessThanOrEqualTo(tileRect.right));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('StarryGroupCard renders children with dividers', (tester) async {
     await tester.pumpWidget(
       _host(
