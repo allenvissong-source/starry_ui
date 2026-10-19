@@ -27,6 +27,7 @@ export 'src/foundations/starry_count_formatter.dart';
 export 'src/media/starry_avatar.dart';
 export 'src/media/starry_media_stage.dart';
 export 'src/media/starry_reference_card.dart';
+export 'src/media/starry_workflow_summary.dart';
 
 // Containers / surfaces.
 export 'src/components/starry_action_item.dart';
@@ -57,6 +58,7 @@ export 'src/inputs/starry_textarea.dart';
 // Interactions.
 export 'src/interactions/starry_press_scale.dart';
 export 'src/interactions/starry_selected_highlight.dart';
+export 'src/interactions/starry_selectable_slidable_card.dart';
 export 'src/interactions/starry_slidable_drawer.dart';
 export 'src/interactions/starry_swipe_action.dart';
 
