@@ -70,6 +70,12 @@ class StarryActionSurface {
     /// children falls back to the root list.
     String? initialSectionId,
 
+    /// Called when the panel's current sub-page changes: null at root, the
+    /// parent item id once a hasChildren item opens its sub-page. Fired from
+    /// the panel's own stack lifecycle (post-frame at open, after setState on
+    /// push/pop); callers must only assign fields, never setState here.
+    ValueChanged<String?>? onSectionChanged,
+
     /// Localized filter-field placeholder; the generic English fallback is
     /// used when null. The component never hardcodes the caller's language.
     String? filterPlaceholder,
@@ -111,6 +117,7 @@ class StarryActionSurface {
               externalFilterQuery: externalFilterQuery,
               externalController: externalController,
               initialSectionId: initialSectionId,
+              onSectionChanged: onSectionChanged,
               filterPlaceholder: filterPlaceholder,
               emptyLabel: emptyLabel,
               onItemSelected: (item) {
@@ -172,6 +179,7 @@ class StarryActionSurface {
             externalFilterQuery: externalFilterQuery,
             externalController: externalController,
             initialSectionId: initialSectionId,
+            onSectionChanged: onSectionChanged,
             filterPlaceholder: filterPlaceholder,
             emptyLabel: emptyLabel,
             onItemSelected: (item) {
@@ -202,6 +210,7 @@ class _StarryActionPanel extends StatefulWidget {
     this.externalFilterQuery,
     this.externalController,
     this.initialSectionId,
+    this.onSectionChanged,
     this.filterPlaceholder,
     this.emptyLabel,
   });
@@ -215,6 +224,7 @@ class _StarryActionPanel extends StatefulWidget {
   final ValueListenable<String>? externalFilterQuery;
   final StarryActionListController? externalController;
   final String? initialSectionId;
+  final ValueChanged<String?>? onSectionChanged;
   final String? filterPlaceholder;
   final String? emptyLabel;
 
@@ -224,7 +234,17 @@ class _StarryActionPanel extends StatefulWidget {
 
 class _StarryActionPanelState extends State<_StarryActionPanel> {
   late final List<List<StarryActionItem>> _stack = [widget.items];
+  final List<String?> _stackIds = [null];
   final List<String> _stackTitles = [];
+
+  /// Post-frame fire so the callback never runs during build.
+  void _notifySection() {
+    final cb = widget.onSectionChanged;
+    if (cb == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cb(_stackIds.last);
+    });
+  }
 
   @override
   void initState() {
@@ -232,10 +252,12 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
     for (final item in widget.items) {
       if (item.id == widget.initialSectionId && item.hasChildren) {
         _stack.add(item.children!);
+        _stackIds.add(item.id);
         _stackTitles.add(item.title);
         break;
       }
     }
+    _notifySection();
   }
 
   bool get _isSubPage => _stack.length > 1;
@@ -249,8 +271,10 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
     if (item.hasChildren) {
       setState(() {
         _stack.add(item.children!);
+        _stackIds.add(item.id);
         _stackTitles.add(item.title);
       });
+      _notifySection();
       return;
     }
     widget.onItemSelected(item);
@@ -261,8 +285,10 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
     if (_isSubPage) {
       setState(() {
         _stack.removeLast();
+        _stackIds.removeLast();
         _stackTitles.removeLast();
       });
+      _notifySection();
       return;
     }
     widget.onClose();
