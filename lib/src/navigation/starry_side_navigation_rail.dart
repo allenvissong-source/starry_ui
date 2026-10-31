@@ -1,155 +1,259 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/starry_tokens.dart';
 
-/// One destination row in [StarrySideNavigationRail].
+/// A destination rendered by [StarrySideNavigationRail].
+///
+/// The rail owns presentation only. [id] is an opaque identity returned to the
+/// host when the item is activated; routing and application state stay outside
+/// the design system.
 @immutable
 class StarrySideNavigationItem {
   const StarrySideNavigationItem({
     required this.id,
     required this.label,
     required this.icon,
+    this.selectedIcon,
+    this.enabled = true,
   });
 
-  /// Stable destination id; echoed back via [StarrySideNavigationRail.onItemSelected].
+  /// Stable identity used for selection matching and activation callbacks.
   final String id;
 
-  /// Human-readable destination label, rendered alongside the icon when expanded.
+  /// Visible and semantic label.
   final String label;
 
-  /// Leading icon widget (asset image or glyph).
+  /// Monochrome artwork for the resting state.
+  ///
+  /// The rail constrains and tints this widget. Material icons, image icons,
+  /// raster assets, and SVG widgets are all supported.
   final Widget icon;
+
+  /// Optional artwork used while this destination is selected.
+  final Widget? selectedIcon;
+
+  /// Whether the destination can receive focus and activation.
+  final bool enabled;
 }
 
-/// Vertical side navigation rail.
+/// A narrow, icon-over-label navigation rail for top-level destinations.
 ///
-/// The design-system component owns rail geometry and destination-row visuals;
-/// the app adapter (e.g. `AppShellSideRail`) owns routing, auth, localization,
-/// and feature visibility. When [collapsed] the rail collapses to zero width
-/// (the hidden/compact band); when expanded it renders the product's narrow
-/// icon-over-label rail whose width is [widthFor].
+/// Visual geometry, color, focus, and motion are entirely token-driven. The
+/// component deliberately owns no routing, localization, or feature visibility
+/// logic; hosts provide the visible items and selected identity.
 class StarrySideNavigationRail extends StatelessWidget {
   const StarrySideNavigationRail({
-    required this.collapsed,
     required this.items,
+    this.selectedId,
     required this.onItemSelected,
     super.key,
-    this.selectedId,
+    this.collapsed = false,
+    this.header,
     this.footer,
   });
 
-  /// Hidden/compact band: the rail renders at zero width.
-  final bool collapsed;
-
-  /// Ordered root destinations.
   final List<StarrySideNavigationItem> items;
-
-  /// Invoked with the tapped [StarrySideNavigationItem.id].
-  final ValueChanged<String> onItemSelected;
-
-  /// Id of the currently selected destination, if any.
   final String? selectedId;
-
-  /// Optional footer rendered below the scrollable destinations (account
-  /// actions, settings, theme toggle).
+  final ValueChanged<String> onItemSelected;
+  final bool collapsed;
+  final Widget? header;
   final Widget? footer;
 
-  /// Expanded rail width. This is a product chrome dimension rather than a
-  /// composition of spacing tokens: changing a spacing step must not silently
-  /// triple the width of the primary navigation.
+  /// Stable product chrome width, independent of spacing scale.
   static const double expandedWidth = 72;
 
-  static double widthFor(StarryTokens tokens) => expandedWidth;
+  static double widthFor(StarryTokens t) => expandedWidth;
+
+  static double itemExtentFor(StarryTokens t) => widthFor(t);
 
   @override
   Widget build(BuildContext context) {
-    if (collapsed) return const SizedBox.shrink();
     final t = Theme.of(context).extension<StarryTokens>()!;
-    return Material(
-      color: Theme.of(context).colorScheme.surface,
-      child: SizedBox(
-        width: widthFor(t),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.symmetric(vertical: t.spacing.s2),
-                children: <Widget>[
-                  for (final item in items)
-                    _RailTile(
-                      item: item,
-                      selected: item.id == selectedId,
-                      tokens: t,
-                      onTap: () => onItemSelected(item.id),
-                    ),
-                ],
-              ),
-            ),
-            if (footer case final footer?)
-              Padding(
-                key: const Key('starry-side-navigation-footer'),
-                padding: EdgeInsets.only(
-                  bottom: t.spacing.s4,
-                  left: t.spacing.s2,
-                  right: t.spacing.s2,
-                ),
-                child: footer,
-              ),
-          ],
+    final reduceMotion =
+        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    final duration = reduceMotion ? Duration.zero : t.motion.durationShort;
+
+    return AnimatedContainer(
+      width: collapsed ? t.spacing.s0 : widthFor(t),
+      duration: duration,
+      curve: t.motion.easingStandard,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: t.semantic.surface,
+        border: Border(
+          right: BorderSide(
+            color: t.semantic.border,
+            width: t.controlMetrics.borderThin,
+          ),
         ),
       ),
+      child: collapsed
+          ? const SizedBox.shrink()
+          : Column(
+              children: [
+                ?header,
+                Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(vertical: t.spacing.s2),
+                    itemCount: items.length,
+                    itemExtent: itemExtentFor(t),
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      return _StarrySideNavigationButton(
+                        item: item,
+                        selected: item.id == selectedId,
+                        onTap: () => onItemSelected(item.id),
+                      );
+                    },
+                  ),
+                ),
+                if (footer != null) ...[
+                  Divider(
+                    height: t.controlMetrics.borderThin,
+                    thickness: t.controlMetrics.borderThin,
+                    color: t.semantic.border,
+                  ),
+                  Padding(
+                    key: const Key('starry-side-navigation-footer'),
+                    padding: EdgeInsets.only(
+                      bottom: t.spacing.s4,
+                      left: t.spacing.s2,
+                      right: t.spacing.s2,
+                    ),
+                    child: footer!,
+                  ),
+                ],
+              ],
+            ),
     );
   }
 }
 
-class _RailTile extends StatelessWidget {
-  const _RailTile({
+class _StarrySideNavigationButton extends StatefulWidget {
+  const _StarrySideNavigationButton({
     required this.item,
     required this.selected,
-    required this.tokens,
     required this.onTap,
   });
 
   final StarrySideNavigationItem item;
   final bool selected;
-  final StarryTokens tokens;
   final VoidCallback onTap;
 
   @override
+  State<_StarrySideNavigationButton> createState() =>
+      _StarrySideNavigationButtonState();
+}
+
+class _StarrySideNavigationButtonState
+    extends State<_StarrySideNavigationButton> {
+  bool _pressed = false;
+  bool _showFocus = false;
+
+  void _setPressed(bool value) {
+    if (_pressed == value) return;
+    setState(() => _pressed = value);
+  }
+
+  void _activate() {
+    if (!widget.item.enabled) return;
+    widget.onTap();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final color = selected
-        ? tokens.semantic.brand
-        : tokens.semantic.textSecondary;
-    return InkWell(
-      onTap: onTap,
-      child: SizedBox(
-        height: tokens.controlMetrics.heightXl + tokens.spacing.s4,
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: tokens.spacing.s2,
-            vertical: tokens.spacing.s1,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              SizedBox(
-                width: tokens.controlMetrics.iconLg,
-                height: tokens.controlMetrics.iconLg,
-                child: item.icon,
-              ),
-              SizedBox(height: tokens.spacing.s1),
-              Text(
-                item.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: tokens.typography.labelSmall.textStyle.copyWith(
-                  color: color,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+    final t = Theme.of(context).extension<StarryTokens>()!;
+    final reduceMotion =
+        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    final duration = reduceMotion ? Duration.zero : t.motion.durationShort;
+    final color = !widget.item.enabled
+        ? t.semantic.textDisabled
+        : widget.selected
+        ? t.semantic.brand
+        : t.semantic.textSecondary;
+    final icon = widget.selected
+        ? widget.item.selectedIcon ?? widget.item.icon
+        : widget.item.icon;
+
+    return FocusableActionDetector(
+      enabled: widget.item.enabled,
+      mouseCursor: widget.item.enabled
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+      },
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) {
+            _activate();
+            return null;
+          },
+        ),
+      },
+      onShowFocusHighlight: (value) {
+        if (_showFocus == value) return;
+        setState(() => _showFocus = value);
+      },
+      child: Semantics(
+        button: true,
+        enabled: widget.item.enabled,
+        selected: widget.selected,
+        label: widget.item.label,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: widget.item.enabled ? (_) => _setPressed(true) : null,
+          onTapUp: widget.item.enabled ? (_) => _setPressed(false) : null,
+          onTapCancel: widget.item.enabled ? () => _setPressed(false) : null,
+          onTap: widget.item.enabled ? _activate : null,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: t.spacing.s2),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: _showFocus ? t.semantic.brand : Colors.transparent,
+                      width: t.controlMetrics.focusBorderWidth,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(t.spacing.s1),
+                    child: AnimatedScale(
+                      key: ValueKey<String>('${widget.item.id}-icon-scale'),
+                      scale: _pressed ? t.motion.pressedScale : 1,
+                      duration: duration,
+                      curve: t.motion.easingStandard,
+                      child: ColorFiltered(
+                        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+                        child: SizedBox.square(
+                          dimension: t.controlMetrics.iconXl,
+                          child: FittedBox(fit: BoxFit.contain, child: icon),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: t.spacing.s1),
+                Text(
+                  widget.item.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: t.typography.labelSmall.textStyle.copyWith(
+                    decoration: TextDecoration.none,
+                    color: color,
+                    fontWeight: widget.selected
+                        ? FontWeight.w600
+                        : FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

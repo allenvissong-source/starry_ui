@@ -1,0 +1,3 @@
+schema: spec-driven
+created: 2026-10-14
+goal: 为 Starry 统一聊天入口提供公共桌面锚定浮层、移动底部面板子页和键盘可导航命令列表组件，并通过公共 barrel 导出。
