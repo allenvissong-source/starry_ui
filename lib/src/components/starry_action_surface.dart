@@ -65,6 +65,12 @@ class StarryActionSurface {
     /// Ignored by the internal autofocus/Plus path.
     StarryActionListController? externalController,
 
+    /// Optional live root-items source. When non-null, the panel rebuilds its
+    /// root level from the latest value without reopening; the sub-page stack
+    /// and its active content are left untouched. Null keeps the static
+    /// snapshot behavior.
+    ValueListenable<List<StarryActionItem>>? itemsListenable,
+
     /// Optional root item id the panel opens directly at (its children render
     /// as a sub-page with back navigation). Unknown id or an item without
     /// children falls back to the root list.
@@ -110,6 +116,7 @@ class StarryActionSurface {
               showFilter: showFilter,
               externalFilterQuery: externalFilterQuery,
               externalController: externalController,
+              itemsListenable: itemsListenable,
               initialSectionId: initialSectionId,
               filterPlaceholder: filterPlaceholder,
               emptyLabel: emptyLabel,
@@ -171,6 +178,7 @@ class StarryActionSurface {
             showFilter: showFilter,
             externalFilterQuery: externalFilterQuery,
             externalController: externalController,
+            itemsListenable: itemsListenable,
             initialSectionId: initialSectionId,
             filterPlaceholder: filterPlaceholder,
             emptyLabel: emptyLabel,
@@ -201,6 +209,7 @@ class _StarryActionPanel extends StatefulWidget {
     this.showFilter = true,
     this.externalFilterQuery,
     this.externalController,
+    this.itemsListenable,
     this.initialSectionId,
     this.filterPlaceholder,
     this.emptyLabel,
@@ -214,6 +223,7 @@ class _StarryActionPanel extends StatefulWidget {
   final String? title;
   final ValueListenable<String>? externalFilterQuery;
   final StarryActionListController? externalController;
+  final ValueListenable<List<StarryActionItem>>? itemsListenable;
   final String? initialSectionId;
   final String? filterPlaceholder;
   final String? emptyLabel;
@@ -225,17 +235,56 @@ class _StarryActionPanel extends StatefulWidget {
 class _StarryActionPanelState extends State<_StarryActionPanel> {
   late final List<List<StarryActionItem>> _stack = [widget.items];
   final List<String> _stackTitles = [];
+  // Parent item id for each sub-page frame, parallel to [_stackTitles]; lets a
+  // live root refresh re-resolve the open sub-page's children in place.
+  final List<String> _stackParentIds = [];
 
   @override
   void initState() {
     super.initState();
+    widget.itemsListenable?.addListener(_onItemsChanged);
     for (final item in widget.items) {
       if (item.id == widget.initialSectionId && item.hasChildren) {
         _stack.add(item.children!);
         _stackTitles.add(item.title);
+        _stackParentIds.add(item.id);
         break;
       }
     }
+  }
+
+  @override
+  void dispose() {
+    widget.itemsListenable?.removeListener(_onItemsChanged);
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StarryActionPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.itemsListenable != widget.itemsListenable) {
+      oldWidget.itemsListenable?.removeListener(_onItemsChanged);
+      widget.itemsListenable?.addListener(_onItemsChanged);
+    }
+  }
+
+  /// Republishes the root level on a live update and re-resolves each open
+  /// sub-page's children from the fresh root list; stack depth, titles and the
+  /// current level are preserved rather than rebuilt over.
+  void _onItemsChanged() {
+    if (!mounted) return;
+    setState(() {
+      _stack[0] = widget.itemsListenable!.value;
+      for (var frame = 1; frame < _stack.length; frame++) {
+        final parentId = _stackParentIds[frame - 1];
+        for (final parent in _stack[frame - 1]) {
+          if (parent.id == parentId && parent.hasChildren) {
+            _stack[frame] = parent.children!;
+            break;
+          }
+        }
+      }
+    });
   }
 
   bool get _isSubPage => _stack.length > 1;
@@ -250,6 +299,7 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
       setState(() {
         _stack.add(item.children!);
         _stackTitles.add(item.title);
+        _stackParentIds.add(item.id);
       });
       return;
     }
@@ -262,6 +312,7 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
       setState(() {
         _stack.removeLast();
         _stackTitles.removeLast();
+        _stackParentIds.removeLast();
       });
       return;
     }

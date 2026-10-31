@@ -1117,4 +1117,228 @@ void main() {
       },
     );
   });
+
+  group('live items listenable', () {
+    testWidgets('refreshes nested children from their actual parent', (
+      tester,
+    ) async {
+      List<StarryActionItem> tree(String leaf) => [
+        StarryActionItem(
+          id: 'root',
+          title: 'Root',
+          children: [
+            StarryActionItem(
+              id: 'nested',
+              title: 'Nested',
+              children: [StarryActionItem(id: leaf, title: leaf)],
+            ),
+          ],
+        ),
+      ];
+      final notifier = ValueNotifier<List<StarryActionItem>>(tree('Old leaf'));
+      addTearDown(notifier.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => StarryActionSurface.show(
+                  context: context,
+                  items: notifier.value,
+                  anchorRect: const Rect.fromLTWH(120, 120, 80, 40),
+                  onItemSelected: (_) {},
+                  itemsListenable: notifier,
+                ),
+                child: const Text('trigger'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('trigger'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Root'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Nested'));
+      await tester.pumpAndSettle();
+      notifier.value = tree('New leaf');
+      await tester.pumpAndSettle();
+      expect(find.text('Old leaf'), findsNothing);
+      expect(find.text('New leaf'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+    });
+    testWidgets('refreshes root and open sub-page in place without reopening', (
+      tester,
+    ) async {
+      final notifier = ValueNotifier<List<StarryActionItem>>([
+        StarryActionItem(id: 'r1', title: 'Root One'),
+        StarryActionItem(
+          id: 'sec',
+          title: 'Section',
+          children: [StarryActionItem(id: 'c1', title: 'Child One')],
+        ),
+      ]);
+      addTearDown(notifier.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => StarryActionSurface.show(
+                  context: context,
+                  items: notifier.value,
+                  anchorRect: const Rect.fromLTWH(120, 120, 80, 40),
+                  onItemSelected: (_) {},
+                  itemsListenable: notifier,
+                ),
+                child: const Text('trigger'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('trigger'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Root One'), findsOneWidget);
+      expect(find.byType(StarryActionList), findsOneWidget);
+
+      // Open the section sub-page; its children render from the initial list.
+      await tester.tap(find.text('Section'));
+      await tester.pumpAndSettle();
+      expect(find.text('Child One'), findsOneWidget);
+
+      // Live root refresh replaces root in place and re-resolves the open
+      // sub-page children; no second panel stacks.
+      notifier.value = [
+        StarryActionItem(id: 'r2', title: 'Root Two'),
+        StarryActionItem(
+          id: 'sec',
+          title: 'Section',
+          children: [StarryActionItem(id: 'c2', title: 'Child Two')],
+        ),
+      ];
+      await tester.pumpAndSettle();
+      expect(find.text('Child One'), findsNothing);
+      expect(find.text('Child Two'), findsOneWidget);
+      expect(find.byType(StarryActionList), findsOneWidget);
+
+      // Back to root: the live refresh replaced root in place with no stack.
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+      expect(find.text('Root One'), findsNothing);
+      expect(find.text('Root Two'), findsOneWidget);
+      expect(find.byType(StarryActionList), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.byType(StarryActionList), findsNothing);
+    });
+
+    testWidgets('settles a directly opened section sub-page in place', (
+      tester,
+    ) async {
+      final notifier = ValueNotifier<List<StarryActionItem>>([
+        StarryActionItem(id: 'r1', title: 'Root One'),
+        StarryActionItem(
+          id: 'sec',
+          title: 'Section',
+          children: [StarryActionItem(id: 'c1', title: 'Child One')],
+        ),
+      ]);
+      addTearDown(notifier.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => StarryActionSurface.show(
+                  context: context,
+                  items: notifier.value,
+                  anchorRect: const Rect.fromLTWH(120, 120, 80, 40),
+                  onItemSelected: (_) {},
+                  itemsListenable: notifier,
+                  initialSectionId: 'sec',
+                ),
+                child: const Text('trigger'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('trigger'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Child One'), findsOneWidget);
+      notifier.value = [
+        StarryActionItem(id: 'r2', title: 'Root Two'),
+        StarryActionItem(
+          id: 'sec',
+          title: 'Section',
+          children: [StarryActionItem(id: 'c2', title: 'Child Two')],
+        ),
+      ];
+      await tester.pumpAndSettle();
+      expect(find.text('Child One'), findsNothing);
+      expect(find.text('Child Two'), findsOneWidget);
+      expect(find.byType(StarryActionList), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets(
+      'mutating the notifier after close throws no setState-after-dispose',
+      (tester) async {
+        final notifier = ValueNotifier<List<StarryActionItem>>([
+          StarryActionItem(id: 'r1', title: 'Root One'),
+        ]);
+        addTearDown(notifier.dispose);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.light(),
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => ElevatedButton(
+                  onPressed: () => StarryActionSurface.show(
+                    context: context,
+                    items: notifier.value,
+                    anchorRect: const Rect.fromLTWH(120, 120, 80, 40),
+                    onItemSelected: (_) {},
+                    itemsListenable: notifier,
+                  ),
+                  child: const Text('trigger'),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('trigger'));
+        await tester.pumpAndSettle();
+        expect(find.text('Root One'), findsOneWidget);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+        expect(find.byType(StarryActionList), findsNothing);
+
+        notifier.value = [StarryActionItem(id: 'r2', title: 'Root Two')];
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
+  });
 }
