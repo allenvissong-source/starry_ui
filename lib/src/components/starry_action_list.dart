@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../interactions/starry_selected_highlight.dart';
+import '../inputs/input_shell.dart';
+import '../inputs/starry_switch.dart';
 import '../theme/starry_tokens.dart';
 import 'starry_action_item.dart';
 
@@ -265,7 +268,6 @@ class _StarryActionListState extends State<StarryActionList> {
   }
 
   Widget _buildFilterField(BuildContext context, StarryTokens t) {
-    final s = t.semantic;
     return Padding(
       padding: EdgeInsets.fromLTRB(
         t.spacing.s3,
@@ -273,43 +275,13 @@ class _StarryActionListState extends State<StarryActionList> {
         t.spacing.s3,
         t.spacing.s1,
       ),
-      child: TextField(
+      // Embedded filter on the panel's own corner language (radius.md — same
+      // family as the row highlight) instead of the standalone pill search
+      // bar, whose full-round ends clash with the rows. The soft system shell
+      // owns rest/focus borders; no hand-rolled decoration.
+      child: _StarryActionFilterField(
         controller: _filterController,
-        style: t.typography.bodyMedium.textStyle.copyWith(color: s.textPrimary),
-        decoration: InputDecoration(
-          isDense: true,
-          constraints: BoxConstraints(minHeight: t.controlMetrics.heightMd),
-          hintText: widget.filterPlaceholder ?? 'Type to filter',
-          hintStyle: t.typography.bodyMedium.textStyle.copyWith(
-            color: s.textTertiary,
-          ),
-          prefixIcon: Icon(
-            Icons.search,
-            size: t.controlMetrics.iconMd,
-            color: s.textTertiary,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(t.radius.sm),
-            borderSide: BorderSide(
-              color: s.border,
-              width: t.controlMetrics.restBorderWidth,
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(t.radius.sm),
-            borderSide: BorderSide(
-              color: s.border,
-              width: t.controlMetrics.restBorderWidth,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(t.radius.sm),
-            borderSide: BorderSide(
-              color: s.brand,
-              width: t.controlMetrics.focusBorderWidth,
-            ),
-          ),
-        ),
+        hint: widget.filterPlaceholder ?? 'Type to filter',
       ),
     );
   }
@@ -398,7 +370,17 @@ class _StarryActionListState extends State<StarryActionList> {
           ),
         ),
         SizedBox(width: t.spacing.s3),
-        if (item.selected)
+        if (item.toggled != null)
+          // Stateful toggle row: the switch IS the state affordance (the row
+          // stays the single 48px activation target; the switch mirrors and
+          // drives the same state so on/off is never left to guessing).
+          StarrySwitch(
+            value: item.toggled!,
+            onChanged: item.disabled
+                ? null
+                : (_) => widget.onItemSelected(item),
+          )
+        else if (item.selected)
           Icon(Icons.check, size: t.controlMetrics.iconSm, color: s.brand)
         else if (item.hasChildren)
           Icon(
@@ -409,25 +391,45 @@ class _StarryActionListState extends State<StarryActionList> {
       ],
     );
 
-    final row = InkWell(
-      key: rowKey,
-      onTap: item.disabled ? null : () => widget.onItemSelected(item),
-      child: Container(
-        constraints: BoxConstraints(minHeight: t.controlMetrics.controlHeight),
-        padding: EdgeInsets.symmetric(horizontal: t.spacing.s4),
-        decoration: BoxDecoration(
-          color: focused
-              ? s.brand.withValues(alpha: t.opacity.selectedSurface)
-              : null,
-          border: focused
-              ? Border.all(
-                  color: s.brand,
-                  width: t.controlMetrics.focusBorderWidth,
-                )
-              : null,
+    // Focus frame reuses the system selection language (StarrySelectedHighlight):
+    // a rounded frame inset from the panel edge. With the panel surface at
+    // radius.lg and this gap at spacing.s1, radius.md keeps the frame
+    // concentric with the surface (innerRadius = outerRadius - gap).
+    // Outer inset + inner padding = spacing.s4, so row content stays aligned
+    // with the group headers. The emphasis glow is the t.focus halo, per the
+    // action-surface design contract ("焦点行用 t.focus 描边 + focusBorderWidth").
+    final row = Padding(
+      padding: EdgeInsets.symmetric(horizontal: t.spacing.s1),
+      child: InkWell(
+        key: rowKey,
+        onTap: item.disabled ? null : () => widget.onItemSelected(item),
+        borderRadius: BorderRadius.circular(t.radius.md),
+        child: StarrySelectedHighlight(
+          isSelected: focused,
+          borderRadius: BorderRadius.circular(t.radius.md),
+          selectedColor: s.brand.withValues(alpha: t.opacity.selectedSurface),
+          selectedShadow: [
+            BoxShadow(
+              color: s.brand.withValues(alpha: t.focus.glowAlpha),
+              blurRadius: t.focus.glowBlurRadius,
+              spreadRadius: t.focus.glowSpreadRadius,
+              offset: t.focus.glowOffset,
+            ),
+          ],
+          padding: EdgeInsets.symmetric(horizontal: t.spacing.s3),
+          child: Container(
+            // The highlight reserves its focusBorderWidth frame in BOTH states
+            // (rest border is transparent), so compensate with the concentric
+            // interior height to keep the row at controlHeight in both.
+            constraints: BoxConstraints(
+              minHeight:
+                  t.controlMetrics.controlHeight -
+                  2 * t.controlMetrics.focusBorderWidth,
+            ),
+            alignment: Alignment.centerLeft,
+            child: rowContent,
+          ),
         ),
-        alignment: Alignment.centerLeft,
-        child: rowContent,
       ),
     );
 
@@ -435,10 +437,92 @@ class _StarryActionListState extends State<StarryActionList> {
       button: true,
       enabled: !item.disabled,
       selected: item.selected,
+      checked: item.toggled,
       label: item.title,
       child: item.disabled
           ? Opacity(opacity: t.opacity.disabledContent, child: row)
           : row,
+    );
+  }
+}
+
+/// Embedded filter input for the action list, composed on the system
+/// [StarryInputShell] (soft variant, radius.md) so every interactive child of
+/// the panel shares one corner-radius family. The shell owns the rest/focus
+/// border; this widget only wires focus state, the leading search glyph and
+/// the borderless text field.
+class _StarryActionFilterField extends StatefulWidget {
+  const _StarryActionFilterField({
+    required this.controller,
+    required this.hint,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+
+  @override
+  State<_StarryActionFilterField> createState() =>
+      _StarryActionFilterFieldState();
+}
+
+class _StarryActionFilterFieldState extends State<_StarryActionFilterField> {
+  final _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_onFocusChanged);
+  }
+
+  void _onFocusChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChanged);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context).extension<StarryTokens>()!;
+    final s = t.semantic;
+    return StarryInputShell(
+      focused: _focusNode.hasFocus,
+      soft: true,
+      controlHeight: t.controlMetrics.heightMd,
+      borderRadius: t.radius.md,
+      child: Row(
+        children: [
+          Icon(
+            Icons.search,
+            size: t.controlMetrics.iconMd,
+            color: s.textTertiary,
+          ),
+          SizedBox(width: t.spacing.s3),
+          Expanded(
+            child: TextField(
+              controller: widget.controller,
+              focusNode: _focusNode,
+              textAlignVertical: TextAlignVertical.center,
+              style: t.typography.bodyMedium.textStyle.copyWith(
+                color: s.textPrimary,
+              ),
+              decoration: InputDecoration(
+                isCollapsed: true,
+                border: InputBorder.none,
+                hintText: widget.hint,
+                hintStyle: t.typography.bodyMedium.textStyle.copyWith(
+                  color: s.textTertiary,
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: t.spacing.s3),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

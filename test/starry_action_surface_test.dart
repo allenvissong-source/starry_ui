@@ -387,8 +387,8 @@ void main() {
       expect(sheetMaterial, isNotNull);
       final shape = sheetMaterial!.shape as RoundedRectangleBorder;
       final radius = (shape.borderRadius as BorderRadius).topLeft.x;
-      // t.radius.lg == 16.
-      expect(radius, 16);
+      // Design contract Decision 6: sheet top corners use t.radius.xl.
+      expect(radius, 20);
     });
   });
 

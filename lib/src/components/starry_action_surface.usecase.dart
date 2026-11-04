@@ -8,7 +8,17 @@ import 'starry_action_surface.dart';
 /// Interactive demo: opens the anchored action surface from a trigger
 /// button, including a second-level sub-page inside the same panel.
 class StarryActionSurfaceDemo extends StatefulWidget {
-  const StarryActionSurfaceDemo({super.key});
+  const StarryActionSurfaceDemo({
+    super.key,
+    this.includeSubPage = true,
+    this.showRootFilter = true,
+  });
+
+  /// Whether the demo items contain a second-level entry.
+  final bool includeSubPage;
+
+  /// Whether the root list shows its built-in filter field.
+  final bool showRootFilter;
 
   @override
   State<StarryActionSurfaceDemo> createState() =>
@@ -35,25 +45,27 @@ class _StarryActionSurfaceDemoState extends State<StarryActionSurfaceDemo> {
                     context: context,
                     anchorRect: box.localToGlobal(Offset.zero) & box.size,
                     title: 'Actions',
+                    showFilter: widget.showRootFilter,
                     items: [
-                      StarryActionItem(
-                        id: 'runtime',
-                        title: 'Runtime',
-                        onActivate: () {},
-                        children: [
-                          StarryActionItem(
-                            id: 'model-a',
-                            title: 'Model A',
-                            selected: true,
-                            onActivate: () {},
-                          ),
-                          StarryActionItem(
-                            id: 'model-b',
-                            title: 'Model B',
-                            onActivate: () {},
-                          ),
-                        ],
-                      ),
+                      if (widget.includeSubPage)
+                        StarryActionItem(
+                          id: 'runtime',
+                          title: 'Runtime',
+                          onActivate: () {},
+                          children: [
+                            StarryActionItem(
+                              id: 'model-a',
+                              title: 'Model A',
+                              selected: true,
+                              onActivate: () {},
+                            ),
+                            StarryActionItem(
+                              id: 'model-b',
+                              title: 'Model B',
+                              onActivate: () {},
+                            ),
+                          ],
+                        ),
                       StarryActionItem(
                         id: 'new',
                         title: 'New chat',
@@ -85,4 +97,18 @@ class _StarryActionSurfaceDemoState extends State<StarryActionSurfaceDemo> {
 @UseCase(name: 'Anchored With Sub-page', type: StarryActionSurfaceDemo)
 Widget anchoredStarryActionSurface(BuildContext context) {
   return const StarryActionSurfaceDemo();
+}
+
+@UseCase(name: 'Playground', type: StarryActionSurfaceDemo)
+Widget playgroundStarryActionSurface(BuildContext context) {
+  return StarryActionSurfaceDemo(
+    includeSubPage: context.knobs.boolean(
+      label: 'Include sub-page',
+      initialValue: true,
+    ),
+    showRootFilter: context.knobs.boolean(
+      label: 'Root filter',
+      initialValue: true,
+    ),
+  );
 }

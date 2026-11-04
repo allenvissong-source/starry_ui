@@ -13,6 +13,16 @@ import 'starry_action_list.dart';
 /// (not a design token); clamped to the viewport with safe margins.
 const double kStarryActionSurfaceWidth = 320;
 
+/// Upper bound for the anchored panel height, as a fraction of the viewport
+/// (design contract: "视口 70%"). Beyond it the list area scrolls internally
+/// instead of the panel overflowing.
+const double _kMaxViewportHeightFraction = 0.7;
+
+/// Fallback chrome copy. Callers override them with localized strings; the
+/// component never locks the caller's language (same policy as
+/// [StarryActionList.filterPlaceholder]).
+const String _kDefaultBackTooltip = 'Back';
+
 /// Unified entry for the chat action surfaces: one item list renders as an
 /// anchored floating panel on medium-and-up layouts and as a bottom sheet on
 /// compact layouts, with second-level lists opened as same-panel sub-pages.
@@ -83,9 +93,19 @@ class StarryActionSurface {
     /// Localized empty-state label; the generic English fallback is used when
     /// null.
     String? emptyLabel,
+
+    /// Localized tooltip for the sub-page back button; English fallback when
+    /// null.
+    String? backTooltip,
   }) async {
     final previousFocus = FocusManager.instance.primaryFocus;
     final sizeClass = context.starryWindowSizeClass;
+    // Narrow viewports: below twice the resting width the anchored panel
+    // would fill most of the screen and float misaligned between the viewport
+    // edges; the bottom sheet hugs both edges instead, so it takes over.
+    final useSheet =
+        sizeClass == StarryWindowSizeClass.compact ||
+        MediaQuery.sizeOf(context).width < kStarryActionSurfaceWidth * 2;
     Future<void> restoreFocus() async {
       // Wait a frame so the list's autofocus has been released by the time we
       // give focus back.
@@ -94,7 +114,7 @@ class StarryActionSurface {
       });
     }
 
-    if (sizeClass == StarryWindowSizeClass.compact) {
+    if (useSheet) {
       final tokens = Theme.of(context).extension<StarryTokens>()!;
       await showModalBottomSheet<void>(
         context: context,
@@ -103,7 +123,7 @@ class StarryActionSurface {
         backgroundColor: tokens.semantic.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(tokens.radius.lg),
+            top: Radius.circular(tokens.radius.xl),
           ),
         ),
         builder: (sheetContext) {
@@ -120,6 +140,7 @@ class StarryActionSurface {
               initialSectionId: initialSectionId,
               filterPlaceholder: filterPlaceholder,
               emptyLabel: emptyLabel,
+              backTooltip: backTooltip,
               onItemSelected: (item) {
                 Navigator.of(sheetContext).pop();
                 onItemSelected(item);
@@ -182,6 +203,7 @@ class StarryActionSurface {
             initialSectionId: initialSectionId,
             filterPlaceholder: filterPlaceholder,
             emptyLabel: emptyLabel,
+            backTooltip: backTooltip,
             onItemSelected: (item) {
               close();
               onItemSelected(item);
@@ -213,6 +235,7 @@ class _StarryActionPanel extends StatefulWidget {
     this.initialSectionId,
     this.filterPlaceholder,
     this.emptyLabel,
+    this.backTooltip,
   });
 
   final List<StarryActionItem> primaryActions;
@@ -227,6 +250,7 @@ class _StarryActionPanel extends StatefulWidget {
   final String? initialSectionId;
   final String? filterPlaceholder;
   final String? emptyLabel;
+  final String? backTooltip;
 
   @override
   State<_StarryActionPanel> createState() => _StarryActionPanelState();
@@ -288,6 +312,9 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
   }
 
   bool get _isSubPage => _stack.length > 1;
+
+  /// Whether an explicit root title should render a header row.
+  bool get _hasRootTitle => widget.title != null && widget.title!.isNotEmpty;
 
   /// When an external filter query drives the root list, suppress the
   /// built-in root filter field (the caller's text field IS the filter).
@@ -352,44 +379,50 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              t.spacing.s2,
-              t.spacing.s2,
-              t.spacing.s2,
-              t.spacing.s1,
-            ),
-            child: Row(
-              children: [
-                if (_isSubPage)
-                  IconButton(
-                    tooltip: 'Back',
-                    icon: Icon(Icons.arrow_back, size: t.controlMetrics.iconMd),
-                    color: s.textPrimary,
-                    onPressed: _handleClose,
-                  )
-                else
-                  SizedBox(width: t.spacing.s3),
-                Expanded(
-                  child: Text(
-                    _isSubPage ? _stackTitles.last : (widget.title ?? ''),
-                    style: t.typography.titleSmall.textStyle.copyWith(
+          // Header only when there is something to show: a sub-page (back +
+          // title) or an explicit root title. A bare root renders no header
+          // block at all — closing is ambient (scrim tap, Escape, sheet drag),
+          // never a dedicated close button.
+          if (_isSubPage || _hasRootTitle)
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                t.spacing.s2,
+                t.spacing.s2,
+                t.spacing.s2,
+                t.spacing.s1,
+              ),
+              child: Row(
+                children: [
+                  if (_isSubPage)
+                    IconButton(
+                      tooltip: widget.backTooltip ?? _kDefaultBackTooltip,
+                      icon: Icon(
+                        Icons.arrow_back,
+                        size: t.controlMetrics.iconMd,
+                      ),
                       color: s.textPrimary,
+                      onPressed: _handleClose,
+                    )
+                  else
+                    SizedBox(width: t.spacing.s3),
+                  Expanded(
+                    child: Text(
+                      _isSubPage ? _stackTitles.last : widget.title!,
+                      style: t.typography.titleSmall.textStyle.copyWith(
+                        color: s.textPrimary,
+                      ),
                     ),
                   ),
-                ),
-                IconButton(
-                  tooltip: 'Close',
-                  icon: Icon(
-                    Icons.keyboard_arrow_down,
-                    size: t.controlMetrics.iconMd,
+                  // Mirror the leading affordance width so the title stays
+                  // optically centered.
+                  SizedBox(
+                    width: _isSubPage
+                        ? t.controlMetrics.minTouchTarget
+                        : t.spacing.s3,
                   ),
-                  color: s.textSecondary,
-                  onPressed: widget.onClose,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
           if (!_isSubPage && widget.primaryActions.isNotEmpty)
             Padding(
               padding: EdgeInsets.all(t.spacing.s3),
@@ -401,41 +434,51 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
                         button: true,
                         enabled: !item.disabled,
                         label: item.title,
-                        child: InkWell(
-                          onTap: item.disabled
-                              ? null
-                              : () => widget.onItemSelected(item),
-                          borderRadius: BorderRadius.circular(t.radius.sm),
-                          child: Padding(
-                            padding: EdgeInsets.all(t.spacing.s2),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  height: t.controlMetrics.controlHeight,
-                                  child: Center(
-                                    child: IconTheme.merge(
-                                      data: IconThemeData(
-                                        size: t.controlMetrics.iconMd,
+                        // Ink fills sit on the Material via Ink (not a child
+                        // Container) so the ripple paints above the tile fill.
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            color: s.surfaceVariant,
+                            borderRadius: BorderRadius.circular(t.radius.md),
+                          ),
+                          child: InkWell(
+                            onTap: item.disabled
+                                ? null
+                                : () => widget.onItemSelected(item),
+                            borderRadius: BorderRadius.circular(t.radius.md),
+                            child: Padding(
+                              padding: EdgeInsets.all(t.spacing.s2),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    height: t.controlMetrics.controlHeight,
+                                    child: Center(
+                                      child: IconTheme.merge(
+                                        data: IconThemeData(
+                                          size: t.controlMetrics.iconMd,
+                                        ),
+                                        child:
+                                            item.leadingBuilder?.call(
+                                              context,
+                                            ) ??
+                                            const SizedBox.shrink(),
                                       ),
-                                      child:
-                                          item.leadingBuilder?.call(context) ??
-                                          const SizedBox.shrink(),
                                     ),
                                   ),
-                                ),
-                                Text(
-                                  item.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: t.typography.bodyMedium.textStyle
-                                      .copyWith(
-                                        color: item.disabled
-                                            ? s.textDisabled
-                                            : s.textPrimary,
-                                      ),
-                                ),
-                              ],
+                                  Text(
+                                    item.title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: t.typography.bodyMedium.textStyle
+                                        .copyWith(
+                                          color: item.disabled
+                                              ? s.textDisabled
+                                              : s.textPrimary,
+                                        ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -445,30 +488,39 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
               ),
             ),
           Flexible(
-            child: _rootUsesExternalFilter
-                ? ValueListenableBuilder<String>(
-                    valueListenable: widget.externalFilterQuery!,
-                    builder: (context, query, _) {
-                      final filtered = _filterItems(rawItems, query);
-                      return StarryActionList(
-                        showFilter: false,
-                        autofocus: false,
-                        controller: widget.externalController,
-                        items: filtered,
+            // Cross-fade between root and sub-page content (design contract
+            // Decision 5): both levels stay mounted inside one panel while the
+            // stack depth animates the switch.
+            child: AnimatedSwitcher(
+              duration: t.motion.durationShort,
+              child: KeyedSubtree(
+                key: ValueKey<int>(_stack.length),
+                child: _rootUsesExternalFilter
+                    ? ValueListenableBuilder<String>(
+                        valueListenable: widget.externalFilterQuery!,
+                        builder: (context, query, _) {
+                          final filtered = _filterItems(rawItems, query);
+                          return StarryActionList(
+                            showFilter: false,
+                            autofocus: false,
+                            controller: widget.externalController,
+                            items: filtered,
+                            emptyLabel: widget.emptyLabel,
+                            onItemSelected: _handleItemSelected,
+                            onClose: _handleClose,
+                          );
+                        },
+                      )
+                    : StarryActionList(
+                        showFilter: _isSubPage || widget.showFilter,
+                        items: rawItems,
+                        filterPlaceholder: widget.filterPlaceholder,
                         emptyLabel: widget.emptyLabel,
                         onItemSelected: _handleItemSelected,
                         onClose: _handleClose,
-                      );
-                    },
-                  )
-                : StarryActionList(
-                    showFilter: _isSubPage || widget.showFilter,
-                    items: rawItems,
-                    filterPlaceholder: widget.filterPlaceholder,
-                    emptyLabel: widget.emptyLabel,
-                    onItemSelected: _handleItemSelected,
-                    onClose: _handleClose,
-                  ),
+                      ),
+              ),
+            ),
           ),
         ],
       ),
@@ -520,7 +572,10 @@ class _AnchoredSurface extends StatelessWidget {
             )
             .toDouble();
         final maxHeight = (placeBelow ? availableBelow : availableAbove)
-            .clamp(t.controlMetrics.controlHeight, viewport.height * 0.7)
+            .clamp(
+              t.controlMetrics.controlHeight,
+              viewport.height * _kMaxViewportHeightFraction,
+            )
             .toDouble();
 
         return Stack(

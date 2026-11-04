@@ -17,6 +17,7 @@ class StarryActionItem {
     this.keywords = const [],
     this.leadingBuilder,
     this.selected = false,
+    this.toggled,
     this.disabled = false,
     this.group,
     this.children,
@@ -43,6 +44,12 @@ class StarryActionItem {
   /// Whether the item is currently selected; rendered as a check/selected
   /// affordance and exposed in semantics.
   final bool selected;
+
+  /// Whether the item is a stateful toggle and its current state. When
+  /// non-null the row renders a switch as its trailing affordance instead of
+  /// the check/chevron, so an on/off entry is recognizable without guessing.
+  /// Activating the row (tap or Enter) flips the state via [onActivate].
+  final bool? toggled;
 
   /// Disabled rows are dimmed and ignore activation and keyboard focus.
   final bool disabled;
@@ -74,6 +81,7 @@ class StarryActionItem {
     List<String>? keywords,
     WidgetBuilder? leadingBuilder,
     bool? selected,
+    bool? toggled,
     bool? disabled,
     String? group,
     List<StarryActionItem>? children,
@@ -87,6 +95,7 @@ class StarryActionItem {
       keywords: keywords ?? this.keywords,
       leadingBuilder: leadingBuilder ?? this.leadingBuilder,
       selected: selected ?? this.selected,
+      toggled: toggled ?? this.toggled,
       disabled: disabled ?? this.disabled,
       group: group ?? this.group,
       children: children ?? this.children,

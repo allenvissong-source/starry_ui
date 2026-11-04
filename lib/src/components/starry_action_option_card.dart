@@ -47,8 +47,12 @@ class StarryActionOptionCard extends StatelessWidget {
     final row = Row(
       children: [
         Container(
-          width: t.spacing.s10,
-          height: t.spacing.s10,
+          // Circular icon shell concentric around the glyph: diameter = 2×
+          // iconLg keeps the ring uniform on all sides (icon shell must lock
+          // the glyph size, AGENTS §1.5.8). Not a spacing value — spacing only
+          // expresses emptiness between elements.
+          width: t.controlMetrics.iconLg * 2,
+          height: t.controlMetrics.iconLg * 2,
           decoration: BoxDecoration(color: s.brand, shape: BoxShape.circle),
           alignment: Alignment.center,
           child: Icon(icon, size: t.controlMetrics.iconLg, color: s.onBrand),

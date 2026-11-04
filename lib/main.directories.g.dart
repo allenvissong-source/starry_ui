@@ -254,6 +254,11 @@ final directories = <_widgetbook.WidgetbookNode>[
             builder: _starry_ui_src_components_starry_action_list_usecase
                 .groupedStarryActionList,
           ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_components_starry_action_list_usecase
+                .playgroundStarryActionList,
+          ),
         ],
       ),
       _widgetbook.WidgetbookComponent(
@@ -283,6 +288,11 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'Anchored With Sub-page',
             builder: _starry_ui_src_components_starry_action_surface_usecase
                 .anchoredStarryActionSurface,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_components_starry_action_surface_usecase
+                .playgroundStarryActionSurface,
           ),
         ],
       ),
