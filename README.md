@@ -62,6 +62,34 @@ StarryDataTable<String>(
 )
 ```
 
+`StarryForm` wraps Flutter's form lifecycle. Keep a
+`GlobalKey<StarryFormState>` in the owning state and call `validate()` before
+`save()`. Validation scrolls the first invalid field into view and focuses its
+optional `focusNode`. `StarryFormSection` groups fields without nested surfaces.
+`StarryFormField<T>` supplies a label, helper/error message and
+`FormFieldState<T>` to any input builder.
+
+```dart
+StarryFormField<String>(
+  label: 'Name',
+  initialValue: nameController.text,
+  focusNode: nameFocus,
+  validator: (value) =>
+      value?.trim().isNotEmpty == true ? null : 'Enter a name',
+  builder: (field) => StarryTextField(
+    controller: nameController,
+    focusNode: nameFocus,
+    onChanged: field.didChange,
+    validationState: field.hasError
+        ? StarryTextFieldState.error
+        : StarryTextFieldState.none,
+  ),
+)
+```
+
+The caller owns and disposes controllers/focus nodes. If using `reset()` with
+an external controller, synchronize it in the field's `onReset` callback.
+
 `StarryTextArea.composer` fills a bounded editor panel and places an optional
 toolbar beside its character counter. Set `maxLengthEnforcement` explicitly
 when a character count is advisory. Use `StarrySectionHeader(compact: true,

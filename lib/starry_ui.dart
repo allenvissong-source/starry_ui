@@ -55,6 +55,7 @@ export 'src/inputs/starry_slider.dart';
 export 'src/inputs/starry_switch.dart';
 export 'src/inputs/starry_text_field.dart';
 export 'src/inputs/starry_textarea.dart';
+export 'src/inputs/starry_form.dart';
 
 // Interactions.
 export 'src/interactions/starry_press_scale.dart';
