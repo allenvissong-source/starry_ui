@@ -32,6 +32,11 @@ dependencies:
     path: ../starry_ui
 ```
 
+`StarryTextArea.composer` fills a bounded editor panel and places an optional
+toolbar beside its character counter. Set `maxLengthEnforcement` explicitly
+when a character count is advisory. Use `StarrySectionHeader(compact: true,
+accent: true)` for sections within an existing card.
+
 ## Development
 
 ```bash

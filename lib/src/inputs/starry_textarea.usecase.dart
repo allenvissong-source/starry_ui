@@ -29,3 +29,19 @@ Widget defaultStarryTextArea(BuildContext context) {
     ),
   );
 }
+
+@UseCase(name: 'Composer', type: StarryTextArea)
+Widget composerStarryTextArea(BuildContext context) {
+  final t = Theme.of(context).extension<StarryTokens>()!;
+  return Center(
+    child: SizedBox(
+      width: t.controlMetrics.controlHeight * 10,
+      height: t.controlMetrics.controlHeight * 8,
+      child: StarryTextArea.composer(
+        hint: '分享你的想法…',
+        maxLength: 2000,
+        enabled: context.knobs.boolean(label: 'Enabled', initialValue: true),
+      ),
+    ),
+  );
+}

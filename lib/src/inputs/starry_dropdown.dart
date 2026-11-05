@@ -9,6 +9,23 @@ import '../theme/starry_tokens.dart';
 /// expanded states (0 → 0.5 turns = 180°).
 const double _kChevronFlipTurns = 0.5;
 
+/// Deflates every corner of [outer] by [borderWidth], giving the radius of the
+/// surface's *inner* edge (`inner = outer − borderWidth`, the concentric-radius
+/// rule). A full-bleed child clipped to this path stays inside the 1px border
+/// stroke instead of painting over it at the rounded corners.
+BorderRadius _innerBorderRadius(BorderRadius outer, double borderWidth) {
+  Radius deflate(Radius radius) => Radius.elliptical(
+    math.max(0.0, radius.x - borderWidth),
+    math.max(0.0, radius.y - borderWidth),
+  );
+  return BorderRadius.only(
+    topLeft: deflate(outer.topLeft),
+    topRight: deflate(outer.topRight),
+    bottomLeft: deflate(outer.bottomLeft),
+    bottomRight: deflate(outer.bottomRight),
+  );
+}
+
 /// A single selectable option for [StarryDropdown].
 ///
 /// [value] is the payload handed back through [StarryDropdown.onSelected];
@@ -325,11 +342,20 @@ class _StarryDropdownState<T> extends State<StarryDropdown<T>>
     // panel carries no padding of its own, so its height is exactly the option
     // rows plus their inter-row hairlines (N * controlHeight + (N-1) * 1px) with
     // no top/bottom slivers; each row spans the full width and carries its own
-    // horizontal padding aligned with the trigger. Clipped to the panel radius
-    // so the first/last rows' tint and ink follow the rounded corners.
+    // horizontal padding aligned with the trigger. The option list is clipped to
+    // the concentric inner radius (outer − border width): a selected row's tint
+    // is painted as a child above the surface decoration, so clipping it at the
+    // outer path would let it cover the 1px border at the first/last row's
+    // rounded corners.
     // Option rows are built only while the panel is not fully collapsed
     // (`_controller.value > 0`): a closed selector is just its trigger, and the
     // rows survive the collapse animation before dropping out of the tree.
+    final BorderRadius panelBorderRadius =
+        widget.borderRadius ?? BorderRadius.circular(t.radius.xxl);
+    final BorderRadius panelInnerRadius = _innerBorderRadius(
+      panelBorderRadius,
+      t.controlMetrics.borderThin,
+    );
     final panel = AnimatedBuilder(
       animation: Listenable.merge(<Listenable>[_controller, _lineController]),
       builder: (context, _) {
@@ -344,11 +370,12 @@ class _StarryDropdownState<T> extends State<StarryDropdown<T>>
               padding: EdgeInsets.only(top: t.spacing.s3),
               child: StarrySurface(
                 color: widget.backgroundColor,
-                borderRadius:
-                    widget.borderRadius ?? BorderRadius.circular(t.radius.xxl),
+                borderRadius: panelBorderRadius,
                 elevated: widget.elevated,
-                clipBehavior: Clip.antiAlias,
-                child: _buildPanelBody(open, t, s),
+                child: ClipRRect(
+                  borderRadius: panelInnerRadius,
+                  child: _buildPanelBody(open, t, s),
+                ),
               ),
             ),
           ),

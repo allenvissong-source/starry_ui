@@ -692,6 +692,11 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'StarryTextArea',
         useCases: [
           _widgetbook.WidgetbookUseCase(
+            name: 'Composer',
+            builder: _starry_ui_src_inputs_starry_textarea_usecase
+                .composerStarryTextArea,
+          ),
+          _widgetbook.WidgetbookUseCase(
             name: 'Default',
             builder: _starry_ui_src_inputs_starry_textarea_usecase
                 .defaultStarryTextArea,

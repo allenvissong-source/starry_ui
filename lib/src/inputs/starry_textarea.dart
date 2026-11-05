@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/starry_tokens.dart';
 import 'editable_state_mixin.dart';
@@ -24,7 +25,33 @@ class StarryTextArea extends StatefulWidget {
     this.controller,
     this.focusNode,
     this.onChanged,
-  });
+    this.fieldKey,
+  }) : expands = false,
+       header = null,
+       toolbar = null,
+       maxLength = null,
+       maxLengthEnforcement = MaxLengthEnforcement.enforced;
+
+  /// 占满父级给定高度的写作面板，底部保留工具栏和字符计数。
+  ///
+  /// [header] 渲染在正文输入之上、同一个输入壳内部，用于把标题写进写作面板，
+  /// 而不是另起一张卡片。
+  const StarryTextArea.composer({
+    super.key,
+    this.label,
+    this.hint,
+    this.enabled = true,
+    this.controller,
+    this.focusNode,
+    this.onChanged,
+    this.fieldKey,
+    this.header,
+    this.toolbar,
+    this.maxLength,
+    this.maxLengthEnforcement = MaxLengthEnforcement.enforced,
+  }) : minLines = 1,
+       maxLines = 1,
+       expands = true;
 
   final String? label;
   final String? hint;
@@ -34,6 +61,15 @@ class StarryTextArea extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final ValueChanged<String>? onChanged;
+
+  /// 内部 [TextField] 的 key，供调用方稳定定位正文输入框（写作面板还包含
+  /// 标题等其它输入时尤其需要）。
+  final Key? fieldKey;
+  final bool expands;
+  final Widget? header;
+  final Widget? toolbar;
+  final int? maxLength;
+  final MaxLengthEnforcement maxLengthEnforcement;
 
   @override
   State<StarryTextArea> createState() => _StarryTextAreaState();
@@ -59,14 +95,21 @@ class _StarryTextAreaState extends State<StarryTextArea>
     final s = t.semantic;
 
     final field = TextField(
+      key: widget.fieldKey,
       controller: controller,
       focusNode: focusNode,
       enabled: widget.enabled,
       onChanged: widget.onChanged,
-      minLines: widget.minLines,
-      maxLines: widget.maxLines,
+      minLines: widget.expands ? null : widget.minLines,
+      maxLines: widget.expands ? null : widget.maxLines,
+      expands: widget.expands,
+      maxLength: widget.maxLength,
+      maxLengthEnforcement: widget.maxLengthEnforcement,
+      textAlignVertical: TextAlignVertical.top,
       keyboardType: TextInputType.multiline,
-      style: t.typography.bodyMedium.textStyle.copyWith(color: s.textPrimary),
+      style: (widget.expands ? t.typography.bodyLarge : t.typography.bodyMedium)
+          .textStyle
+          .copyWith(color: s.textPrimary),
       decoration: InputDecoration(
         // The shell owns the fill, the border and the horizontal padding, so
         // the field inside it must contribute none of the three.
@@ -76,7 +119,10 @@ class _StarryTextAreaState extends State<StarryTextArea>
         hintStyle: t.typography.bodyMedium.textStyle.copyWith(
           color: s.textDisabled,
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: t.spacing.s3),
+        contentPadding: widget.expands && widget.header != null
+            ? EdgeInsets.zero
+            : EdgeInsets.symmetric(vertical: t.spacing.s3),
+        counterText: '',
       ),
     );
 
@@ -88,8 +134,46 @@ class _StarryTextAreaState extends State<StarryTextArea>
     final shell = StarryInputShell(
       focused: isFocused,
       enabled: widget.enabled,
-      borderRadius: t.radius.xxl,
-      child: field,
+      borderRadius: widget.expands ? t.radius.lg : t.radius.xxl,
+      // 大型写作面板在浅色背景上仍需明确边界，聚焦后沿用输入家族的品牌色。
+      borderColor: widget.expands && !isFocused ? s.border : null,
+      child: widget.expands
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (widget.header != null)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: t.spacing.s5,
+                      bottom: t.spacing.s3,
+                    ),
+                    child: widget.header,
+                  ),
+                Expanded(child: field),
+                Padding(
+                  padding: EdgeInsets.only(bottom: t.spacing.s3),
+                  child: Row(
+                    children: [
+                      if (widget.toolbar != null)
+                        Expanded(child: widget.toolbar!)
+                      else
+                        const Spacer(),
+                      if (widget.maxLength != null)
+                        ValueListenableBuilder<TextEditingValue>(
+                          valueListenable: controller,
+                          builder: (context, value, _) => Text(
+                            '${value.text.characters.length} / ${widget.maxLength}',
+                            style: t.typography.bodySmall.textStyle.copyWith(
+                              color: s.textSecondary,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : field,
     );
 
     final label = widget.label;
@@ -106,7 +190,7 @@ class _StarryTextAreaState extends State<StarryTextArea>
             ),
           ),
         ),
-        shell,
+        if (widget.expands) Expanded(child: shell) else shell,
       ],
     );
   }
