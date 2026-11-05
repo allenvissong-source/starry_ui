@@ -26,6 +26,7 @@ export 'src/foundations/starry_count_formatter.dart';
 // Media.
 export 'src/media/starry_avatar.dart';
 export 'src/media/starry_media_stage.dart';
+export 'src/media/starry_media_picker.dart';
 export 'src/media/starry_reference_card.dart';
 export 'src/media/starry_workflow_summary.dart';
 

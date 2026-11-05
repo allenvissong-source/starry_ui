@@ -90,6 +90,13 @@ StarryFormField<String>(
 The caller owns and disposes controllers/focus nodes. If using `reset()` with
 an external controller, synchronize it in the field's `onReset` callback.
 
+### Content composers
+
+`StarryMediaPicker` displays an empty add area, a scrollable media grid, removal
+and optional edit actions, and caller-defined source buttons. Place it inside
+a parent with a bounded height. Callers own picking, cropping, uploads, and
+media state; `mediaBuilder` supplies each preview.
+
 `StarryTextArea.composer` fills a bounded editor panel and places an optional
 toolbar beside its character counter. Set `maxLengthEnforcement` explicitly
 when a character count is advisory. Use `StarrySectionHeader(compact: true,
