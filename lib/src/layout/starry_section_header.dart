@@ -22,6 +22,10 @@ class StarrySectionHeader extends StatelessWidget {
     this.contentPadding,
     this.bottomSpacing = 0,
     this.tone = StarrySectionHeaderTone.primary,
+    this.accent = false,
+    this.trailing,
+    this.compact = false,
+    this.emphasis = false,
   }) : assert(
          title != null || description != null || child != null,
          'StarrySectionHeader requires at least one of title, description or child.',
@@ -45,6 +49,15 @@ class StarrySectionHeader extends StatelessWidget {
   /// Title emphasis tone.
   final StarrySectionHeaderTone tone;
 
+  /// 紧凑标题可放在卡片内部；默认仍使用设置页的分组间距。
+  final bool compact;
+
+  /// 在紧凑标题上再强调一级：字号从 labelLarge 提升到 titleMedium，并加
+  /// 半粗字重。用于卡片内需要被快速扫读的分区标题。
+  final bool emphasis;
+  final bool accent;
+  final Widget? trailing;
+
   @override
   Widget build(BuildContext context) {
     final tokens = Theme.of(context).extension<StarryTokens>()!;
@@ -59,17 +72,42 @@ class StarrySectionHeader extends StatelessWidget {
     if (title != null) {
       children.add(
         Padding(
-          padding: EdgeInsets.fromLTRB(
-            tokens.spacing.s3,
-            tokens.spacing.s4,
-            tokens.spacing.s3,
-            tokens.spacing.s1,
-          ),
-          child: Text(
-            title!,
-            style: tokens.typography.labelLarge.textStyle.copyWith(
-              color: titleColor,
-            ),
+          padding: compact
+              ? EdgeInsets.zero
+              : EdgeInsets.fromLTRB(
+                  tokens.spacing.s3,
+                  tokens.spacing.s4,
+                  tokens.spacing.s3,
+                  tokens.spacing.s1,
+                ),
+          child: Row(
+            children: [
+              if (accent) ...[
+                Container(
+                  width: tokens.controlMetrics.borderThick,
+                  height: tokens.controlMetrics.iconLg,
+                  decoration: BoxDecoration(
+                    color: s.brand,
+                    borderRadius: BorderRadius.circular(tokens.radius.full),
+                  ),
+                ),
+                SizedBox(width: tokens.spacing.s2),
+              ],
+              Expanded(
+                child: Text(
+                  title!,
+                  style: emphasis
+                      ? tokens.typography.titleMedium.textStyle.copyWith(
+                          color: titleColor,
+                          fontWeight: FontWeight.w600,
+                        )
+                      : tokens.typography.labelLarge.textStyle.copyWith(
+                          color: titleColor,
+                        ),
+                ),
+              ),
+              ?trailing,
+            ],
           ),
         ),
       );

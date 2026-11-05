@@ -56,6 +56,36 @@ void main() {
       expect(deco.boxShadow, isNull);
     });
 
+    testWidgets('treats a transparent border as no border, without insetting', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _host(
+          const StarrySurface(
+            borderColor: Colors.transparent,
+            child: SizedBox(width: 40, height: 40),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final container = tester.widget<Container>(
+        find
+            .descendant(
+              of: find.byType(StarrySurface),
+              matching: find.byType(Container),
+            )
+            .first,
+      );
+      final deco = container.decoration! as BoxDecoration;
+      expect(deco.border, isNull);
+      expect(
+        tester.getSize(find.byType(StarrySurface)),
+        const Size(40, 40),
+        reason: 'transparent border must not reserve layout padding',
+      );
+    });
+
     testWidgets('wraps in a button-semantic InkWell when onTap is set', (
       tester,
     ) async {

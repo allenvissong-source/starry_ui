@@ -117,6 +117,7 @@ class StarrySideNavigationRail extends StatelessWidget {
                   Padding(
                     key: const Key('starry-side-navigation-footer'),
                     padding: EdgeInsets.only(
+                      top: t.spacing.s4,
                       bottom: t.spacing.s4,
                       left: t.spacing.s2,
                       right: t.spacing.s2,

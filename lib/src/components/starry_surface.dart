@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/starry_tokens.dart';
 
-/// Private surface primitive: the single source of truth for the Starry card
+/// Public surface primitive: the single source of truth for the Starry card
 /// family's container styling.
 ///
 /// Resolves purely from [StarryTokens]:
@@ -13,7 +13,7 @@ import '../theme/starry_tokens.dart';
 ///
 /// This is the card-family equivalent of the input family's private shell: both
 /// [StarryCard] and [StarryExpandableCard] compose it so the card surface can
-/// never re-diverge. Not exported from the package barrel.
+/// never re-diverge.
 class StarrySurface extends StatelessWidget {
   const StarrySurface({
     required this.child,
@@ -57,6 +57,13 @@ class StarrySurface extends StatelessWidget {
     final t = Theme.of(context).extension<StarryTokens>()!;
     final s = t.semantic;
     final radius = borderRadius ?? BorderRadius.circular(t.radius.lg);
+    final resolvedBorderColor = borderColor ?? s.border;
+    // A transparent border is not a border: keeping it would still inset the
+    // child by its width (BoxDecoration.padding counts border dimensions),
+    // exposing a 1px surface-coloured hairline around full-bleed media.
+    final border = resolvedBorderColor.a == 0
+        ? null
+        : Border.all(color: resolvedBorderColor);
 
     final content = Container(
       padding: padding,
@@ -64,7 +71,7 @@ class StarrySurface extends StatelessWidget {
       decoration: BoxDecoration(
         color: color ?? s.surface,
         borderRadius: radius,
-        border: Border.all(color: borderColor ?? s.border),
+        border: border,
         boxShadow: elevated ? t.elevation.level2 : null,
       ),
       child: child,

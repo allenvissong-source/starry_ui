@@ -179,7 +179,13 @@ class _StarryButtonState extends State<StarryButton> {
                 Icon(widget.icon, size: t.controlMetrics.iconMd),
                 SizedBox(width: t.spacing.s2),
               ],
-              Text(widget.label),
+              Flexible(
+                child: Text(
+                  widget.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           );
 
