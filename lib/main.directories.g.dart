@@ -34,6 +34,8 @@ import 'package:starry_ui/src/components/starry_card.usecase.dart'
     as _starry_ui_src_components_starry_card_usecase;
 import 'package:starry_ui/src/components/starry_control_shell.usecase.dart'
     as _starry_ui_src_components_starry_control_shell_usecase;
+import 'package:starry_ui/src/components/starry_data_table.usecase.dart'
+    as _starry_ui_src_components_starry_data_table_usecase;
 import 'package:starry_ui/src/feedback/starry_empty_state.usecase.dart'
     as _starry_ui_src_feedback_starry_empty_state_usecase;
 import 'package:starry_ui/src/feedback/starry_error_widget.usecase.dart'
@@ -328,6 +330,36 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'All States',
             builder: _starry_ui_src_components_starry_control_shell_usecase
                 .allStatesStarryControlShell,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryDataTable',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_components_starry_data_table_usecase
+                .allStarryDataTable,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_components_starry_data_table_usecase
+                .playgroundStarryDataTable,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryDataTableAction',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_components_starry_data_table_usecase
+                .allStarryDataTableAction,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_components_starry_data_table_usecase
+                .playgroundStarryDataTableAction,
           ),
         ],
       ),

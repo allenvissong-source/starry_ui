@@ -32,6 +32,36 @@ dependencies:
     path: ../starry_ui
 ```
 
+### Tables and forms
+
+`StarryDataTable<T>` takes typed rows, a unique stable `rowKey`, and
+`StarryDataColumn<T>` definitions. A column's optional `compare` enables sorting.
+The table paginates locally (`pageSize: 10` by default); callers own filtering and
+remote requests. It shares cells and actions between aligned wide columns and
+labelled narrow rows, and provides `loading`, `error`, and `empty` states.
+Wide rows share a uniform token-derived height, centered contents, and the
+same column padding as the header. Text supports two lines; the shared row
+height grows with accessibility text scaling. Use `StarryDataTableAction`
+for row operations: its label aligns with the cell while retaining the
+standard touch target. Place the table inside the page's scroll view.
+Set `maxLines: 1` on `SelectableText` cells containing IDs so their editable
+text area occupies one line and centers alongside ordinary text.
+
+```dart
+StarryDataTable<String>(
+  rows: applications,
+  rowKey: (name) => name,
+  empty: const Text('No applications'),
+  columns: [
+    StarryDataColumn(
+      label: 'Application',
+      compare: (a, b) => a.compareTo(b),
+      cellBuilder: (context, name) => Text(name),
+    ),
+  ],
+)
+```
+
 `StarryTextArea.composer` fills a bounded editor panel and places an optional
 toolbar beside its character counter. Set `maxLengthEnforcement` explicitly
 when a character count is advisory. Use `StarrySectionHeader(compact: true,
