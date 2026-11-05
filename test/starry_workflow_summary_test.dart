@@ -88,7 +88,10 @@ void main() {
       await tester.tap(find.byType(InkWell));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.keyboard_arrow_down_rounded), findsOneWidget);
+      expect(
+        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns,
+        0.25,
+      );
       expect(find.text('思考已完成'), findsOneWidget);
       expect(find.text('阅读 App.tsx'), findsOneWidget);
       expect(find.text('编辑 App.tsx'), findsOneWidget);
@@ -98,5 +101,116 @@ void main() {
       expect(find.text('阅读 App.tsx'), findsNothing);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('live steps collapse once on completion and can reopen', (
+      tester,
+    ) async {
+      Widget workflow(bool running) => _host(
+        SizedBox(
+          width: 360,
+          child: StarryWorkflowSummary(
+            name: 'Starry',
+            elapsedText: '工作 49 秒',
+            isRunning: running,
+            steps: const [StarryWorkflowStep(label: '读取文件')],
+          ),
+        ),
+      );
+      await tester.pumpWidget(workflow(true));
+      await tester.pumpAndSettle();
+      expect(find.text('读取文件'), findsOneWidget);
+
+      // A manual collapse during execution survives an event refresh.
+      await tester.tap(find.byType(InkWell));
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(workflow(true));
+      expect(find.text('读取文件'), findsNothing);
+      await tester.tap(find.byType(InkWell));
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(workflow(false));
+      await tester.pumpAndSettle();
+      expect(find.text('读取文件'), findsNothing);
+      await tester.tap(find.byType(InkWell));
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(workflow(false));
+      expect(find.text('读取文件'), findsOneWidget);
+    });
+
+    testWidgets(
+      'chevron follows elapsed and expansion has intermediate sizes',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(
+            const SizedBox(
+              width: 640,
+              child: StarryWorkflowSummary(
+                name: 'Starry',
+                elapsedText: '工作 49 秒',
+                steps: [
+                  StarryWorkflowStep(label: '读取文件'),
+                  StarryWorkflowStep(label: '确认结果'),
+                ],
+              ),
+            ),
+          ),
+        );
+        final arrow = tester.getRect(
+          find.byIcon(Icons.keyboard_arrow_right_rounded),
+        );
+        final elapsed = tester.getRect(find.text('工作 49 秒'));
+        expect(arrow.left - elapsed.right, inInclusiveRange(0, 8));
+        final collapsed = tester
+            .getSize(find.byType(StarryWorkflowSummary))
+            .height;
+        await tester.tap(find.byType(InkWell));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 75));
+        final intermediate = tester
+            .getSize(find.byType(StarryWorkflowSummary))
+            .height;
+        await tester.pumpAndSettle();
+        final expanded = tester
+            .getSize(find.byType(StarryWorkflowSummary))
+            .height;
+        expect(intermediate, greaterThan(collapsed));
+        expect(intermediate, lessThan(expanded));
+        await tester.tap(find.byType(InkWell));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 75));
+        expect(
+          tester.getSize(find.byType(StarryWorkflowSummary)).height,
+          inExclusiveRange(collapsed, expanded),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('读取文件'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'narrow header keeps chevron visible and reduced motion settles',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(
+            MediaQuery(
+              data: const MediaQueryData(disableAnimations: true),
+              child: const SizedBox(
+                width: 160,
+                child: StarryWorkflowSummary(
+                  name: '一个很长的助手名称',
+                  elapsedText: '工作 49 秒',
+                  steps: [StarryWorkflowStep(label: '读取文件')],
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(InkWell));
+        await tester.pumpAndSettle();
+        expect(find.text('读取文件'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }

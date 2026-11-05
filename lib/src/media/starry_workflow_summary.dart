@@ -28,6 +28,7 @@ class StarryWorkflowSummary extends StatefulWidget {
     this.steps = const <StarryWorkflowStep>[],
     this.avatar,
     this.initiallyExpanded = false,
+    this.isRunning = false,
     super.key,
   });
 
@@ -46,28 +47,44 @@ class StarryWorkflowSummary extends StatefulWidget {
 
   final bool initiallyExpanded;
 
+  /// A live workflow opens once; its terminal transition collapses the steps.
+  /// Manual expansion remains available after completion.
+  final bool isRunning;
+
   @override
   State<StarryWorkflowSummary> createState() => _StarryWorkflowSummaryState();
 }
 
 class _StarryWorkflowSummaryState extends State<StarryWorkflowSummary> {
-  late bool _expanded = widget.initiallyExpanded;
+  late bool _expanded = widget.initiallyExpanded || widget.isRunning;
 
   bool get _hasSteps => widget.steps.isNotEmpty;
+
+  @override
+  void didUpdateWidget(covariant StarryWorkflowSummary oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isRunning != widget.isRunning) {
+      _expanded = widget.isRunning;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
     final s = t.semantic;
+    final duration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : t.motion.durationMedium;
 
     final header = Row(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         if (widget.avatar != null) ...<Widget>[
           widget.avatar!,
           SizedBox(width: t.spacing.s2),
         ],
-        Expanded(
+        Flexible(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -80,7 +97,7 @@ class _StarryWorkflowSummaryState extends State<StarryWorkflowSummary> {
                   overflow: TextOverflow.ellipsis,
                   style: t.typography.labelSmall.textStyle.copyWith(
                     color: s.textPrimary,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -94,6 +111,7 @@ class _StarryWorkflowSummaryState extends State<StarryWorkflowSummary> {
                     overflow: TextOverflow.ellipsis,
                     style: t.typography.bodySmall.textStyle.copyWith(
                       color: s.textSecondary,
+                      fontWeight: FontWeight.w300,
                     ),
                   ),
                 ),
@@ -103,12 +121,15 @@ class _StarryWorkflowSummaryState extends State<StarryWorkflowSummary> {
         ),
         if (_hasSteps) ...<Widget>[
           SizedBox(width: t.spacing.s1),
-          Icon(
-            _expanded
-                ? Icons.keyboard_arrow_down_rounded
-                : Icons.keyboard_arrow_right_rounded,
-            size: t.controlMetrics.iconSm,
-            color: s.textSecondary,
+          AnimatedRotation(
+            turns: _expanded ? 0.25 : 0,
+            duration: duration,
+            curve: t.motion.easingStandard,
+            child: Icon(
+              Icons.keyboard_arrow_right_rounded,
+              size: t.controlMetrics.iconSm,
+              color: s.textSecondary,
+            ),
           ),
         ],
       ],
@@ -122,6 +143,9 @@ class _StarryWorkflowSummaryState extends State<StarryWorkflowSummary> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () => setState(() => _expanded = !_expanded),
+                hoverColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                splashFactory: NoSplash.splashFactory,
                 child: header,
               ),
             ),
@@ -133,8 +157,21 @@ class _StarryWorkflowSummaryState extends State<StarryWorkflowSummary> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         row,
-        if (_hasSteps && _expanded)
-          Padding(
+        TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0, end: _hasSteps && _expanded ? 1 : 0),
+          duration: duration,
+          curve: t.motion.easingStandard,
+          builder: (context, value, child) {
+            if (value == 0) return const SizedBox.shrink();
+            return ClipRect(
+              child: Align(
+                alignment: Alignment.topLeft,
+                heightFactor: value,
+                child: Opacity(opacity: value, child: child),
+              ),
+            );
+          },
+          child: Padding(
             padding: EdgeInsets.only(left: t.spacing.s2, top: t.spacing.s1),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,6 +186,7 @@ class _StarryWorkflowSummaryState extends State<StarryWorkflowSummary> {
               ],
             ),
           ),
+        ),
       ],
     );
   }
@@ -196,6 +234,7 @@ class _TimelineRow extends StatelessWidget {
                 step.label,
                 style: tokens.typography.bodySmall.textStyle.copyWith(
                   color: s.textSecondary,
+                  fontWeight: FontWeight.w300,
                 ),
               ),
             ),
