@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 
 import '../theme/starry_tokens.dart';
 import 'editable_state_mixin.dart';
+import 'field_feedback.dart';
 import 'input_shell.dart';
+import 'starry_text_field.dart';
 
 /// Starry UI 多行文本域。与 [StarryTextField] 共享视觉语言，支持固定行数。
 ///
@@ -22,6 +24,13 @@ class StarryTextArea extends StatefulWidget {
     this.minLines = 3,
     this.maxLines = 6,
     this.enabled = true,
+    this.readOnly = false,
+    this.maxLength,
+    this.maxLengthEnforcement = MaxLengthEnforcement.enforced,
+    this.showCounter = false,
+    this.validationState = StarryTextFieldState.none,
+    this.errorText,
+    this.helperText,
     this.controller,
     this.focusNode,
     this.onChanged,
@@ -29,8 +38,8 @@ class StarryTextArea extends StatefulWidget {
   }) : expands = false,
        header = null,
        toolbar = null,
-       maxLength = null,
-       maxLengthEnforcement = MaxLengthEnforcement.enforced;
+       assert(minLines > 0 && maxLines >= minLines),
+       assert(maxLength == null || maxLength > 0);
 
   /// 占满父级给定高度的写作面板，底部保留工具栏和字符计数。
   ///
@@ -41,6 +50,10 @@ class StarryTextArea extends StatefulWidget {
     this.label,
     this.hint,
     this.enabled = true,
+    this.readOnly = false,
+    this.validationState = StarryTextFieldState.none,
+    this.errorText,
+    this.helperText,
     this.controller,
     this.focusNode,
     this.onChanged,
@@ -51,6 +64,7 @@ class StarryTextArea extends StatefulWidget {
     this.maxLengthEnforcement = MaxLengthEnforcement.enforced,
   }) : minLines = 1,
        maxLines = 1,
+       showCounter = true,
        expands = true;
 
   final String? label;
@@ -58,6 +72,11 @@ class StarryTextArea extends StatefulWidget {
   final int minLines;
   final int maxLines;
   final bool enabled;
+  final bool readOnly;
+  final bool showCounter;
+  final StarryTextFieldState validationState;
+  final String? errorText;
+  final String? helperText;
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final ValueChanged<String>? onChanged;
@@ -93,12 +112,21 @@ class _StarryTextAreaState extends State<StarryTextArea>
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
     final s = t.semantic;
+    final borderColor = switch (widget.validationState) {
+      StarryTextFieldState.none => null,
+      StarryTextFieldState.success => s.success,
+      StarryTextFieldState.warning => s.warning,
+      StarryTextFieldState.error => s.error,
+    };
+    final hasError = widget.validationState == StarryTextFieldState.error;
+    final message = hasError ? widget.errorText : widget.helperText;
 
     final field = TextField(
       key: widget.fieldKey,
       controller: controller,
       focusNode: focusNode,
       enabled: widget.enabled,
+      readOnly: widget.readOnly,
       onChanged: widget.onChanged,
       minLines: widget.expands ? null : widget.minLines,
       maxLines: widget.expands ? null : widget.maxLines,
@@ -136,7 +164,8 @@ class _StarryTextAreaState extends State<StarryTextArea>
       enabled: widget.enabled,
       borderRadius: widget.expands ? t.radius.lg : t.radius.xxl,
       // 大型写作面板在浅色背景上仍需明确边界，聚焦后沿用输入家族的品牌色。
-      borderColor: widget.expands && !isFocused ? s.border : null,
+      borderColor:
+          borderColor ?? (widget.expands && !isFocused ? s.border : null),
       child: widget.expands
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -177,20 +206,46 @@ class _StarryTextAreaState extends State<StarryTextArea>
     );
 
     final label = widget.label;
-    if (label == null) return shell;
+    if (label == null &&
+        message == null &&
+        (widget.expands || !widget.showCounter || widget.maxLength == null)) {
+      return shell;
+    }
     return Column(
+      mainAxisSize: widget.expands ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Padding(
-          padding: EdgeInsets.only(bottom: t.spacing.s2),
-          child: Text(
-            label,
-            style: t.typography.labelLarge.textStyle.copyWith(
-              color: widget.enabled ? s.textSecondary : s.textDisabled,
+        if (label != null)
+          Padding(
+            padding: EdgeInsets.only(bottom: t.spacing.s2),
+            child: Text(
+              label,
+              style: t.typography.labelLarge.textStyle.copyWith(
+                color: widget.enabled ? s.textSecondary : s.textDisabled,
+              ),
             ),
           ),
-        ),
         if (widget.expands) Expanded(child: shell) else shell,
+        if (message != null ||
+            (!widget.expands && widget.showCounter && widget.maxLength != null))
+          StarryFieldFeedback(
+            message: message,
+            hasError: hasError,
+            counter:
+                !widget.expands &&
+                    widget.showCounter &&
+                    widget.maxLength != null
+                ? ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: controller,
+                    builder: (context, value, _) => Text(
+                      '${value.text.characters.length}/${widget.maxLength}',
+                      style: t.typography.labelLarge.textStyle.copyWith(
+                        color: s.textSecondary,
+                      ),
+                    ),
+                  )
+                : null,
+          ),
       ],
     );
   }

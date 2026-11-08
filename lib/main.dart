@@ -3,6 +3,8 @@ import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart' as widgetbook;
 
 import 'src/theme/app_theme.dart';
+import 'src/theme/starry_application_tokens.dart';
+import 'src/theme/starry_tokens.dart';
 
 // 由 build_runner 根据组件里的 @UseCase 注解生成。
 // 首次生成前该文件不存在，运行 `dart run build_runner build` 后出现。
@@ -16,6 +18,16 @@ void main() {
 class StarryWidgetbook extends StatelessWidget {
   const StarryWidgetbook({super.key});
 
+  ThemeData _theme(ThemeData base) {
+    final t = base.extension<StarryTokens>()!;
+    return base.copyWith(
+      extensions: [
+        ...base.extensions.values,
+        StarryApplicationTokens.from(t, base.brightness),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Widgetbook.material(
@@ -23,8 +35,8 @@ class StarryWidgetbook extends StatelessWidget {
       addons: [
         MaterialThemeAddon(
           themes: [
-            WidgetbookTheme(name: 'Light', data: AppTheme.light()),
-            WidgetbookTheme(name: 'Dark', data: AppTheme.dark()),
+            WidgetbookTheme(name: 'Light', data: _theme(AppTheme.light())),
+            WidgetbookTheme(name: 'Dark', data: _theme(AppTheme.dark())),
           ],
         ),
         TextScaleAddon(),

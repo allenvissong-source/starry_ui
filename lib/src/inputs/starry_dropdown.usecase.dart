@@ -14,7 +14,7 @@ const List<StarryDropdownItem<String>> _demoItems =
       StarryDropdownItem<String>(value: 'e', label: '选项 E'),
     ];
 
-@UseCase(name: 'All States', type: StarryDropdown)
+@UseCase(name: 'All Variants', type: StarryDropdown)
 Widget allStatesStarryDropdown(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
   return Padding(

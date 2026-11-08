@@ -61,6 +61,36 @@ void main() {
       expect(selected, ['a', 'b', 'c']);
     });
 
+    testWidgets(
+      'pointer-opened list paints no focus frame until keyboard use',
+      (tester) async {
+        await tester.pumpWidget(
+          _host(
+            SizedBox(
+              width: 320,
+              child: StarryActionList(
+                items: [_item('a'), _item('b')],
+                onItemSelected: (_) {},
+                onClose: () {},
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        bool hasSelectedFrame() => tester
+            .widgetList<StarrySelectedHighlight>(
+              find.byType(StarrySelectedHighlight),
+            )
+            .any((highlight) => highlight.isSelected);
+        expect(hasSelectedFrame(), isFalse);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pump();
+        expect(hasSelectedFrame(), isTrue);
+      },
+    );
+
     testWidgets('arrows skip disabled rows', (tester) async {
       final selected = <String>[];
       await tester.pumpWidget(
@@ -78,8 +108,9 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-      // Skipped the disabled 'b', activated 'c'.
+      // First Down reaches 'a', the next Down skips disabled 'b' and lands on 'c'.
       expect(selected, ['c']);
     });
 
@@ -249,7 +280,8 @@ void main() {
       await tester.pump();
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
-      expect(selected, ['b']);
+      // The filter reset clears the active row, so Down starts at the first row.
+      expect(selected, ['a']);
     });
 
     testWidgets('long title and subtitle ellipsize within narrow width', (

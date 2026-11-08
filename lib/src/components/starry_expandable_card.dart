@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/starry_tokens.dart';
+import 'disclosure_trigger.dart';
 import 'starry_surface.dart';
 
 /// Half-turn rotation applied to the disclosure chevron between the
@@ -37,7 +38,10 @@ class StarryExpandableCard extends StatefulWidget {
     required this.children,
     super.key,
     this.initiallyExpanded = false,
+    this.expanded,
     this.onExpansionChanged,
+    this.headerActions,
+    this.focusNode,
     this.trailing,
     this.headerPadding,
     this.childrenPadding,
@@ -56,6 +60,17 @@ class StarryExpandableCard extends StatefulWidget {
 
   /// Whether the card starts expanded.
   final bool initiallyExpanded;
+
+  /// Controlled expansion. When supplied, taps request a change through
+  /// [onExpansionChanged]; only the owner's next value changes the panel.
+  final bool? expanded;
+
+  /// Independent actions beside the disclosure. Tapping them does not toggle
+  /// the panel and they never rotate with [trailing].
+  final Widget? headerActions;
+
+  /// Caller-owned focus node for the disclosure button.
+  final FocusNode? focusNode;
 
   /// Called when the expansion state toggles.
   final ValueChanged<bool>? onExpansionChanged;
@@ -105,7 +120,7 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
   @override
   void initState() {
     super.initState();
-    _isExpanded = widget.initiallyExpanded;
+    _isExpanded = widget.expanded ?? widget.initiallyExpanded;
 
     _controller = AnimationController(
       vsync: this,
@@ -114,12 +129,9 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
       duration: widget.animationDuration,
     );
 
-    _heightFactor = _controller.drive(CurveTween(curve: Curves.easeInOut));
+    _heightFactor = _controller;
     _iconTurns = _controller.drive(
-      Tween<double>(
-        begin: 0.0,
-        end: _kChevronFlipTurns,
-      ).chain(CurveTween(curve: Curves.easeInOut)),
+      Tween<double>(begin: 0.0, end: _kChevronFlipTurns),
     );
 
     if (_isExpanded) {
@@ -133,8 +145,41 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
     final t = Theme.of(context).extension<StarryTokens>()!;
     // Bind the token-driven default duration once the theme is available,
     // unless the caller pinned an explicit duration.
-    if (widget.animationDuration == null) {
-      _controller.duration = t.motion.durationMedium;
+    _bindMotion(t);
+  }
+
+  void _bindMotion(StarryTokens t) {
+    _controller.duration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : widget.animationDuration ?? t.motion.durationMedium;
+    _heightFactor = _controller.drive(
+      CurveTween(curve: t.motion.easingStandard),
+    );
+    _iconTurns = _heightFactor.drive(
+      Tween<double>(begin: 0, end: _kChevronFlipTurns),
+    );
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.value = _isExpanded ? 1 : 0;
+    }
+  }
+
+  @override
+  void didUpdateWidget(StarryExpandableCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _bindMotion(Theme.of(context).extension<StarryTokens>()!);
+    if (widget.expanded != null && widget.expanded != _isExpanded) {
+      _isExpanded = widget.expanded!;
+      _animate();
+    }
+  }
+
+  void _animate() {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.value = _isExpanded ? 1 : 0;
+    } else if (_isExpanded) {
+      _controller.forward();
+    } else {
+      _controller.reverse();
     }
   }
 
@@ -145,15 +190,12 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
   }
 
   void _toggle() {
-    setState(() {
-      _isExpanded = !_isExpanded;
-      if (_isExpanded) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
-      widget.onExpansionChanged?.call(_isExpanded);
-    });
+    final next = !_isExpanded;
+    if (widget.expanded == null) {
+      setState(() => _isExpanded = next);
+      _animate();
+    }
+    widget.onExpansionChanged?.call(next);
   }
 
   @override
@@ -169,12 +211,13 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
       t.radius.xxl,
       t.controlMetrics.controlHeight / 2,
     );
-    final header = StarrySurface(
+    final header = StarryDisclosureTrigger(
       color: widget.backgroundColor,
-      borderRadius: BorderRadius.circular(headerRadius),
+      radius: BorderRadius.circular(headerRadius),
       elevated: widget.elevated,
       onTap: _toggle,
-      clipBehavior: Clip.antiAlias,
+      expanded: _isExpanded,
+      focusNode: widget.focusNode,
       child: SizedBox(
         height: t.controlMetrics.controlHeight,
         child: Padding(
@@ -194,29 +237,50 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
 
     // Detached content panel: its own rounded-rectangle surface below the
     // header, revealed by the height-factor animation and cross-faded in.
-    final content = ClipRect(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Align(
-            alignment: Alignment.topCenter,
-            heightFactor: _heightFactor.value,
-            child: Opacity(opacity: _heightFactor.value, child: child),
-          );
-        },
-        child: Padding(
-          padding: EdgeInsets.only(top: t.spacing.s3),
-          child: StarrySurface(
-            color: widget.backgroundColor,
-            borderRadius:
-                widget.borderRadius ?? BorderRadius.circular(t.radius.xxl),
-            elevated: widget.elevated,
-            padding: widget.childrenPadding ?? EdgeInsets.all(t.spacing.s5),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: widget.children,
+    final content = AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final hidden = _controller.value == 0;
+        if (hidden && !widget.maintainState) {
+          return const SizedBox.shrink();
+        }
+        final revealed = Align(
+          alignment: Alignment.topCenter,
+          heightFactor: _heightFactor.value,
+          child: Opacity(
+            opacity: _heightFactor.value,
+            child: IgnorePointer(
+              ignoring: !_isExpanded,
+              child: ExcludeFocus(
+                excluding: !_isExpanded,
+                child: ExcludeSemantics(
+                  excluding: !_isExpanded,
+                  child: TickerMode(
+                    enabled: !hidden,
+                    child: Offstage(offstage: hidden, child: child),
+                  ),
+                ),
+              ),
             ),
+          ),
+        );
+        return ClipRect(
+          clipBehavior: _heightFactor.value < 1 ? Clip.hardEdge : Clip.none,
+          child: revealed,
+        );
+      },
+      child: Padding(
+        padding: EdgeInsets.only(top: t.spacing.s3),
+        child: StarrySurface(
+          color: widget.backgroundColor,
+          borderRadius:
+              widget.borderRadius ?? BorderRadius.circular(t.radius.xxl),
+          elevated: widget.elevated,
+          padding: widget.childrenPadding ?? EdgeInsets.all(t.spacing.s5),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: widget.children,
           ),
         ),
       ),
@@ -225,7 +289,19 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[header, content],
+      children: <Widget>[
+        if (widget.headerActions == null)
+          header
+        else
+          Row(
+            children: [
+              Expanded(child: header),
+              SizedBox(width: t.spacing.s2),
+              widget.headerActions!,
+            ],
+          ),
+        content,
+      ],
     );
   }
 
@@ -236,7 +312,13 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
 
     return RotationTransition(
       turns: _iconTurns,
-      child: Icon(Icons.expand_more, color: s.textTertiary),
+      child: Icon(
+        Icons.expand_more,
+        color: s.textTertiary,
+        size: Theme.of(
+          context,
+        ).extension<StarryTokens>()!.controlMetrics.iconMd,
+      ),
     );
   }
 }

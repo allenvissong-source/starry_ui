@@ -16,6 +16,9 @@ import '../inputs/starry_switch.dart';
 /// `destructive` swaps it to `semantic.error`. Selection tints the background
 /// with the brand color at the `accentSurface` opacity. All spacing, radius,
 /// typography, and motion come from [StarryTokens]; no `ColorScheme` lookups.
+/// When [showChevron] is true the chevron renders only if the row can actually
+/// be activated ([enabled] plus an `onTap`/`onLongPress` handler), so read-only
+/// value rows never expose a dead affordance.
 class StarrySettingsTile extends StatefulWidget {
   const StarrySettingsTile({
     required this.title,
@@ -402,7 +405,7 @@ class _StarrySettingsTileState extends State<StarrySettingsTile> {
       );
     }
 
-    if (widget.showChevron) {
+    if (widget.showChevron && _canInteract) {
       if (children.isNotEmpty) {
         children.add(SizedBox(width: t.spacing.s2));
       }
@@ -411,9 +414,7 @@ class _StarrySettingsTileState extends State<StarrySettingsTile> {
         Icon(
           Icons.chevron_right_rounded,
           size: t.spacing.s5,
-          color: secondaryForeground.withValues(
-            alpha: _canInteract ? 0.85 : 0.6,
-          ),
+          color: secondaryForeground.withValues(alpha: 0.85),
         ),
       );
     }

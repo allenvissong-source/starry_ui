@@ -5,7 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 import '../theme/starry_tokens.dart';
 import 'starry_tag.dart';
 
-@UseCase(name: 'All States', type: StarryTag)
+@UseCase(name: 'All Variants', type: StarryTag)
 Widget allStatesStarryTag(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
   return Padding(
@@ -19,6 +19,16 @@ Widget allStatesStarryTag(BuildContext context) {
         StarryTag(label: '警告', status: StarryTagStatus.warning),
         StarryTag(label: '错误', status: StarryTagStatus.error),
         StarryTag(label: 'AI', status: StarryTagStatus.accent),
+        StarryTag(
+          label: '已启用',
+          status: StarryTagStatus.success,
+          leading: Icon(Icons.check),
+        ),
+        StarryTag(
+          label: '媒体标签',
+          onMedia: true,
+          leading: Icon(Icons.image_outlined),
+        ),
       ],
     ),
   );
@@ -40,6 +50,10 @@ Widget playgroundStarryTag(BuildContext context) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           StarryTag(
+            leading:
+                context.knobs.boolean(label: 'Leading', initialValue: false)
+                ? const Icon(Icons.info_outline)
+                : null,
             label: context.knobs.string(label: 'Label', initialValue: '标签'),
             status: context.knobs.object.dropdown<StarryTagStatus>(
               label: 'Status',

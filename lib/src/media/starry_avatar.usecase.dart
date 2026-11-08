@@ -5,7 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 import '../theme/starry_tokens.dart';
 import 'starry_avatar.dart';
 
-@UseCase(name: 'All Sizes', type: StarryAvatar)
+@UseCase(name: 'All Variants', type: StarryAvatar)
 Widget allSizesStarryAvatar(BuildContext context) {
   final t = Theme.of(context).extension<StarryTokens>()!;
   return Padding(
@@ -24,6 +24,11 @@ Widget allSizesStarryAvatar(BuildContext context) {
           shape: StarryAvatarShape.rounded,
           bordered: true,
         ),
+        const StarryAvatar(
+          media: Icon(Icons.pets),
+          shape: StarryAvatarShape.rounded,
+          bordered: true,
+        ),
       ],
     ),
   );
@@ -33,6 +38,9 @@ Widget allSizesStarryAvatar(BuildContext context) {
 Widget playgroundStarryAvatar(BuildContext context) {
   return Center(
     child: StarryAvatar(
+      media: context.knobs.boolean(label: 'App media', initialValue: false)
+          ? const Icon(Icons.pets)
+          : null,
       fallbackText: context.knobs.string(
         label: 'Fallback',
         initialValue: 'John Doe',

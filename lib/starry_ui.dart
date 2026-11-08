@@ -22,9 +22,11 @@ export 'src/buttons/starry_primary_action_button.dart';
 
 // Foundations.
 export 'src/foundations/starry_count_formatter.dart';
+export 'src/navigation/starry_file_tree.dart';
 
 // Media.
 export 'src/media/starry_avatar.dart';
+export 'src/media/starry_media_slot.dart';
 export 'src/media/starry_media_stage.dart';
 export 'src/media/starry_media_picker.dart';
 export 'src/media/starry_reference_card.dart';
@@ -43,6 +45,8 @@ export 'src/components/starry_surface.dart';
 export 'src/components/starry_data_table.dart';
 
 // Feedback.
+export 'src/feedback/starry_dialog.dart';
+export 'src/feedback/starry_input_dialog.dart';
 export 'src/feedback/starry_message_list.dart';
 export 'src/feedback/starry_empty_state.dart';
 export 'src/feedback/starry_loading_indicator.dart';
@@ -55,6 +59,7 @@ export 'src/inputs/starry_dropdown.dart';
 export 'src/inputs/starry_slider.dart';
 export 'src/inputs/starry_switch.dart';
 export 'src/inputs/starry_text_field.dart';
+export 'src/inputs/starry_number_field.dart';
 export 'src/inputs/starry_textarea.dart';
 export 'src/inputs/starry_form.dart';
 
@@ -84,6 +89,7 @@ export 'src/navigation/starry_navigation_pane.dart';
 export 'src/navigation/starry_page_top_bar.dart';
 export 'src/navigation/starry_round_action_button.dart';
 export 'src/navigation/starry_segmented_control.dart';
+export 'src/navigation/starry_tab_bar.dart';
 export 'src/navigation/starry_side_navigation_rail.dart';
 export 'src/navigation/starry_sliver_page_top_bar.dart';
 
@@ -91,3 +97,6 @@ export 'src/navigation/starry_sliver_page_top_bar.dart';
 export 'src/tags/starry_badge.dart';
 export 'src/tags/starry_chip.dart';
 export 'src/tags/starry_tag.dart';
+
+// Text.
+export 'src/text/starry_code_block.dart';

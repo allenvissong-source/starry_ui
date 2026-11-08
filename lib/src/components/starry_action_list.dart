@@ -115,11 +115,22 @@ class _StarryActionListState extends State<StarryActionList> {
   final _scrollController = ScrollController();
   final _rowKeys = <String, GlobalKey>{};
   var _query = '';
-  var _activeIndex = 0;
+  // -1 means "no keyboard-active row yet". A surface opened with a pointer must
+  // not paint a selection-looking focus frame on its first row; the frame only
+  // appears after an explicit keyboard navigation event.
+  var _activeIndex = -1;
+  var _keyboardNavigationActive = false;
 
   @override
   void initState() {
     super.initState();
+    // The composer-driven external list keeps its historical "first row is
+    // active" behavior; pointer-opened panels start with no active row so no
+    // false selection frame is painted before the user navigates by keyboard.
+    if (widget.controller != null) {
+      _activeIndex = 0;
+      _keyboardNavigationActive = true;
+    }
     _filterController.addListener(_onFilterChanged);
     widget.controller?.attach(
       moveUp: () => _move(-1),
@@ -149,7 +160,8 @@ class _StarryActionListState extends State<StarryActionList> {
     if (_filterController.text == _query) return;
     setState(() {
       _query = _filterController.text;
-      _activeIndex = 0;
+      _activeIndex = -1;
+      _keyboardNavigationActive = false;
     });
   }
 
@@ -169,7 +181,12 @@ class _StarryActionListState extends State<StarryActionList> {
     final activable = _activable;
     if (activable.isEmpty) return;
     setState(() {
-      _activeIndex = (_activeIndex + delta) % activable.length;
+      _keyboardNavigationActive = true;
+      if (_activeIndex < 0) {
+        _activeIndex = delta > 0 ? 0 : activable.length - 1;
+      } else {
+        _activeIndex = (_activeIndex + delta) % activable.length;
+      }
     });
     final id = activable[_activeIndex.clamp(0, activable.length - 1)].id;
     WidgetsBinding.instance.addPostFrameCallback((_) => _ensureRowVisible(id));
@@ -189,8 +206,20 @@ class _StarryActionListState extends State<StarryActionList> {
   void _activateCurrent() {
     final activable = _activable;
     if (activable.isEmpty) return;
+    // Enter without prior arrow navigation is still a keyboard activation:
+    // make the first row active, then invoke it. No frame is painted before
+    // this point, so pointer-opened surfaces never show a false selection.
+    if (_activeIndex < 0) {
+      _activeIndex = 0;
+      _keyboardNavigationActive = true;
+    }
     final index = _activeIndex.clamp(0, activable.length - 1);
     widget.onItemSelected(activable[index]);
+  }
+
+  void _clearKeyboardHighlight() {
+    if (!_keyboardNavigationActive) return;
+    setState(() => _keyboardNavigationActive = false);
   }
 
   KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
@@ -227,7 +256,8 @@ class _StarryActionListState extends State<StarryActionList> {
     final t = Theme.of(context).extension<StarryTokens>()!;
     final groups = _groups;
     final activable = _activable;
-    final activeId = activable.isEmpty
+    final activeId =
+        activable.isEmpty || _activeIndex < 0 || !_keyboardNavigationActive
         ? null
         : activable[_activeIndex.clamp(0, activable.length - 1)].id;
 
@@ -243,23 +273,26 @@ class _StarryActionListState extends State<StarryActionList> {
           Flexible(
             child: groups.isEmpty
                 ? _buildEmpty(context, t)
-                : ListView(
-                    controller: _scrollController,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(vertical: t.spacing.s1),
-                    children: [
-                      for (final group in groups) ...[
-                        if (group.title != null)
-                          _buildGroupHeader(context, t, group.title!),
-                        for (final item in group.items)
-                          _buildRow(
-                            context,
-                            t,
-                            item,
-                            focused: item.id == activeId,
-                          ),
+                : Listener(
+                    onPointerDown: (_) => _clearKeyboardHighlight(),
+                    child: ListView(
+                      controller: _scrollController,
+                      shrinkWrap: true,
+                      padding: EdgeInsets.symmetric(vertical: t.spacing.s1),
+                      children: [
+                        for (final group in groups) ...[
+                          if (group.title != null)
+                            _buildGroupHeader(context, t, group.title!),
+                          for (final item in group.items)
+                            _buildRow(
+                              context,
+                              t,
+                              item,
+                              focused: item.id == activeId,
+                            ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
           ),
         ],

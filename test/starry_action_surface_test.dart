@@ -19,6 +19,7 @@ Future<Rect> _openSurface(
   required ValueChanged<StarryActionItem> onSelected,
   FocusNode? triggerNode,
   String? initialSectionId,
+  List<StarryActionItem> primaryActions = const [],
 }) async {
   Rect? triggerRect;
   await tester.pumpWidget(
@@ -39,6 +40,7 @@ Future<Rect> _openSurface(
                       StarryActionSurface.show(
                         context: context,
                         items: items,
+                        primaryActions: primaryActions,
                         anchorRect: triggerRect!,
                         onItemSelected: onSelected,
                         title: 'Actions',
@@ -78,6 +80,32 @@ void main() {
 
       final panelTop = tester.getTopLeft(find.byType(StarryActionList));
       expect(panelTop.dy, greaterThanOrEqualTo(rect.bottom + 7));
+    });
+
+    testWidgets('primary actions keep a token gap between tiles', (
+      tester,
+    ) async {
+      await _openSurface(
+        tester,
+        items: [_leaf('a')],
+        primaryActions: const [
+          StarryActionItem(id: 'camera', title: 'Camera'),
+          StarryActionItem(id: 'album', title: 'Album'),
+          StarryActionItem(id: 'file', title: 'File'),
+        ],
+        onSelected: (_) {},
+      );
+
+      Rect tileRect(String label) => tester.getRect(
+        find.byWidgetPredicate(
+          (widget) => widget is Semantics && widget.properties.label == label,
+        ),
+      );
+      final camera = tileRect('Camera');
+      final album = tileRect('Album');
+      final file = tileRect('File');
+      expect(album.left - camera.right, 8);
+      expect(file.left - album.right, 8);
     });
 
     testWidgets('flips the panel above the trigger near the viewport bottom', (

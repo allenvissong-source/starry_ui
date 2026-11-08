@@ -428,12 +428,17 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
               padding: EdgeInsets.all(t.spacing.s3),
               child: Row(
                 children: [
-                  for (final item in widget.primaryActions)
+                  for (
+                    var index = 0;
+                    index < widget.primaryActions.length;
+                    index++
+                  ) ...[
+                    if (index > 0) SizedBox(width: t.spacing.s2),
                     Expanded(
                       child: Semantics(
                         button: true,
-                        enabled: !item.disabled,
-                        label: item.title,
+                        enabled: !widget.primaryActions[index].disabled,
+                        label: widget.primaryActions[index].title,
                         // Ink fills sit on the Material via Ink (not a child
                         // Container) so the ripple paints above the tile fill.
                         child: Ink(
@@ -442,9 +447,11 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
                             borderRadius: BorderRadius.circular(t.radius.md),
                           ),
                           child: InkWell(
-                            onTap: item.disabled
+                            onTap: widget.primaryActions[index].disabled
                                 ? null
-                                : () => widget.onItemSelected(item),
+                                : () => widget.onItemSelected(
+                                    widget.primaryActions[index],
+                                  ),
                             borderRadius: BorderRadius.circular(t.radius.md),
                             child: Padding(
                               padding: EdgeInsets.all(t.spacing.s2),
@@ -459,20 +466,24 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
                                           size: t.controlMetrics.iconMd,
                                         ),
                                         child:
-                                            item.leadingBuilder?.call(
-                                              context,
-                                            ) ??
+                                            widget
+                                                .primaryActions[index]
+                                                .leadingBuilder
+                                                ?.call(context) ??
                                             const SizedBox.shrink(),
                                       ),
                                     ),
                                   ),
                                   Text(
-                                    item.title,
+                                    widget.primaryActions[index].title,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: t.typography.bodyMedium.textStyle
                                         .copyWith(
-                                          color: item.disabled
+                                          color:
+                                              widget
+                                                  .primaryActions[index]
+                                                  .disabled
                                               ? s.textDisabled
                                               : s.textPrimary,
                                         ),
@@ -484,6 +495,7 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
                         ),
                       ),
                     ),
+                  ],
                 ],
               ),
             ),

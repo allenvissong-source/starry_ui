@@ -44,6 +44,7 @@ class StarryAvatar extends StatelessWidget {
   const StarryAvatar({
     super.key,
     this.imageProvider,
+    this.media,
     this.fallbackText,
     this.fallbackIcon,
     this.size = StarryAvatarSize.medium,
@@ -56,7 +57,11 @@ class StarryAvatar extends StatelessWidget {
     this.foregroundColor,
     this.onTap,
     this.heroTag,
-  });
+    this.semanticLabel,
+  }) : assert(
+         imageProvider == null || media == null,
+         'Provide either imageProvider or media.',
+       );
 
   /// Fallback-glyph extent as a fraction of the avatar diameter, matching the
   /// visual weight of the initials tier it stands in for.
@@ -65,6 +70,11 @@ class StarryAvatar extends StatelessWidget {
   /// Foreground image. When null (or it fails to decode) the fallback chain
   /// takes over.
   final ImageProvider? imageProvider;
+
+  /// App-built media with its own loading/error handling. Mutually exclusive
+  /// with [imageProvider]; clipped and sized by the avatar. No path or URL
+  /// resolution enters the design system.
+  final Widget? media;
 
   /// Text whose initials are shown when there is no image. See [_initials].
   final String? fallbackText;
@@ -103,6 +113,9 @@ class StarryAvatar extends StatelessWidget {
 
   /// Optional [Hero] tag wrapping the avatar for shared-element transitions.
   final Object? heroTag;
+
+  /// Accessible identity for app-built media or a tappable avatar.
+  final String? semanticLabel;
 
   /// Resolve initials from [fallbackText]: a single token yields its first two
   /// letters, two or more tokens yield the first letter of the first two
@@ -173,6 +186,7 @@ class StarryAvatar extends StatelessWidget {
             fit: StackFit.expand,
             children: <Widget>[
               fallback,
+              ?media,
               if (imageProvider != null)
                 Image(
                   image: imageProvider!,
@@ -196,17 +210,27 @@ class StarryAvatar extends StatelessWidget {
     if (onTap != null) {
       content = Semantics(
         button: true,
+        label: semanticLabel ?? fallbackText,
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
             onTap: onTap,
-            customBorder: RoundedRectangleBorder(borderRadius: borderRadius),
-            child: content,
+            customBorder: shape == StarryAvatarShape.circle
+                ? const CircleBorder()
+                : RoundedRectangleBorder(borderRadius: borderRadius),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: t.controlMetrics.minTouchTarget,
+                minHeight: t.controlMetrics.minTouchTarget,
+              ),
+              child: Center(widthFactor: 1, heightFactor: 1, child: content),
+            ),
           ),
         ),
       );
     }
 
-    return content;
+    // Keep the visual square even when a parent supplies a tight row width.
+    return Align(widthFactor: 1, heightFactor: 1, child: content);
   }
 }

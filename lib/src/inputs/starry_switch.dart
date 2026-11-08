@@ -141,18 +141,30 @@ class _StarrySwitchState extends State<StarrySwitch> {
         : Transform.scale(scale: scale, child: ringed);
 
     if (widget.label == null) return sized;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        sized,
-        SizedBox(width: t.spacing.s2),
-        Text(
-          widget.label!,
-          style: t.typography.bodyMedium.textStyle.copyWith(
-            color: s.textPrimary,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final label = InkWell(
+          canRequestFocus: false,
+          onTap: widget.onChanged == null
+              ? null
+              : () => widget.onChanged!(!widget.value),
+          borderRadius: BorderRadius.circular(t.radius.sm),
+          child: Text(
+            widget.label!,
+            style: t.typography.bodyMedium.textStyle.copyWith(
+              color: s.textPrimary,
+            ),
           ),
-        ),
-      ],
+        );
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            sized,
+            SizedBox(width: t.spacing.s2),
+            if (constraints.hasBoundedWidth) Flexible(child: label) else label,
+          ],
+        );
+      },
     );
   }
 }

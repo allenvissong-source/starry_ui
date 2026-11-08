@@ -20,10 +20,34 @@ class StarryTag extends StatelessWidget {
     super.key,
     this.status = StarryTagStatus.neutral,
     this.onMedia = false,
+    this.leading,
   });
 
   final String label;
   final StarryTagStatus status;
+
+  /// Decorative leading content. Uses the tag's ink and token icon size;
+  /// the tag remains a non-interactive status label.
+  final Widget? leading;
+
+  Widget _content(StarryTokens t, TextStyle style) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      if (leading != null) ...[
+        ExcludeSemantics(
+          child: IconTheme.merge(
+            data: IconThemeData(
+              size: t.controlMetrics.iconXs,
+              color: style.color,
+            ),
+            child: leading!,
+          ),
+        ),
+        SizedBox(width: t.spacing.s1),
+      ],
+      Flexible(child: Text(label, style: style)),
+    ],
+  );
 
   /// Whether the tag sits on top of media (an image / video thumbnail) rather
   /// than a solid surface. When true it drops the status tint for a translucent
@@ -57,9 +81,9 @@ class StarryTag extends StatelessWidget {
           color: scrim.withValues(alpha: t.opacity.mediaScrim),
           borderRadius: BorderRadius.circular(t.radius.full),
         ),
-        child: Text(
-          label,
-          style: t.typography.labelSmall.textStyle.copyWith(
+        child: _content(
+          t,
+          t.typography.labelSmall.textStyle.copyWith(
             color: Colors
                 .white, // hardcode-allow: on-media 文字用白色是图片上的规范墨色,不随主题变化,无对应语义令牌
             fontWeight: FontWeight.w700,
@@ -122,7 +146,7 @@ class StarryTag extends StatelessWidget {
         color: bg,
         borderRadius: BorderRadius.circular(t.radius.full),
       ),
-      child: Text(label, style: labelStyle),
+      child: _content(t, labelStyle),
     );
   }
 }

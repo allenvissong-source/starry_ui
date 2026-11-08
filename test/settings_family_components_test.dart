@@ -13,6 +13,45 @@ Widget _host(Widget child) {
 }
 
 void main() {
+  testWidgets('switch label wraps and toggles in a narrow column', (
+    tester,
+  ) async {
+    var value = false;
+    const label = 'I reviewed the public content, dependencies and scope.';
+    await tester.pumpWidget(
+      _host(
+        SizedBox(
+          width: 240,
+          child: StatefulBuilder(
+            builder: (context, update) => StarrySwitch(
+              value: value,
+              label: label,
+              onChanged: (next) => update(() => value = next),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.text(label)).height, greaterThan(20));
+    await tester.tap(find.text(label));
+    await tester.pumpAndSettle();
+    expect(value, isTrue);
+  });
+
+  testWidgets('disabled switch label never toggles', (tester) async {
+    await tester.pumpWidget(
+      _host(const StarrySwitch(value: false, label: 'Disabled')),
+    );
+    await tester.tap(find.text('Disabled'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<StarrySwitch>(find.byType(StarrySwitch)).value,
+      isFalse,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('StarrySettingsTile.navigation renders and fires onTap', (
     tester,
   ) async {
@@ -31,6 +70,37 @@ void main() {
     await tester.tap(find.text('账号管理'));
     await tester.pumpAndSettle();
     expect(tapped, 1);
+  });
+
+  testWidgets('StarrySettingsTile.value hides the chevron when read-only', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const StarrySettingsTile.value(title: '最后摘要时间', trailingText: '尚无摘要'),
+      ),
+    );
+    expect(find.text('尚无摘要'), findsOneWidget);
+    expect(
+      find.byIcon(Icons.chevron_right_rounded),
+      findsNothing,
+      reason: 'a row with no activation handler must not imply navigation',
+    );
+  });
+
+  testWidgets('StarrySettingsTile.value keeps the chevron when tappable', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        StarrySettingsTile.value(
+          title: '连接',
+          trailingText: '火山方舟',
+          onTap: () {},
+        ),
+      ),
+    );
+    expect(find.byIcon(Icons.chevron_right_rounded), findsOneWidget);
   });
 
   testWidgets('StarrySettingsTile.toggle drives the switch', (tester) async {

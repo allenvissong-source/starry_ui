@@ -26,6 +26,7 @@ class StarryTextField extends StatefulWidget {
     this.hint,
     this.prefixIcon,
     this.leading,
+    this.leadingGap,
     this.trailing,
     this.suffixIcon,
     this.obscureText = false,
@@ -46,6 +47,7 @@ class StarryTextField extends StatefulWidget {
     this.clearTooltip,
     this.onChanged,
     this.onSubmitted,
+    this.onPaste,
     this.onClear,
   }) : assert(
          !showClearButton || clearTooltip != null,
@@ -70,6 +72,11 @@ class StarryTextField extends StatefulWidget {
 
   /// Custom leading widget slot (mutually exclusive with [prefixIcon]).
   final Widget? leading;
+
+  /// Gap between [leading] and the text field. Defaults to `spacing.s3`.
+  /// Pass 0 when the leading slot is collapsed to zero width so it leaves no
+  /// phantom inset behind.
+  final double? leadingGap;
 
   /// Custom trailing widget slot. Rendered after the clear/suffix affordances.
   final Widget? trailing;
@@ -104,6 +111,11 @@ class StarryTextField extends StatefulWidget {
 
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
+
+  /// Optional paste handler that replaces the context-menu paste action, so a
+  /// host can accept files from the clipboard instead of only plain text.
+  final VoidCallback? onPaste;
+
   final VoidCallback? onClear;
 
   @override
@@ -247,7 +259,7 @@ class _StarryTextFieldState extends State<StarryTextField>
                 children: <Widget>[
                   if (leading != null) ...<Widget>[
                     leading,
-                    SizedBox(width: t.spacing.s3),
+                    SizedBox(width: widget.leadingGap ?? t.spacing.s3),
                   ],
                   Expanded(
                     child: TextField(
@@ -266,6 +278,27 @@ class _StarryTextFieldState extends State<StarryTextField>
                       onChanged: widget.onChanged,
                       onSubmitted: widget.onSubmitted,
                       buildCounter: _noCounter,
+                      contextMenuBuilder: widget.onPaste == null
+                          ? null
+                          : (context, editable) =>
+                                AdaptiveTextSelectionToolbar.buttonItems(
+                                  anchors: editable.contextMenuAnchors,
+                                  buttonItems: editable.contextMenuButtonItems
+                                      .map((item) {
+                                        if (item.type !=
+                                            ContextMenuButtonType.paste) {
+                                          return item;
+                                        }
+                                        return ContextMenuButtonItem(
+                                          type: item.type,
+                                          onPressed: () {
+                                            editable.hideToolbar();
+                                            widget.onPaste!();
+                                          },
+                                        );
+                                      })
+                                      .toList(),
+                                ),
                       textAlignVertical: TextAlignVertical.center,
                       style: t.typography.bodyMedium.textStyle.copyWith(
                         color: s.textPrimary,

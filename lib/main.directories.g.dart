@@ -36,10 +36,16 @@ import 'package:starry_ui/src/components/starry_control_shell.usecase.dart'
     as _starry_ui_src_components_starry_control_shell_usecase;
 import 'package:starry_ui/src/components/starry_data_table.usecase.dart'
     as _starry_ui_src_components_starry_data_table_usecase;
+import 'package:starry_ui/src/components/starry_expandable_card.usecase.dart'
+    as _starry_ui_src_components_starry_expandable_card_usecase;
+import 'package:starry_ui/src/feedback/starry_dialog.usecase.dart'
+    as _starry_ui_src_feedback_starry_dialog_usecase;
 import 'package:starry_ui/src/feedback/starry_empty_state.usecase.dart'
     as _starry_ui_src_feedback_starry_empty_state_usecase;
 import 'package:starry_ui/src/feedback/starry_error_widget.usecase.dart'
     as _starry_ui_src_feedback_starry_error_widget_usecase;
+import 'package:starry_ui/src/feedback/starry_input_dialog.usecase.dart'
+    as _starry_ui_src_feedback_starry_input_dialog_usecase;
 import 'package:starry_ui/src/feedback/starry_loading_indicator.usecase.dart'
     as _starry_ui_src_feedback_starry_loading_indicator_usecase;
 import 'package:starry_ui/src/feedback/starry_looping_animations.usecase.dart'
@@ -58,6 +64,8 @@ import 'package:starry_ui/src/inputs/starry_dropdown.usecase.dart'
     as _starry_ui_src_inputs_starry_dropdown_usecase;
 import 'package:starry_ui/src/inputs/starry_form.usecase.dart'
     as _starry_ui_src_inputs_starry_form_usecase;
+import 'package:starry_ui/src/inputs/starry_number_field.usecase.dart'
+    as _starry_ui_src_inputs_starry_number_field_usecase;
 import 'package:starry_ui/src/inputs/starry_search_input.usecase.dart'
     as _starry_ui_src_inputs_starry_search_input_usecase;
 import 'package:starry_ui/src/inputs/starry_slider.usecase.dart'
@@ -102,10 +110,14 @@ import 'package:starry_ui/src/media/starry_identity_row.usecase.dart'
     as _starry_ui_src_media_starry_identity_row_usecase;
 import 'package:starry_ui/src/media/starry_media_picker.usecase.dart'
     as _starry_ui_src_media_starry_media_picker_usecase;
+import 'package:starry_ui/src/media/starry_media_slot.usecase.dart'
+    as _starry_ui_src_media_starry_media_slot_usecase;
 import 'package:starry_ui/src/media/starry_reference_card.usecase.dart'
     as _starry_ui_src_media_starry_reference_card_usecase;
 import 'package:starry_ui/src/navigation/starry_dock_bar.usecase.dart'
     as _starry_ui_src_navigation_starry_dock_bar_usecase;
+import 'package:starry_ui/src/navigation/starry_file_tree.usecase.dart'
+    as _starry_ui_src_navigation_starry_file_tree_usecase;
 import 'package:starry_ui/src/navigation/starry_navigation_pane.usecase.dart'
     as _starry_ui_src_navigation_starry_navigation_pane_usecase;
 import 'package:starry_ui/src/navigation/starry_page_top_bar.usecase.dart'
@@ -118,12 +130,16 @@ import 'package:starry_ui/src/navigation/starry_side_navigation_rail.usecase.dar
     as _starry_ui_src_navigation_starry_side_navigation_rail_usecase;
 import 'package:starry_ui/src/navigation/starry_sliver_page_top_bar.usecase.dart'
     as _starry_ui_src_navigation_starry_sliver_page_top_bar_usecase;
+import 'package:starry_ui/src/navigation/starry_tab_bar.usecase.dart'
+    as _starry_ui_src_navigation_starry_tab_bar_usecase;
 import 'package:starry_ui/src/tags/starry_badge.usecase.dart'
     as _starry_ui_src_tags_starry_badge_usecase;
 import 'package:starry_ui/src/tags/starry_chip.usecase.dart'
     as _starry_ui_src_tags_starry_chip_usecase;
 import 'package:starry_ui/src/tags/starry_tag.usecase.dart'
     as _starry_ui_src_tags_starry_tag_usecase;
+import 'package:starry_ui/src/text/starry_code_block.usecase.dart'
+    as _starry_ui_src_text_starry_code_block_usecase;
 import 'package:starry_ui/src/text/starry_emoji_text.usecase.dart'
     as _starry_ui_src_text_starry_emoji_text_usecase;
 import 'package:widgetbook/widgetbook.dart' as _widgetbook;
@@ -368,6 +384,21 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookComponent(
+        name: 'StarryExpandableCard',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_components_starry_expandable_card_usecase
+                .allVariantsStarryExpandableCard,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_components_starry_expandable_card_usecase
+                .playgroundStarryExpandableCard,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
         name: 'StarryRoundIconShell',
         useCases: [
           _widgetbook.WidgetbookUseCase(
@@ -382,6 +413,21 @@ final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookFolder(
     name: 'feedback',
     children: [
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryDialog',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_feedback_starry_dialog_usecase
+                .allVariantsStarryDialog,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_feedback_starry_dialog_usecase
+                .playgroundStarryDialog,
+          ),
+        ],
+      ),
       _widgetbook.WidgetbookComponent(
         name: 'StarryEmptyState',
         useCases: [
@@ -434,6 +480,21 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'Full Screen',
             builder: _starry_ui_src_feedback_starry_loading_indicator_usecase
                 .fullScreenStarryLoadingIndicator,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryInputDialog',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_feedback_starry_input_dialog_usecase
+                .allVariantsStarryInputDialog,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_feedback_starry_input_dialog_usecase
+                .playgroundStarryInputDialog,
           ),
         ],
       ),
@@ -663,7 +724,7 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'StarryDropdown',
         useCases: [
           _widgetbook.WidgetbookUseCase(
-            name: 'All States',
+            name: 'All Variants',
             builder: _starry_ui_src_inputs_starry_dropdown_usecase
                 .allStatesStarryDropdown,
           ),
@@ -715,6 +776,21 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'Playground',
             builder: _starry_ui_src_inputs_starry_form_usecase
                 .playgroundStarryFormSection,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryNumberField',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_inputs_starry_number_field_usecase
+                .allVariantsStarryNumberField,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_inputs_starry_number_field_usecase
+                .playgroundStarryNumberField,
           ),
         ],
       ),
@@ -772,12 +848,17 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'StarryTextArea',
         useCases: [
           _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_inputs_starry_textarea_usecase
+                .allVariantsStarryTextArea,
+          ),
+          _widgetbook.WidgetbookUseCase(
             name: 'Composer',
             builder: _starry_ui_src_inputs_starry_textarea_usecase
                 .composerStarryTextArea,
           ),
           _widgetbook.WidgetbookUseCase(
-            name: 'Default',
+            name: 'Playground',
             builder: _starry_ui_src_inputs_starry_textarea_usecase
                 .defaultStarryTextArea,
           ),
@@ -1044,7 +1125,7 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'StarryAvatar',
         useCases: [
           _widgetbook.WidgetbookUseCase(
-            name: 'All Sizes',
+            name: 'All Variants',
             builder:
                 _starry_ui_src_media_starry_avatar_usecase.allSizesStarryAvatar,
           ),
@@ -1086,6 +1167,21 @@ final directories = <_widgetbook.WidgetbookNode>[
         ],
       ),
       _widgetbook.WidgetbookComponent(
+        name: 'StarryMediaSlot',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_media_starry_media_slot_usecase
+                .allVariantsStarryMediaSlot,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_media_starry_media_slot_usecase
+                .playgroundStarryMediaSlot,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
         name: 'StarryReferenceCard',
         useCases: [
           _widgetbook.WidgetbookUseCase(
@@ -1122,6 +1218,21 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'With Leading Action',
             builder: _starry_ui_src_navigation_starry_dock_bar_usecase
                 .leadingStarryDockBar,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryFileTree',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_navigation_starry_file_tree_usecase
+                .allVariantsStarryFileTree,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_navigation_starry_file_tree_usecase
+                .playgroundStarryFileTree,
           ),
         ],
       ),
@@ -1243,6 +1354,21 @@ final directories = <_widgetbook.WidgetbookNode>[
           ),
         ],
       ),
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryTabBar',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_navigation_starry_tab_bar_usecase
+                .allVariantsStarryTabBar,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_navigation_starry_tab_bar_usecase
+                .playgroundStarryTabBar,
+          ),
+        ],
+      ),
     ],
   ),
   _widgetbook.WidgetbookFolder(
@@ -1282,7 +1408,7 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'StarryTag',
         useCases: [
           _widgetbook.WidgetbookUseCase(
-            name: 'All States',
+            name: 'All Variants',
             builder: _starry_ui_src_tags_starry_tag_usecase.allStatesStarryTag,
           ),
           _widgetbook.WidgetbookUseCase(
@@ -1296,6 +1422,21 @@ final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookFolder(
     name: 'text',
     children: [
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryCodeBlock',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_text_starry_code_block_usecase
+                .allVariantsStarryCodeBlock,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_text_starry_code_block_usecase
+                .playgroundStarryCodeBlock,
+          ),
+        ],
+      ),
       _widgetbook.WidgetbookComponent(
         name: 'StarryEmojiText',
         useCases: [
