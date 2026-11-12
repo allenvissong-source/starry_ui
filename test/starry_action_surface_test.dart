@@ -108,6 +108,28 @@ void main() {
       expect(file.left - album.right, 8);
     });
 
+    testWidgets('primary tiles activate independently of root list items', (
+      tester,
+    ) async {
+      final activated = <String>[];
+      await _openSurface(
+        tester,
+        items: [_leaf('root')],
+        primaryActions: [
+          StarryActionItem(
+            id: 'camera',
+            title: 'Camera',
+            onActivate: () => activated.add('camera'),
+          ),
+        ],
+        onSelected: (item) => item.onActivate?.call(),
+      );
+      await tester.tap(find.text('Camera'));
+      await tester.pumpAndSettle();
+      expect(activated, ['camera']);
+      expect(find.byType(StarryActionList), findsNothing);
+    });
+
     testWidgets('flips the panel above the trigger near the viewport bottom', (
       tester,
     ) async {
@@ -948,6 +970,187 @@ void main() {
 
   group('single anchored surface', () {
     testWidgets(
+      'replacement settles the old call without closing the new panel',
+      (tester) async {
+        BuildContext? captured;
+        final triggerFocus = FocusNode();
+        addTearDown(triggerFocus.dispose);
+        await tester.pumpWidget(
+          _host(
+            Builder(
+              builder: (context) {
+                captured = context;
+                return TextField(focusNode: triggerFocus);
+              },
+            ),
+          ),
+        );
+        triggerFocus.requestFocus();
+        await tester.pumpAndSettle();
+        var firstSettled = false;
+        final first = StarryActionSurface.show(
+          context: captured!,
+          anchorRect: const Rect.fromLTRB(100, 100, 148, 148),
+          items: [_leaf('root')],
+          onItemSelected: (_) {},
+        ).then((_) => firstSettled = true);
+        await tester.pumpAndSettle();
+        final staleClose = tester
+            .widget<StarryActionList>(find.byType(StarryActionList))
+            .onClose!;
+        final second = StarryActionSurface.show(
+          context: captured!,
+          anchorRect: const Rect.fromLTRB(300, 100, 348, 148),
+          items: [_leaf('child')],
+          onItemSelected: (_) {},
+        );
+        await tester.pumpAndSettle();
+        expect(firstSettled, true);
+        await first;
+        expect(find.text('Item root'), findsNothing);
+        expect(find.text('Item child'), findsOneWidget);
+        expect(triggerFocus.hasFocus, false);
+        staleClose();
+        staleClose();
+        await tester.pumpAndSettle();
+        expect(find.text('Item child'), findsOneWidget);
+        await tester.tapAt(const Offset(20, 20));
+        await tester.pumpAndSettle();
+        await second;
+        await tester.pump();
+        expect(find.byType(StarryActionList), findsNothing);
+        expect(triggerFocus.hasFocus, true);
+      },
+    );
+
+    testWidgets(
+      'replacement before the first frame removes the unmounted entry',
+      (tester) async {
+        BuildContext? captured;
+        await tester.pumpWidget(
+          _host(
+            Builder(
+              builder: (context) {
+                captured = context;
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        var firstSettled = false;
+        final first = StarryActionSurface.show(
+          context: captured!,
+          anchorRect: const Rect.fromLTRB(100, 100, 148, 148),
+          items: [_leaf('root')],
+          onItemSelected: (_) {},
+        ).then((_) => firstSettled = true);
+        final second = StarryActionSurface.show(
+          context: captured!,
+          anchorRect: const Rect.fromLTRB(300, 100, 348, 148),
+          items: [_leaf('child')],
+          onItemSelected: (_) {},
+        );
+        await tester.pumpAndSettle();
+        expect(firstSettled, true);
+        await first;
+        expect(find.text('Item root'), findsNothing);
+        expect(find.text('Item child'), findsOneWidget);
+        expect(find.byType(StarryActionList), findsOneWidget);
+        await tester.tapAt(const Offset(20, 20));
+        await tester.pumpAndSettle();
+        await second;
+      },
+    );
+
+    testWidgets('replacement never settles a surface in another overlay', (
+      tester,
+    ) async {
+      final left = GlobalKey<OverlayState>();
+      final right = GlobalKey<OverlayState>();
+      BuildContext? leftContext;
+      BuildContext? rightContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: Row(
+              children: [
+                Expanded(
+                  child: Overlay(
+                    key: left,
+                    initialEntries: [
+                      OverlayEntry(
+                        builder: (context) {
+                          leftContext = context;
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Overlay(
+                    key: right,
+                    initialEntries: [
+                      OverlayEntry(
+                        builder: (context) {
+                          rightContext = context;
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      var leftSettled = false;
+      final leftCall = StarryActionSurface.show(
+        context: leftContext!,
+        anchorRect: const Rect.fromLTRB(50, 100, 98, 148),
+        items: [_leaf('left')],
+        onItemSelected: (_) {},
+      ).then((_) => leftSettled = true);
+      var oldRightSettled = false;
+      final oldRight = StarryActionSurface.show(
+        context: rightContext!,
+        anchorRect: const Rect.fromLTRB(450, 100, 498, 148),
+        items: [_leaf('old-right')],
+        onItemSelected: (_) {},
+      ).then((_) => oldRightSettled = true);
+      await tester.pumpAndSettle();
+      final newRight = StarryActionSurface.show(
+        context: rightContext!,
+        anchorRect: const Rect.fromLTRB(450, 100, 498, 148),
+        items: [_leaf('new-right')],
+        onItemSelected: (_) {},
+      );
+      await tester.pumpAndSettle();
+      expect(oldRightSettled, true);
+      await oldRight;
+      expect(leftSettled, false);
+      expect(find.text('Item left'), findsOneWidget);
+      expect(find.text('Item old-right'), findsNothing);
+      expect(find.text('Item new-right'), findsOneWidget);
+      final rightBox =
+          right.currentState!.context.findRenderObject()! as RenderBox;
+      await tester.tapAt(rightBox.localToGlobal(const Offset(8, 8)));
+      await tester.pumpAndSettle();
+      await newRight;
+      expect(leftSettled, false);
+      final leftBox =
+          left.currentState!.context.findRenderObject()! as RenderBox;
+      await tester.tapAt(leftBox.localToGlobal(const Offset(8, 8)));
+      await tester.pumpAndSettle();
+      await leftCall;
+      expect(leftSettled, true);
+    });
+
+    testWidgets(
       'opening a second panel dismisses the first; panels never stack',
       (tester) async {
         BuildContext? captured;
@@ -1147,6 +1350,137 @@ void main() {
   });
 
   group('live items listenable', () {
+    for (final state in ['removed', 'disabled', 'empty']) {
+      testWidgets('invalid live parent closes stale child page: $state', (
+        tester,
+      ) async {
+        var activations = 0;
+        final child = StarryActionItem(
+          id: 'stale-child',
+          title: 'Stale child',
+          onActivate: () => activations++,
+        );
+        final notifier = ValueNotifier<List<StarryActionItem>>([
+          StarryActionItem(id: 'parent', title: 'Parent', children: [child]),
+        ]);
+        addTearDown(notifier.dispose);
+        await tester.pumpWidget(
+          _host(
+            Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => StarryActionSurface.show(
+                  context: context,
+                  items: notifier.value,
+                  anchorRect: const Rect.fromLTWH(100, 100, 48, 48),
+                  itemsListenable: notifier,
+                  onItemSelected: (item) => item.onActivate?.call(),
+                ),
+                child: const Text('trigger'),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('trigger'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Parent'));
+        await tester.pumpAndSettle();
+        expect(find.text('Stale child'), findsOneWidget);
+        final staleSelection = tester
+            .widget<StarryActionList>(find.byType(StarryActionList))
+            .onItemSelected;
+        notifier.value = switch (state) {
+          'removed' => [const StarryActionItem(id: 'other', title: 'Other')],
+          'disabled' => [
+            StarryActionItem(
+              id: 'parent',
+              title: 'Parent',
+              disabled: true,
+              children: [child],
+            ),
+          ],
+          _ => [const StarryActionItem(id: 'parent', title: 'Parent')],
+        };
+        staleSelection(child);
+        expect(activations, 0);
+        await tester.pumpAndSettle();
+        if (find.text('Stale child').evaluate().isNotEmpty) {
+          await tester.tap(find.text('Stale child'));
+          await tester.pumpAndSettle();
+        }
+        expect(activations, 0);
+        expect(find.text('Stale child'), findsNothing);
+        expect(find.byIcon(Icons.arrow_back), findsNothing);
+        await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+        await tester.pumpAndSettle();
+        expect(find.byType(StarryActionList), findsNothing);
+      });
+    }
+    testWidgets('nested invalid parent returns to the current valid ancestor', (
+      tester,
+    ) async {
+      final child = StarryActionItem(
+        id: 'old',
+        title: 'Old child',
+        onActivate: () {},
+      );
+      List<StarryActionItem> tree({required bool nestedEnabled}) => [
+        StarryActionItem(
+          id: 'root',
+          title: 'Current root',
+          children: [
+            StarryActionItem(
+              id: 'nested',
+              title: 'Current nested',
+              disabled: !nestedEnabled,
+              children: [child],
+            ),
+          ],
+        ),
+      ];
+      final notifier = ValueNotifier<List<StarryActionItem>>(
+        tree(nestedEnabled: true),
+      );
+      addTearDown(notifier.dispose);
+      BuildContext? captured;
+      await tester.pumpWidget(
+        _host(
+          Builder(
+            builder: (context) {
+              captured = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final closed = StarryActionSurface.show(
+        context: captured!,
+        items: notifier.value,
+        anchorRect: const Rect.fromLTWH(100, 100, 48, 48),
+        itemsListenable: notifier,
+        onItemSelected: (item) => item.onActivate?.call(),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Current root'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Current nested'));
+      await tester.pumpAndSettle();
+      notifier.value = tree(nestedEnabled: false);
+      await tester.pumpAndSettle();
+      expect(find.text('Old child'), findsNothing);
+      expect(find.text('Current nested'), findsOneWidget);
+      await tester.tap(find.text('Current nested'));
+      await tester.pumpAndSettle();
+      expect(find.text('Old child'), findsNothing);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('Current root'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      await closed;
+    });
+
     testWidgets('refreshes nested children from their actual parent', (
       tester,
     ) async {
