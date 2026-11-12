@@ -278,27 +278,35 @@ class _StarryTextFieldState extends State<StarryTextField>
                       onChanged: widget.onChanged,
                       onSubmitted: widget.onSubmitted,
                       buildCounter: _noCounter,
-                      contextMenuBuilder: widget.onPaste == null
-                          ? null
-                          : (context, editable) =>
-                                AdaptiveTextSelectionToolbar.buttonItems(
-                                  anchors: editable.contextMenuAnchors,
-                                  buttonItems: editable.contextMenuButtonItems
-                                      .map((item) {
-                                        if (item.type !=
-                                            ContextMenuButtonType.paste) {
-                                          return item;
-                                        }
-                                        return ContextMenuButtonItem(
-                                          type: item.type,
-                                          onPressed: () {
-                                            editable.hideToolbar();
-                                            widget.onPaste!();
-                                          },
-                                        );
-                                      })
-                                      .toList(),
-                                ),
+                      contextMenuBuilder: (context, editable) {
+                        if (widget.onPaste == null) {
+                          if (SystemContextMenu.isSupportedByField(editable)) {
+                            return SystemContextMenu.editableText(
+                              editableTextState: editable,
+                            );
+                          }
+                          return AdaptiveTextSelectionToolbar.editableText(
+                            editableTextState: editable,
+                          );
+                        }
+                        return AdaptiveTextSelectionToolbar.buttonItems(
+                          anchors: editable.contextMenuAnchors,
+                          buttonItems: editable.contextMenuButtonItems.map((
+                            item,
+                          ) {
+                            if (item.type != ContextMenuButtonType.paste) {
+                              return item;
+                            }
+                            return ContextMenuButtonItem(
+                              type: item.type,
+                              onPressed: () {
+                                editable.hideToolbar();
+                                widget.onPaste!();
+                              },
+                            );
+                          }).toList(),
+                        );
+                      },
                       textAlignVertical: TextAlignVertical.center,
                       style: t.typography.bodyMedium.textStyle.copyWith(
                         color: s.textPrimary,
