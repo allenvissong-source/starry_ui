@@ -394,6 +394,89 @@ void main() {
       expect(closed, 1);
     });
 
+    testWidgets('replacement disposal preserves the new controller delegate', (
+      tester,
+    ) async {
+      final controller = StarryActionListController();
+      final selected = <String>[];
+      late BuildContext overlayContext;
+      await tester.pumpWidget(
+        _host(
+          Builder(
+            builder: (context) {
+              overlayContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      OverlayEntry entry(String id) => OverlayEntry(
+        builder: (_) => Center(
+          child: Material(
+            child: SizedBox(
+              width: 320,
+              height: 160,
+              child: StarryActionList(
+                controller: controller,
+                showFilter: false,
+                autofocus: false,
+                items: [_item(id)],
+                onItemSelected: (item) => selected.add(item.id),
+              ),
+            ),
+          ),
+        ),
+      );
+      final oldEntry = entry('old');
+      final overlay = Overlay.of(overlayContext);
+      overlay.insert(oldEntry);
+      await tester.pump();
+      expect(controller.isAttached, isTrue);
+      oldEntry.remove();
+      oldEntry.dispose();
+      final newEntry = entry('new');
+      overlay.insert(newEntry);
+      await tester.pump();
+      expect(find.text('Item new'), findsOneWidget);
+      expect(controller.isAttached, isTrue);
+      controller.activate();
+      expect(selected, ['new']);
+      newEntry.remove();
+      newEntry.dispose();
+      await tester.pump();
+      expect(controller.isAttached, isFalse);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('changing controllers detaches the old and attaches the new', (
+      tester,
+    ) async {
+      final oldController = StarryActionListController();
+      final newController = StarryActionListController();
+      final selected = <String>[];
+      Widget list(StarryActionListController controller) => _host(
+        SizedBox(
+          width: 320,
+          child: StarryActionList(
+            controller: controller,
+            items: [_item('current')],
+            onItemSelected: (item) => selected.add(item.id),
+          ),
+        ),
+      );
+      await tester.pumpWidget(list(oldController));
+      expect(oldController.isAttached, isTrue);
+      await tester.pumpWidget(list(newController));
+      expect(oldController.isAttached, isFalse);
+      expect(newController.isAttached, isTrue);
+      oldController.activate();
+      expect(selected, isEmpty);
+      newController.activate();
+      expect(selected, ['current']);
+      await tester.pumpWidget(_host(const SizedBox.shrink()));
+      expect(newController.isAttached, isFalse);
+    });
+
     testWidgets('unattached controller methods are no-ops; detach on dispose', (
       tester,
     ) async {

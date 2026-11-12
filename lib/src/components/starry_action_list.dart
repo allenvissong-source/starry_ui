@@ -19,25 +19,32 @@ class StarryActionListController {
   VoidCallback? _moveDown;
   VoidCallback? _activate;
   VoidCallback? _close;
+  Object? _attachment;
 
   /// True once a live list has registered its navigation callbacks.
   bool get isAttached => _activate != null;
 
-  /// Called by the list on build; replaces any previously attached delegate.
-  void attach({
+  /// Replaces the attached delegate and returns its ownership-bound cleanup.
+  VoidCallback attach({
     required VoidCallback moveUp,
     required VoidCallback moveDown,
     required VoidCallback activate,
     required VoidCallback close,
   }) {
+    final attachment = Object();
+    _attachment = attachment;
     _moveUp = moveUp;
     _moveDown = moveDown;
     _activate = activate;
     _close = close;
+    return () {
+      if (identical(_attachment, attachment)) detach();
+    };
   }
 
-  /// Called by the list on dispose; drops every callback.
+  /// Detaches the current delegate unconditionally.
   void detach() {
+    _attachment = null;
     _moveUp = null;
     _moveDown = null;
     _activate = null;
@@ -120,6 +127,16 @@ class _StarryActionListState extends State<StarryActionList> {
   // appears after an explicit keyboard navigation event.
   var _activeIndex = -1;
   var _keyboardNavigationActive = false;
+  VoidCallback? _detachController;
+
+  void _attachController() {
+    _detachController = widget.controller?.attach(
+      moveUp: () => _move(-1),
+      moveDown: () => _move(1),
+      activate: _activateCurrent,
+      close: () => widget.onClose?.call(),
+    );
+  }
 
   @override
   void initState() {
@@ -132,12 +149,7 @@ class _StarryActionListState extends State<StarryActionList> {
       _keyboardNavigationActive = true;
     }
     _filterController.addListener(_onFilterChanged);
-    widget.controller?.attach(
-      moveUp: () => _move(-1),
-      moveDown: () => _move(1),
-      activate: _activateCurrent,
-      close: () => widget.onClose?.call(),
-    );
+    _attachController();
     if (widget.autofocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _focusNode.requestFocus();
@@ -146,8 +158,17 @@ class _StarryActionListState extends State<StarryActionList> {
   }
 
   @override
+  void didUpdateWidget(StarryActionList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.controller, widget.controller)) {
+      _detachController?.call();
+      _attachController();
+    }
+  }
+
+  @override
   void dispose() {
-    widget.controller?.detach();
+    _detachController?.call();
     _filterController
       ..removeListener(_onFilterChanged)
       ..dispose();
