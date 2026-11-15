@@ -1406,6 +1406,11 @@ final directories = <_widgetbook.WidgetbookNode>[
             builder: _starry_ui_src_navigation_starry_tab_bar_usecase
                 .playgroundStarryTabBar,
           ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Underline',
+            builder: _starry_ui_src_navigation_starry_tab_bar_usecase
+                .underlineStarryTabBar,
+          ),
         ],
       ),
     ],

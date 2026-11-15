@@ -30,8 +30,19 @@ Widget allVariantsStarryTabBar(BuildContext context) {
         ),
         SizedBox(height: t.spacing.s4),
         const StarryTabBar(tabs: _tabs, value: 'details', onChanged: null),
+        SizedBox(height: t.spacing.s6),
+        const _TabsDemo(variant: StarryTabBarVariant.underline),
       ],
     ),
+  );
+}
+
+@UseCase(name: 'Underline', type: StarryTabBar)
+Widget underlineStarryTabBar(BuildContext context) {
+  final t = context.starryTokens;
+  return Padding(
+    padding: EdgeInsets.all(t.spacing.s6),
+    child: const _TabsDemo(variant: StarryTabBarVariant.underline),
   );
 }
 
@@ -47,8 +58,12 @@ Widget playgroundStarryTabBar(BuildContext context) {
 }
 
 class _TabsDemo extends StatefulWidget {
-  const _TabsDemo({this.enabled = true});
+  const _TabsDemo({
+    this.enabled = true,
+    this.variant = StarryTabBarVariant.pill,
+  });
   final bool enabled;
+  final StarryTabBarVariant variant;
   @override
   State<_TabsDemo> createState() => _TabsDemoState();
 }
@@ -57,6 +72,7 @@ class _TabsDemoState extends State<_TabsDemo> {
   String _value = 'details';
   @override
   Widget build(BuildContext context) => StarryTabBar<String>(
+    variant: widget.variant,
     tabs: _tabs,
     value: _value,
     onChanged: widget.enabled

@@ -171,6 +171,62 @@ void main() {
     }
   }
 
+  testWidgets(
+    'underline tabs keep semantics, keyboard and the 48dp touch target',
+    (tester) async {
+      final semanticsHandle = tester.ensureSemantics();
+      var value = 'a';
+      await tester.pumpWidget(
+        _host(
+          StatefulBuilder(
+            builder: (_, setState) => StarryTabBar(
+              variant: StarryTabBarVariant.underline,
+              tabs: _tabs,
+              value: value,
+              onChanged: (next) => setState(() => value = next),
+            ),
+          ),
+          width: 360,
+          textScale: 1.5,
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      final bounds = tester.getRect(find.byType(StarryTabBar<String>));
+      for (final button in find.byType(InkWell).evaluate()) {
+        final box = button.renderObject! as RenderBox;
+        final rect = box.localToGlobal(Offset.zero) & box.size;
+        expect(rect.height, greaterThanOrEqualTo(48));
+        expect(rect.left, greaterThanOrEqualTo(bounds.left));
+        expect(rect.right, lessThanOrEqualTo(bounds.right));
+      }
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+      expect(value, 'b');
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+      expect(value, 'c');
+      final semantics = tester.getSemantics(find.bySemanticsLabel('Media'));
+      expect(
+        semantics,
+        matchesSemantics(
+          label: 'Media',
+          isButton: true,
+          isSelected: true,
+          hasSelectedState: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          isInMutuallyExclusiveGroup: true,
+          isFocusable: true,
+          isFocused: true,
+          hasTapAction: true,
+          hasFocusAction: true,
+        ),
+      );
+      semanticsHandle.dispose();
+    },
+  );
+
   testWidgets('tab reorder and external selection keep identities', (
     tester,
   ) async {

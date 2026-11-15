@@ -3,6 +3,17 @@ import 'package:flutter/services.dart';
 
 import '../theme/starry_tokens.dart';
 
+/// The visual skin of [StarryTabBar]. Both variants share selection, keyboard,
+/// focus and semantics; only the painted affordance differs.
+enum StarryTabBarVariant {
+  /// Independent pills, one per tab. Suited to filter rows and section tabs.
+  pill,
+
+  /// Text tabs with a bottom indicator. Suited to page-level tab strips that
+  /// sit directly above content.
+  underline,
+}
+
 /// A stable tab identity, independent of its position or translated label.
 class StarryTab<T> {
   const StarryTab({
@@ -28,12 +39,14 @@ class StarryTabBar<T> extends StatefulWidget {
     required this.tabs,
     required this.value,
     required this.onChanged,
+    this.variant = StarryTabBarVariant.pill,
     super.key,
   });
 
   final List<StarryTab<T>> tabs;
   final T value;
   final ValueChanged<T>? onChanged;
+  final StarryTabBarVariant variant;
 
   @override
   State<StarryTabBar<T>> createState() => _StarryTabBarState<T>();
@@ -130,7 +143,12 @@ class _StarryTabBarState<T> extends State<StarryTabBar<T>> {
         t.spacing.s4 * 2 +
         t.controlMetrics.focusBorderWidth * 2;
     painter.dispose();
-    if (tab.icon != null) width += t.controlMetrics.iconMd + t.spacing.s2;
+    final underline = widget.variant == StarryTabBarVariant.underline;
+    if (tab.icon != null) {
+      width +=
+          (underline ? t.controlMetrics.iconSm : t.controlMetrics.iconMd) +
+          t.spacing.s2;
+    }
     if (tab.count != null) {
       final count = TextPainter(
         text: TextSpan(
@@ -140,7 +158,10 @@ class _StarryTabBarState<T> extends State<StarryTabBar<T>> {
         textDirection: Directionality.of(context),
         textScaler: MediaQuery.textScalerOf(context),
       )..layout();
-      width += count.width + t.spacing.s2 * 2 + t.spacing.s2;
+      width +=
+          count.width +
+          (underline ? t.spacing.s1 : t.spacing.s2) * 2 +
+          (underline ? t.spacing.s1 : t.spacing.s2);
       count.dispose();
     }
     return width < t.controlMetrics.minTouchTarget
@@ -157,7 +178,9 @@ class _StarryTabBarState<T> extends State<StarryTabBar<T>> {
         final total =
             widths.fold<double>(0, (sum, width) => sum + width) +
             t.spacing.s2 * (widget.tabs.length - 1);
-        if (constraints.hasBoundedWidth && total <= constraints.maxWidth) {
+        if (widget.variant == StarryTabBarVariant.pill &&
+            constraints.hasBoundedWidth &&
+            total <= constraints.maxWidth) {
           return Row(
             children: [
               for (var i = 0; i < widget.tabs.length; i++) ...[
@@ -168,7 +191,9 @@ class _StarryTabBarState<T> extends State<StarryTabBar<T>> {
           );
         }
         return Wrap(
-          spacing: t.spacing.s2,
+          spacing: widget.variant == StarryTabBarVariant.pill
+              ? t.spacing.s2
+              : t.spacing.s0,
           runSpacing: t.spacing.s2,
           children: [
             for (var i = 0; i < widget.tabs.length; i++)
@@ -189,11 +214,30 @@ class _StarryTabBarState<T> extends State<StarryTabBar<T>> {
   Widget _tab(StarryTab<T> tab, StarryTokens t) {
     final selected = tab.value == widget.value;
     final enabled = tab.enabled && widget.onChanged != null;
+    final focused = _nodes[tab.value]!.hasFocus;
     final fg = !enabled
         ? t.semantic.textDisabled
         : selected
         ? t.semantic.textPrimary
         : t.semantic.textSecondary;
+    final content = _tabContent(tab, t, fg, selected: selected);
+    final body = widget.variant == StarryTabBarVariant.pill
+        ? _pillTab(
+            tab,
+            t,
+            selected: selected,
+            enabled: enabled,
+            focused: focused,
+            content: content,
+          )
+        : _underlineTab(
+            tab,
+            t,
+            selected: selected,
+            enabled: enabled,
+            focused: focused,
+            content: content,
+          );
     return Focus(
       canRequestFocus: false,
       onKeyEvent: (_, event) => _handleKey(tab.value, event),
@@ -208,78 +252,177 @@ class _StarryTabBarState<T> extends State<StarryTabBar<T>> {
         child: Tooltip(
           message: tab.label,
           excludeFromSemantics: true,
-          child: Material(
-            color: selected ? t.semantic.surfaceVariant : t.semantic.surface,
-            shape: StadiumBorder(
-              side: BorderSide(
-                color: _nodes[tab.value]!.hasFocus
-                    ? t.semantic.brandStrong
-                    : selected
-                    ? t.semantic.borderStrong
-                    : t.semantic.border,
-                width: t.controlMetrics.focusBorderWidth,
+          child: body,
+        ),
+      ),
+    );
+  }
+
+  Widget _pillTab(
+    StarryTab<T> tab,
+    StarryTokens t, {
+    required bool selected,
+    required bool enabled,
+    required bool focused,
+    required Widget content,
+  }) {
+    return Material(
+      color: selected ? t.semantic.surfaceVariant : t.semantic.surface,
+      shape: StadiumBorder(
+        side: BorderSide(
+          color: focused
+              ? t.semantic.brandStrong
+              : selected
+              ? t.semantic.borderStrong
+              : t.semantic.border,
+          width: t.controlMetrics.focusBorderWidth,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        focusNode: _nodes[tab.value],
+        canRequestFocus: enabled,
+        onFocusChange: (_) => setState(() {}),
+        onTap: enabled ? () => widget.onChanged!(tab.value) : null,
+        excludeFromSemantics: true,
+        customBorder: const StadiumBorder(),
+        child: ExcludeSemantics(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: t.controlMetrics.minTouchTarget,
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: t.spacing.s4,
+                vertical: t.spacing.s2,
+              ),
+              child: content,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _underlineTab(
+    StarryTab<T> tab,
+    StarryTokens t, {
+    required bool selected,
+    required bool enabled,
+    required bool focused,
+    required Widget content,
+  }) {
+    final radius = BorderRadius.circular(t.radius.xs);
+    return Material(
+      color: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: radius,
+        side: BorderSide(
+          color: focused ? t.semantic.brandStrong : Colors.transparent,
+          width: t.controlMetrics.focusBorderWidth,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        focusNode: _nodes[tab.value],
+        canRequestFocus: enabled,
+        onFocusChange: (_) => setState(() {}),
+        onTap: enabled ? () => widget.onChanged!(tab.value) : null,
+        excludeFromSemantics: true,
+        customBorder: RoundedRectangleBorder(borderRadius: radius),
+        child: ExcludeSemantics(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  // The indicator stays reserved when unselected so switching
+                  // tabs never shifts the strip by a border width.
+                  color: selected ? t.semantic.brand : Colors.transparent,
+                  width: t.controlMetrics.borderThick,
+                ),
               ),
             ),
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              focusNode: _nodes[tab.value],
-              canRequestFocus: enabled,
-              onFocusChange: (_) => setState(() {}),
-              onTap: enabled ? () => widget.onChanged!(tab.value) : null,
-              excludeFromSemantics: true,
-              customBorder: const StadiumBorder(),
-              child: ExcludeSemantics(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: t.controlMetrics.minTouchTarget,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: t.spacing.s4,
-                      vertical: t.spacing.s2,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (tab.icon != null) ...[
-                          Icon(
-                            tab.icon,
-                            size: t.controlMetrics.iconMd,
-                            color: fg,
-                          ),
-                          SizedBox(width: t.spacing.s2),
-                        ],
-                        Flexible(
-                          child: Text(
-                            tab.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: t.typography.labelLarge.textStyle.copyWith(
-                              color: fg,
-                            ),
-                          ),
-                        ),
-                        if (tab.count != null) ...[
-                          SizedBox(width: t.spacing.s2),
-                          Text(
-                            '${tab.count}',
-                            style: t.typography.labelSmall.textStyle.copyWith(
-                              color: fg,
-                              fontFeatures: const [
-                                FontFeature.tabularFigures(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: t.controlMetrics.minTouchTarget,
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: t.spacing.s4,
+                  vertical: t.spacing.s2,
                 ),
+                child: content,
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _tabContent(
+    StarryTab<T> tab,
+    StarryTokens t,
+    Color foreground, {
+    required bool selected,
+  }) {
+    final underline = widget.variant == StarryTabBarVariant.underline;
+    final badgePadding = underline ? t.spacing.s1 : t.spacing.s2;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (tab.icon != null) ...[
+          Icon(
+            tab.icon,
+            size: underline ? t.controlMetrics.iconSm : t.controlMetrics.iconMd,
+            // The underline variant carries its selected state on the icon
+            // colour and the bottom indicator; the pill variant uses the fill.
+            color: underline && selected ? t.semantic.brand : foreground,
+          ),
+          SizedBox(width: t.spacing.s2),
+        ],
+        Flexible(
+          child: Text(
+            tab.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: t.typography.labelLarge.textStyle.copyWith(
+              color: foreground,
+            ),
+          ),
+        ),
+        if (tab.count != null) ...[
+          SizedBox(width: underline ? t.spacing.s1 : t.spacing.s2),
+          if (underline)
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: badgePadding,
+                vertical: t.controlMetrics.borderThin,
+              ),
+              decoration: BoxDecoration(
+                color: t.semantic.surfaceVariant,
+                borderRadius: BorderRadius.circular(t.radius.full),
+              ),
+              child: Text(
+                '${tab.count}',
+                style: t.typography.labelSmall.textStyle.copyWith(
+                  color: selected
+                      ? t.semantic.textPrimary
+                      : t.semantic.textSecondary,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            )
+          else
+            Text(
+              '${tab.count}',
+              style: t.typography.labelSmall.textStyle.copyWith(
+                color: foreground,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+        ],
+      ],
     );
   }
 }
