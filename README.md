@@ -11,6 +11,12 @@ Shared Flutter design-system package for the Starry product family.
 - A Widgetbook component catalogue (`*.usecase.dart` files) that documents the public widgets
   visually.
 
+Bundled fonts retain their own licenses in `fonts/`: Inter and Outfit use
+SIL OFL 1.1; Twemoji Mozilla v0.7.0 uses Apache-2.0 for code and CC-BY-4.0 for
+artwork. MiSans uses Xiaomi's dedicated agreement, which permits distribution
+with applications but prohibits standalone redistribution and modification of
+the font. These fonts are not covered by a license for Starry's own code.
+
 ## Boundary
 
 - Consumed by `starry` through a `path: ../starry_ui` dependency.

@@ -23,6 +23,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - fonts/Inter-LICENSE.txt
+    - fonts/Outfit-LICENSE.txt
+    - fonts/MiSans-LICENSE.txt
+    - fonts/MiSans-LICENSE.pdf
+    - fonts/Twemoji-Mozilla-LICENSE.txt
+    - fonts/Twemoji-Mozilla-NOTICE.txt
+    - fonts/Apache-2.0.txt
+    - fonts/CC-BY-4.0.txt
   fonts:
     - family: Outfit
       fonts:
