@@ -15,6 +15,57 @@ StarryTokens _tokens(WidgetTester tester, Finder anchor) {
 
 void main() {
   group('StarryMediaStage', () {
+    testWidgets('intrinsic media height sizes foreground and bottom overlay', (
+      tester,
+    ) async {
+      for (final ratio in [0.5, 1.0, 2.0]) {
+        await tester.pumpWidget(
+          _host(
+            SingleChildScrollView(
+              child: SizedBox(
+                width: 240,
+                child: StarryMediaStage(
+                  foreground: Stack(
+                    children: const [
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: SizedBox(
+                          key: ValueKey('top-control'),
+                          width: 40,
+                          height: 40,
+                        ),
+                      ),
+                    ],
+                  ),
+                  overlayPadding: EdgeInsets.zero,
+                  overlay: const SizedBox(
+                    key: ValueKey('bottom-overlay'),
+                    height: 20,
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: ratio,
+                    child: const ColoredBox(color: Colors.blue),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        final stage = find.byType(StarryMediaStage);
+        expect(tester.getSize(stage), Size(240, 240 / ratio));
+        expect(
+          tester.getTopRight(find.byKey(const ValueKey('top-control'))),
+          tester.getTopRight(stage),
+        );
+        expect(
+          tester.getBottomLeft(find.byKey(const ValueKey('bottom-overlay'))),
+          tester.getBottomLeft(stage),
+        );
+        expect(tester.takeException(), isNull);
+      }
+    });
+
     testWidgets('uses the given aspectRatio', (tester) async {
       await tester.pumpWidget(
         _host(

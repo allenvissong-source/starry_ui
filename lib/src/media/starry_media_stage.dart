@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../theme/starry_tokens.dart';
 
-/// A fixed-aspect media stage: the standard way to present an image/video in a
+/// A media stage: the standard way to present an image/video in a
 /// feed card with an optional bottom scrim + overlay content on top.
 ///
 /// Layout:
 ///   * The stage is sized by [aspectRatio] (values `<= 0` are normalized to 1).
+///     When omitted, [child] determines the height at the available width.
 ///   * [child] fills the stage (the media itself).
 ///   * When [overlay] is non-null it is pinned to the bottom over a downward
 ///     scrim gradient (`Colors.transparent` → `semantic.mediaOverlayEnd`) so
@@ -15,22 +16,28 @@ import '../theme/starry_tokens.dart';
 ///     the animation value (`1 + value * 0.06`), e.g. a subtle breathing pulse.
 class StarryMediaStage extends StatelessWidget {
   const StarryMediaStage({
-    required this.aspectRatio,
     required this.child,
     super.key,
+    this.aspectRatio,
     this.overlay,
+    this.foreground,
     this.brightnessAnimation,
     this.overlayPadding = const EdgeInsets.fromLTRB(16, 24, 16, 12),
   });
 
-  /// Aspect ratio of the stage. Values `<= 0` are normalized to `1`.
-  final double aspectRatio;
+  /// Aspect ratio of the stage. Null preserves the child's intrinsic height.
+  /// Values `<= 0` are normalized to `1`.
+  final double? aspectRatio;
 
   /// The media content, laid out to fill the stage.
   final Widget child;
 
   /// Optional content pinned to the bottom over a scrim gradient.
   final Widget? overlay;
+
+  /// Content covering the media, without participating in its sizing.
+  /// Used for positioned controls such as a top action menu.
+  final Widget? foreground;
 
   /// Optional brightness driver — the media brightness follows
   /// `1 + brightnessAnimation.value * 0.06`.
@@ -58,35 +65,37 @@ class StarryMediaStage extends StatelessWidget {
             child: child,
           );
 
-    return AspectRatio(
-      aspectRatio: aspectRatio <= 0 ? 1 : aspectRatio,
-      child: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          media,
-          if (overlay != null)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: overlayPadding,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: <Color>[
-                      Colors.transparent,
-                      t.semantic.mediaOverlayEnd,
-                    ],
-                  ),
+    final stage = Stack(
+      fit: aspectRatio == null ? StackFit.passthrough : StackFit.expand,
+      children: <Widget>[
+        media,
+        if (foreground != null) Positioned.fill(child: foreground!),
+        if (overlay != null)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: overlayPadding,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: <Color>[
+                    Colors.transparent,
+                    t.semantic.mediaOverlayEnd,
+                  ],
                 ),
-                child: overlay,
               ),
+              child: overlay,
             ),
-        ],
-      ),
+          ),
+      ],
     );
+    final ratio = aspectRatio;
+    return ratio == null
+        ? SizedBox(width: double.infinity, child: stage)
+        : AspectRatio(aspectRatio: ratio <= 0 ? 1 : ratio, child: stage);
   }
 
   static List<double> _brightnessMatrix(double value) {

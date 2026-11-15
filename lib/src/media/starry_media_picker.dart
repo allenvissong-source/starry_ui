@@ -412,6 +412,7 @@ class _GridTile extends StatelessWidget {
           onTap: onTap,
           borderRadius: radius,
           child: DecoratedBox(
+            position: DecorationPosition.foreground,
             decoration: BoxDecoration(
               borderRadius: radius,
               border: selected
@@ -479,6 +480,7 @@ class _MediaTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: radius,
         child: DecoratedBox(
+          position: DecorationPosition.foreground,
           decoration: BoxDecoration(
             borderRadius: radius,
             border: selected

@@ -114,6 +114,8 @@ import 'package:starry_ui/src/media/starry_media_picker.usecase.dart'
     as _starry_ui_src_media_starry_media_picker_usecase;
 import 'package:starry_ui/src/media/starry_media_slot.usecase.dart'
     as _starry_ui_src_media_starry_media_slot_usecase;
+import 'package:starry_ui/src/media/starry_media_stage.usecase.dart'
+    as _starry_ui_src_media_starry_media_stage_usecase;
 import 'package:starry_ui/src/media/starry_reference_card.usecase.dart'
     as _starry_ui_src_media_starry_reference_card_usecase;
 import 'package:starry_ui/src/navigation/starry_dock_bar.usecase.dart'
@@ -1200,6 +1202,21 @@ final directories = <_widgetbook.WidgetbookNode>[
             name: 'Playground',
             builder: _starry_ui_src_media_starry_media_slot_usecase
                 .playgroundStarryMediaSlot,
+          ),
+        ],
+      ),
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryMediaStage',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_media_starry_media_stage_usecase
+                .allVariantsStarryMediaStage,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_media_starry_media_stage_usecase
+                .playgroundStarryMediaStage,
           ),
         ],
       ),
