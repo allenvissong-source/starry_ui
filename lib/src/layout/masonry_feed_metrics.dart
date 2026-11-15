@@ -78,7 +78,12 @@ class MasonryFeedMetrics {
   final int columns;
   final double cardWidth;
 
-  static MasonryFeedMetrics resolve(double contentWidth) {
+  static MasonryFeedMetrics resolve(
+    double contentWidth, {
+    int minimumColumns = 2,
+    int maximumColumns = 5,
+  }) {
+    assert(minimumColumns >= 1 && maximumColumns >= minimumColumns);
     final safeContentWidth = contentWidth.isFinite
         ? math.max(0.0, contentWidth)
         : 0.0;
@@ -86,9 +91,16 @@ class MasonryFeedMetrics {
       0.0,
       safeContentWidth - masonryFeedOuterInset * 2,
     );
-    final columns = masonryFeedColumnCountForWidth(usableGridWidth);
-    final cardWidth = masonryFeedColumnWidthForWidth(usableGridWidth);
-    final gridWidth = masonryFeedGridWidthForWidth(usableGridWidth);
+    final preferredColumns =
+        usableGridWidth < masonryFeedMinGridWidthForColumns(2)
+        ? minimumColumns
+        : masonryFeedColumnCountForWidth(usableGridWidth);
+    final columns = preferredColumns.clamp(minimumColumns, maximumColumns);
+    final gaps = masonryFeedColumnGap * (columns - 1);
+    final cardWidth = ((usableGridWidth - gaps) / columns)
+        .clamp(0, masonryFeedTargetCardWidth)
+        .toDouble();
+    final gridWidth = cardWidth * columns + gaps;
     final frameWidth = math.min(
       safeContentWidth,
       gridWidth + masonryFeedOuterInset * 2,

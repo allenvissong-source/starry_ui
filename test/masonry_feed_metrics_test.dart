@@ -45,6 +45,25 @@ void main() {
   });
 
   group('MasonryFeedMetrics.resolve', () {
+    test('management cards fit one to four columns and remain centered', () {
+      for (final (width, columns) in [
+        (320.0, 1),
+        (760.0, 2),
+        (1080.0, 3),
+        (1600.0, 4),
+      ]) {
+        final metrics = MasonryFeedMetrics.resolve(
+          width,
+          minimumColumns: 1,
+          maximumColumns: 4,
+        );
+        expect(metrics.columns, columns);
+        expect(metrics.cardWidth, greaterThan(0));
+        expect(metrics.gridWidth, lessThanOrEqualTo(width));
+        expect(metrics.gridInset, (width - metrics.gridWidth) / 2);
+      }
+    });
+
     test('insets are non-negative and centered', () {
       const contentWidth = 1200.0;
       final metrics = MasonryFeedMetrics.resolve(contentWidth);
