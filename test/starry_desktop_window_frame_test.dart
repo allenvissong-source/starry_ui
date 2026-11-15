@@ -127,22 +127,24 @@ void main() {
     expect(leading.center.dy, actions.center.dy);
   });
 
-  testWidgets('macOS controls are left aligned and ordered', (tester) async {
-    await tester.pumpWidget(_host(platform: StarryDesktopPlatform.macOS));
-
-    final close = tester.getCenter(
-      find.byKey(StarryDesktopWindowFrame.closeKey),
+  testWidgets('macOS reserves native controls without drawing duplicates', (
+    tester,
+  ) async {
+    const actionsKey = ValueKey('macos-actions');
+    await tester.pumpWidget(
+      _host(
+        platform: StarryDesktopPlatform.macOS,
+        actions: const SizedBox(key: actionsKey, width: 160),
+      ),
     );
-    final minimize = tester.getCenter(
-      find.byKey(StarryDesktopWindowFrame.minimizeKey),
+    expect(find.byKey(StarryDesktopWindowFrame.closeKey), findsNothing);
+    expect(find.byKey(StarryDesktopWindowFrame.minimizeKey), findsNothing);
+    expect(find.byKey(StarryDesktopWindowFrame.maximizeKey), findsNothing);
+    final reserved = tester.getRect(
+      find.byKey(const ValueKey('starry-macos-native-controls-space')),
     );
-    final maximize = tester.getCenter(
-      find.byKey(StarryDesktopWindowFrame.maximizeKey),
-    );
-
-    expect(close.dx, lessThan(minimize.dx));
-    expect(minimize.dx, lessThan(maximize.dx));
-    expect(close.dx, lessThan(100));
+    expect(reserved.width, 96);
+    expect(tester.getRect(find.byKey(actionsKey)).left, reserved.right);
   });
 
   testWidgets('normal frame sits flush to the window with a visible border', (
@@ -366,7 +368,7 @@ void main() {
     final handle = tester.ensureSemantics();
     await tester.pumpWidget(
       _host(
-        platform: StarryDesktopPlatform.macOS,
+        platform: StarryDesktopPlatform.windows,
         visualState: StarryWindowVisualState.maximized,
       ),
     );
@@ -495,56 +497,4 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
-
-  testWidgets('pressed macOS control paints the same feedback layer', (
-    tester,
-  ) async {
-    await tester.pumpWidget(_host(platform: StarryDesktopPlatform.macOS));
-    final finder = find.byKey(StarryDesktopWindowFrame.closeKey);
-    final inkWell = tester.widget<InkWell>(
-      find.descendant(of: finder, matching: find.byType(InkWell)),
-    );
-    final tokens = Theme.of(tester.element(finder)).extension<StarryTokens>()!;
-
-    expect(
-      inkWell.overlayColor!.resolve(const <WidgetState>{WidgetState.pressed}),
-      tokens.semantic.textPrimary.withValues(
-        alpha: tokens.opacity.statePressed,
-      ),
-    );
-
-    final gesture = await tester.press(finder);
-    await tester.pump();
-    await gesture.up();
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets(
-    'macOS control reveals its glyph immediately under reduced motion',
-    (tester) async {
-      await tester.binding.setSurfaceSize(const Size(600, 160));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-      await tester.pumpWidget(
-        _host(platform: StarryDesktopPlatform.macOS, disableAnimations: true),
-      );
-
-      final button = find.byKey(StarryDesktopWindowFrame.closeKey);
-      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
-      addTearDown(gesture.removePointer);
-      // Start outside the control so hover flips on, not off.
-      await gesture.addPointer(
-        location: tester.getTopLeft(button) - const Offset(24, 24),
-      );
-      await gesture.moveTo(tester.getCenter(button));
-      // A single frame must already be at the resting opacity: with animations
-      // disabled the 150ms fade must not interpolate at all.
-      await tester.pump();
-
-      final opacity = tester.widget<AnimatedOpacity>(
-        find.descendant(of: button, matching: find.byType(AnimatedOpacity)),
-      );
-      expect(opacity.opacity, 1.0);
-    },
-  );
 }

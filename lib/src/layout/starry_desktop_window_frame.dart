@@ -69,6 +69,10 @@ class StarryDesktopWindowFrame extends StatelessWidget {
     'starry-window-close',
   );
 
+  /// Logical points shared with the native host's window-button layout.
+  static double titleBarHeight(StarryTokens tokens) =>
+      tokens.controlMetrics.heightLg;
+
   final StarryDesktopPlatform platform;
   final StarryWindowVisualState visualState;
   final bool isFocused;
@@ -165,7 +169,7 @@ class StarryDesktopWindowFrame extends StatelessWidget {
           child: Column(
             children: <Widget>[
               SizedBox(
-                height: tokens.controlMetrics.heightLg,
+                height: titleBarHeight(tokens),
                 child: _DesktopTitleBar(
                   platform: platform,
                   visualState: visualState,
@@ -257,28 +261,7 @@ class _DesktopTitleBar extends StatelessWidget {
           onPressed: onClose,
         ),
       ],
-      StarryDesktopPlatform.macOS => <Widget>[
-        _MacControlButton(
-          key: StarryDesktopWindowFrame.closeKey,
-          kind: _WindowControlKind.close,
-          tooltip: labels.close,
-          onPressed: onClose,
-        ),
-        _MacControlButton(
-          key: StarryDesktopWindowFrame.minimizeKey,
-          kind: _WindowControlKind.minimize,
-          tooltip: labels.minimize,
-          onPressed: onMinimize,
-        ),
-        _MacControlButton(
-          key: StarryDesktopWindowFrame.maximizeKey,
-          kind: isMaximized
-              ? _WindowControlKind.restore
-              : _WindowControlKind.maximize,
-          tooltip: isMaximized ? labels.restore : labels.maximize,
-          onPressed: onToggleMaximize,
-        ),
-      ],
+      StarryDesktopPlatform.macOS => const <Widget>[],
       StarryDesktopPlatform.linux => const <Widget>[],
     };
 
@@ -291,7 +274,16 @@ class _DesktopTitleBar extends StatelessWidget {
     final trailingControls = Row(
       mainAxisSize: MainAxisSize.min,
       children: platform == StarryDesktopPlatform.macOS
-          ? <Widget>[nativeControls, applicationActions]
+          ? <Widget>[
+              SizedBox(
+                key: const ValueKey('starry-macos-native-controls-space'),
+                width:
+                    tokens.controlMetrics.heightLg +
+                    tokens.controlMetrics.heightXs +
+                    tokens.spacing.s4,
+              ),
+              applicationActions,
+            ]
           : <Widget>[applicationActions, nativeControls],
     );
     final titleStyle = tokens.typography.labelMedium.textStyle.copyWith(
@@ -303,7 +295,7 @@ class _DesktopTitleBar extends StatelessWidget {
 
     return SizedBox(
       key: StarryDesktopWindowFrame.titleBarKey,
-      height: tokens.controlMetrics.heightLg,
+      height: StarryDesktopWindowFrame.titleBarHeight(tokens),
       child: Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -414,106 +406,6 @@ class _WindowsControlButtonState extends State<_WindowsControlButton> {
                 },
                 color: foreground,
                 size: tokens.controlMetrics.iconSm,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MacControlButton extends StatefulWidget {
-  const _MacControlButton({
-    required this.kind,
-    required this.tooltip,
-    required this.onPressed,
-    super.key,
-  });
-
-  final _WindowControlKind kind;
-  final String tooltip;
-  final VoidCallback onPressed;
-
-  @override
-  State<_MacControlButton> createState() => _MacControlButtonState();
-}
-
-class _MacControlButtonState extends State<_MacControlButton> {
-  bool _hovered = false;
-  bool _focused = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = Theme.of(context).extension<StarryTokens>()!;
-    // Reduced motion: mirror StarryMasterDetailLayout._duration so the dot
-    // reveal / glyph fade switch state on the next frame instead of animating.
-    final reduceMotion =
-        MediaQuery.maybeOf(context)?.disableAnimations ?? false;
-    final duration = reduceMotion ? Duration.zero : tokens.motion.durationShort;
-    final fill = switch (widget.kind) {
-      _WindowControlKind.close => tokens.semantic.error,
-      _WindowControlKind.minimize => tokens.semantic.warning,
-      _WindowControlKind.maximize ||
-      _WindowControlKind.restore => tokens.semantic.success,
-    };
-    final showGlyph = _hovered || _focused;
-
-    return Semantics(
-      button: true,
-      label: widget.tooltip,
-      excludeSemantics: true,
-      child: SizedBox.square(
-        dimension: tokens.controlMetrics.heightLg,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: widget.onPressed,
-            onHover: (value) => setState(() => _hovered = value),
-            onFocusChange: (value) => setState(() => _focused = value),
-            hoverColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
-              if (states.contains(WidgetState.pressed)) {
-                return tokens.semantic.textPrimary.withValues(
-                  alpha: tokens.opacity.statePressed,
-                );
-              }
-              return Colors.transparent;
-            }),
-            child: Center(
-              child: AnimatedContainer(
-                duration: duration,
-                curve: tokens.motion.easingStandard,
-                width: tokens.indicator.dotMd,
-                height: tokens.indicator.dotMd,
-                decoration: BoxDecoration(
-                  color: fill,
-                  shape: BoxShape.circle,
-                  border: _focused
-                      ? Border.all(
-                          color: tokens.semantic.textPrimary,
-                          width: tokens.controlMetrics.borderThin,
-                        )
-                      : null,
-                ),
-                child: AnimatedOpacity(
-                  duration: duration,
-                  opacity: showGlyph ? 1 : 0,
-                  child: Icon(
-                    switch (widget.kind) {
-                      _WindowControlKind.close => Icons.close,
-                      _WindowControlKind.minimize => Icons.remove,
-                      _WindowControlKind.maximize => Icons.add,
-                      _WindowControlKind.restore => Icons.unfold_less,
-                    },
-                    color: tokens.semantic.textPrimary,
-                    size: tokens.controlMetrics.iconXs,
-                  ),
-                ),
               ),
             ),
           ),
