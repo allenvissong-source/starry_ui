@@ -44,6 +44,7 @@ class StarryButton extends StatefulWidget {
     this.pill = true,
     this.pressScale = false,
     this.layout = StarryButtonLayout.inline,
+    this.textStyle,
   }) : height = null;
 
   /// Concentric nested capsule button (AGENTS.md §1.5.2) — the *only* public
@@ -71,6 +72,7 @@ class StarryButton extends StatefulWidget {
     this.pill = true,
     this.pressScale = false,
     this.layout = StarryButtonLayout.inline,
+    this.textStyle,
   }) : fullWidth = false;
 
   final String label;
@@ -96,6 +98,7 @@ class StarryButton extends StatefulWidget {
   /// Content arrangement — see [StarryButtonLayout]. Defaults to
   /// [StarryButtonLayout.inline] so existing call sites are unchanged.
   final StarryButtonLayout layout;
+  final TextStyle? textStyle;
 
   /// Visual height of the button's capsule/rectangle, set only via
   /// [StarryButton.concentric]; the default constructor leaves it null so a
@@ -255,7 +258,10 @@ class _StarryButtonState extends State<StarryButton> {
             : EdgeInsets.symmetric(horizontal: t.spacing.s4),
       ),
       textStyle: WidgetStateProperty.all(
-        t.typography.labelLarge.textStyle.copyWith(fontWeight: FontWeight.w600),
+        widget.textStyle ??
+            t.typography.labelLarge.textStyle.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
       ),
       shape: WidgetStateProperty.all(
         widget.pill

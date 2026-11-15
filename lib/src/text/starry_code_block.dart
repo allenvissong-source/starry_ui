@@ -22,6 +22,7 @@ class StarryCodeBlock extends StatefulWidget {
     this.copyErrorLabel,
     this.onCopy,
     this.onCopyError,
+    this.embedded = false,
     super.key,
   }) : assert(
          maxHeight == null || (maxHeight > 0 && maxHeight < double.infinity),
@@ -49,6 +50,10 @@ class StarryCodeBlock extends StatefulWidget {
   final String? copyErrorLabel;
   final Future<void> Function(String code)? onCopy;
   final void Function(Object error, StackTrace stackTrace)? onCopyError;
+
+  /// Plain code content inside an existing surface, with the same typography
+  /// and wrapping behavior as a standalone code block.
+  final bool embedded;
 
   @override
   State<StarryCodeBlock> createState() => _StarryCodeBlockState();
@@ -114,7 +119,9 @@ class _StarryCodeBlockState extends State<StarryCodeBlock> {
     Widget source = SelectableText(
       widget.code,
       textDirection: TextDirection.ltr,
-      style: t.typography.bodyLarge.textStyle.copyWith(
+      // Source is supporting material: keep it at the body size of surrounding
+      // prose instead of the larger reading tier.
+      style: t.typography.bodyMedium.textStyle.copyWith(
         color: codeTokens.codeText,
         // Flutter's platform generic family, not a second bundled font palette.
         fontFamily: 'monospace',
@@ -127,76 +134,79 @@ class _StarryCodeBlockState extends State<StarryCodeBlock> {
       );
     }
 
-    return StarrySurface(
-      elevated: false,
-      color: codeTokens.codeSurface,
-      padding: EdgeInsets.all(t.spacing.s4),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (hasHeader) ...[
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: t.spacing.s2,
-              runSpacing: t.spacing.s2,
-              children: [
-                if (widget.title != null || widget.language != null)
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (widget.title != null)
-                        Text(
-                          widget.title!,
-                          style: t.typography.titleMedium.textStyle.copyWith(
-                            color: codeTokens.codeText,
-                          ),
+    final body = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (hasHeader) ...[
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: t.spacing.s2,
+            runSpacing: t.spacing.s2,
+            children: [
+              if (widget.title != null || widget.language != null)
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (widget.title != null)
+                      Text(
+                        widget.title!,
+                        style: t.typography.titleMedium.textStyle.copyWith(
+                          color: codeTokens.codeText,
                         ),
-                      if (widget.language != null)
-                        Text(
-                          widget.language!,
-                          style: t.typography.labelLarge.textStyle.copyWith(
-                            color: codeTokens.copyIdle,
-                          ),
+                      ),
+                    if (widget.language != null)
+                      Text(
+                        widget.language!,
+                        style: t.typography.labelLarge.textStyle.copyWith(
+                          color: codeTokens.copyIdle,
                         ),
-                    ],
+                      ),
+                  ],
+                ),
+              if (widget.copyLabel != null)
+                Semantics(
+                  liveRegion: true,
+                  child: StarryEditorActionButton(
+                    label: _copying
+                        ? widget.copyingLabel!
+                        : _copied
+                        ? widget.copiedLabel!
+                        : widget.copyLabel!,
+                    icon: _copied ? Icons.check : Icons.copy_outlined,
+                    loading: _copying,
+                    onPressed: _copy,
                   ),
-                if (widget.copyLabel != null)
-                  Semantics(
-                    liveRegion: true,
-                    child: StarryEditorActionButton(
-                      label: _copying
-                          ? widget.copyingLabel!
-                          : _copied
-                          ? widget.copiedLabel!
-                          : widget.copyLabel!,
-                      icon: _copied ? Icons.check : Icons.copy_outlined,
-                      loading: _copying,
-                      onPressed: _copy,
-                    ),
-                  ),
-              ],
-            ),
-            SizedBox(height: t.spacing.s3),
-          ],
-          source,
-          if (_failed && widget.copyLabel != null)
-            Padding(
-              padding: EdgeInsets.only(top: t.spacing.s2),
-              child: Semantics(
-                liveRegion: true,
-                child: Text(
-                  widget.copyErrorLabel!,
-                  style: t.typography.bodyMedium.textStyle.copyWith(
-                    color: t.semantic.errorStrong,
-                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: t.spacing.s3),
+        ],
+        source,
+        if (_failed && widget.copyLabel != null)
+          Padding(
+            padding: EdgeInsets.only(top: t.spacing.s2),
+            child: Semantics(
+              liveRegion: true,
+              child: Text(
+                widget.copyErrorLabel!,
+                style: t.typography.bodyMedium.textStyle.copyWith(
+                  color: t.semantic.errorStrong,
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+      ],
     );
+    return widget.embedded
+        ? body
+        : StarrySurface(
+            elevated: false,
+            color: codeTokens.codeSurface,
+            padding: EdgeInsets.all(t.spacing.s4),
+            child: body,
+          );
   }
 }

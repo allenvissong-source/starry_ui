@@ -105,6 +105,7 @@ class StarryDropdown<T> extends StatefulWidget {
     this.borderRadius,
     this.animationDuration,
     this.elevated = true,
+    this.compact = false,
   });
 
   /// The selectable options.
@@ -156,6 +157,12 @@ class StarryDropdown<T> extends StatefulWidget {
 
   /// Whether to paint the surface drop shadow (`elevation.level2`).
   final bool elevated;
+
+  /// Uses the `bodyMedium` ramp and a tighter horizontal inset for both the
+  /// trigger and the option rows. The control keeps its `controlHeight` so the
+  /// 48pt touch target is untouched; only the text weight of the value drops
+  /// a level, which keeps secondary settings from outranking section titles.
+  final bool compact;
 
   @override
   State<StarryDropdown<T>> createState() => _StarryDropdownState<T>();
@@ -460,11 +467,14 @@ class _StarryDropdownState<T> extends State<StarryDropdown<T>>
       t.radius.xxl,
       t.controlMetrics.controlHeight / 2,
     );
+    final TextStyle ramp = widget.compact
+        ? t.typography.bodyMedium.textStyle
+        : t.typography.bodyLarge.textStyle;
     final Color labelColor = widget.enabled ? s.textPrimary : s.textDisabled;
     final Widget triggerLabel = selected == null
         ? Text(
             widget.hint ?? '请选择',
-            style: t.typography.bodyLarge.textStyle.copyWith(
+            style: ramp.copyWith(
               color: widget.enabled ? s.textTertiary : s.textDisabled,
             ),
             maxLines: 1,
@@ -472,7 +482,7 @@ class _StarryDropdownState<T> extends State<StarryDropdown<T>>
           )
         : Text(
             selected.label,
-            style: t.typography.bodyLarge.textStyle.copyWith(color: labelColor),
+            style: ramp.copyWith(color: labelColor),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           );
@@ -490,7 +500,9 @@ class _StarryDropdownState<T> extends State<StarryDropdown<T>>
       child: SizedBox(
         height: t.controlMetrics.controlHeight,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: t.spacing.s5),
+          padding: EdgeInsets.symmetric(
+            horizontal: widget.compact ? t.spacing.s4 : t.spacing.s5,
+          ),
           child: Row(
             children: <Widget>[
               if (selected?.icon != null) ...<Widget>[
@@ -709,7 +721,9 @@ class _StarryDropdownState<T> extends State<StarryDropdown<T>>
                   ),
                 )
               : null,
-          padding: EdgeInsets.symmetric(horizontal: t.spacing.s5),
+          padding: EdgeInsets.symmetric(
+            horizontal: widget.compact ? t.spacing.s4 : t.spacing.s5,
+          ),
           child: Row(
             children: <Widget>[
               indicator,
@@ -727,9 +741,13 @@ class _StarryDropdownState<T> extends State<StarryDropdown<T>>
               Expanded(
                 child: Text(
                   item.label,
-                  style: t.typography.bodyLarge.textStyle.copyWith(
-                    color: active ? s.textPrimary : s.textDisabled,
-                  ),
+                  style:
+                      (widget.compact
+                              ? t.typography.bodyMedium.textStyle
+                              : t.typography.bodyLarge.textStyle)
+                          .copyWith(
+                            color: active ? s.textPrimary : s.textDisabled,
+                          ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

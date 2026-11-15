@@ -49,6 +49,29 @@ Widget _launcher(Future<void> Function(BuildContext) open) => Builder(
 );
 
 void main() {
+  testWidgets('embedded code wraps without adding a surface', (tester) async {
+    const source =
+        'a/long/source/path/that/must/remain/intact/and/wrap/inside/the/section';
+    await tester.pumpWidget(
+      _host(
+        const SizedBox(
+          width: 240,
+          child: StarryCodeBlock(code: source, embedded: true),
+        ),
+      ),
+    );
+    expect(find.byType(StarrySurface), findsNothing);
+    expect(
+      tester.widget<SelectableText>(find.byType(SelectableText)).data,
+      source,
+    );
+    expect(
+      tester.getSize(find.byType(SelectableText)).width,
+      lessThanOrEqualTo(240),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('copy waits, serializes attempts and preserves exact source', (
     tester,
   ) async {

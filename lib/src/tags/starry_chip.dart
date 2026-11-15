@@ -99,11 +99,15 @@ class StarryChip extends StatelessWidget {
           ),
           SizedBox(width: t.spacing.s1),
         ],
-        Text(
-          label,
-          style: t.typography.bodySmall.textStyle.copyWith(
-            color: fgColor,
-            fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+        Flexible(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: t.typography.bodySmall.textStyle.copyWith(
+              color: fgColor,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            ),
           ),
         ),
         if (trailing != null) ...<Widget>[
@@ -171,9 +175,11 @@ class StarryChip extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(left: t.spacing.s3),
-                child: labelRow,
+              Flexible(
+                child: Padding(
+                  padding: EdgeInsets.only(left: t.spacing.s3),
+                  child: labelRow,
+                ),
               ),
               delete,
             ],

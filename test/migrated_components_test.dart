@@ -612,6 +612,64 @@ void main() {
   );
 
   testWidgets(
+    'StarryDropdown compact keeps the 48pt trigger and drops to bodyMedium',
+    (tester) async {
+      await tester.pumpWidget(
+        _host(
+          Column(
+            children: <Widget>[
+              StarryDropdown<String>(
+                key: const ValueKey<String>('compact-dropdown'),
+                value: 'a',
+                valueIsControlled: true,
+                compact: true,
+                items: const <StarryDropdownItem<String>>[
+                  StarryDropdownItem<String>(
+                    value: 'a',
+                    label: 'Compact value',
+                  ),
+                ],
+                onSelected: (_) {},
+              ),
+              StarryDropdown<String>(
+                key: const ValueKey<String>('regular-dropdown'),
+                value: 'a',
+                valueIsControlled: true,
+                items: const <StarryDropdownItem<String>>[
+                  StarryDropdownItem<String>(
+                    value: 'a',
+                    label: 'Regular value',
+                  ),
+                ],
+                onSelected: (_) {},
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tokens = StarryTokens.light;
+      final compactLabel = tester.widget<Text>(find.text('Compact value'));
+      final regularLabel = tester.widget<Text>(find.text('Regular value'));
+      expect(compactLabel.style!.fontSize, tokens.typography.bodyMedium.size);
+      expect(regularLabel.style!.fontSize, tokens.typography.bodyLarge.size);
+
+      for (final key in ['compact-dropdown', 'regular-dropdown']) {
+        final triggerBox = tester.widget<SizedBox>(
+          find
+              .descendant(
+                of: find.byKey(ValueKey<String>(key)),
+                matching: find.byType(SizedBox),
+              )
+              .first,
+        );
+        expect(triggerBox.height, tokens.controlMetrics.controlHeight);
+      }
+    },
+  );
+
+  testWidgets(
     'StarryDropdown expands an inline detached radius.xxl option panel',
     (tester) async {
       await tester.pumpWidget(
