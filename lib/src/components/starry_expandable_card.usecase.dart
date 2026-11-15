@@ -29,6 +29,16 @@ Widget allVariantsStarryExpandableCard(BuildContext context) {
           maintainState: true,
           children: [StarryTextField(label: '草稿')],
         ),
+        SizedBox(height: t.spacing.s4),
+        const StarryContentSection(
+          title: '嵌入内容区块',
+          child: StarryExpandableCard(
+            embedded: true,
+            initiallyExpanded: true,
+            header: Text('平铺展开'),
+            children: [Text('不叠加卡片容器。')],
+          ),
+        ),
       ],
     ),
   );
@@ -40,6 +50,7 @@ Widget playgroundStarryExpandableCard(BuildContext context) {
   return Padding(
     padding: EdgeInsets.all(t.spacing.s6),
     child: StarryExpandableCard(
+      embedded: context.knobs.boolean(label: 'Embedded', initialValue: false),
       header: Text(context.knobs.string(label: 'Header', initialValue: '高级选项')),
       expanded: context.knobs.boolean(label: 'Expanded', initialValue: false),
       maintainState: context.knobs.boolean(

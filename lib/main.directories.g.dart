@@ -84,6 +84,8 @@ import 'package:starry_ui/src/interactions/starry_slidable_drawer.usecase.dart'
     as _starry_ui_src_interactions_starry_slidable_drawer_usecase;
 import 'package:starry_ui/src/interactions/starry_state_layer.usecase.dart'
     as _starry_ui_src_interactions_starry_state_layer_usecase;
+import 'package:starry_ui/src/layout/starry_content_section.usecase.dart'
+    as _starry_ui_src_layout_starry_content_section_usecase;
 import 'package:starry_ui/src/layout/starry_desktop_window_frame.usecase.dart'
     as _starry_ui_src_layout_starry_desktop_window_frame_usecase;
 import 'package:starry_ui/src/layout/starry_glass_panel.usecase.dart'
@@ -951,6 +953,21 @@ final directories = <_widgetbook.WidgetbookNode>[
   _widgetbook.WidgetbookFolder(
     name: 'layout',
     children: [
+      _widgetbook.WidgetbookComponent(
+        name: 'StarryContentSection',
+        useCases: [
+          _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_layout_starry_content_section_usecase
+                .allVariantsStarryContentSection,
+          ),
+          _widgetbook.WidgetbookUseCase(
+            name: 'Playground',
+            builder: _starry_ui_src_layout_starry_content_section_usecase
+                .playgroundStarryContentSection,
+          ),
+        ],
+      ),
       _widgetbook.WidgetbookComponent(
         name: 'StarryDesktopWindowFrame',
         useCases: [

@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 
 import '../theme/starry_tokens.dart';
 
-/// A frosted-glass container: a blurred, translucent surface with a bright
-/// hairline border and a diffuse drop shadow.
+/// The backdrop on which a glass panel is used.
+enum StarryGlassPanelVariant { media, content }
+
+/// A frosted-glass container with a blurred, translucent surface.
 ///
-/// The backdrop behind [child] is blurred ([blurSigma]) and tinted with the
-/// theme surface at [surfaceOpacity]. The hairline border uses
-/// `semantic.onMedia` (white in both themes, since a glass panel floats over
-/// media/photographic backdrops) and the shadow uses the dedicated
-/// `elevation.glass` tier. All colors and the shadow are token-driven.
+/// Media panels use a bright on-media outline and a floating glass shadow.
+/// Content panels use a quiet secondary surface and semantic border.
+/// All colors, blur and shadows resolve from the design tokens.
 class StarryGlassPanel extends StatelessWidget {
   const StarryGlassPanel({
     required this.child,
@@ -22,11 +22,16 @@ class StarryGlassPanel extends StatelessWidget {
     this.borderOpacity,
     this.borderWidth,
     this.boxShadow,
+    this.variant = StarryGlassPanelVariant.media,
     super.key,
   });
 
   /// Content painted on top of the glass surface.
   final Widget child;
+
+  /// Content panels use a secondary surface and semantic border, without a
+  /// floating shadow. Media panels retain their bright on-media outline.
+  final StarryGlassPanelVariant variant;
 
   /// Corner radius of the panel (and its clip / border).
   ///
@@ -51,6 +56,7 @@ class StarryGlassPanel extends StatelessWidget {
   /// Alpha applied to the `onMedia` hairline border color.
   ///
   /// Defaults to `glass.borderOpacity` (0.58) when null.
+  /// Only applies to the media variant; content uses the semantic border.
   final double? borderOpacity;
 
   /// Width of the hairline border.
@@ -75,6 +81,7 @@ class StarryGlassPanel extends StatelessWidget {
     final resolvedBlur = blurSigma ?? t.glass.blurSigma;
     final resolvedSurfaceOpacity = surfaceOpacity ?? t.glass.surfaceOpacity;
     final resolvedBorderOpacity = borderOpacity ?? t.glass.borderOpacity;
+    final content = variant == StarryGlassPanelVariant.content;
 
     return ClipRRect(
       borderRadius: radius,
@@ -82,15 +89,17 @@ class StarryGlassPanel extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: resolvedBlur, sigmaY: resolvedBlur),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: t.semantic.surface.withValues(alpha: resolvedSurfaceOpacity),
+            color:
+                (content ? t.semantic.backgroundSecondary : t.semantic.surface)
+                    .withValues(alpha: resolvedSurfaceOpacity),
             borderRadius: radius,
             border: Border.all(
-              color: t.semantic.onMedia.withValues(
-                alpha: resolvedBorderOpacity,
-              ),
+              color: content
+                  ? t.semantic.border
+                  : t.semantic.onMedia.withValues(alpha: resolvedBorderOpacity),
               width: resolvedBorderWidth,
             ),
-            boxShadow: boxShadow ?? t.elevation.glass,
+            boxShadow: boxShadow ?? (content ? const [] : t.elevation.glass),
           ),
           child: Padding(padding: resolvedPadding, child: child),
         ),

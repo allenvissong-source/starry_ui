@@ -24,10 +24,10 @@
   存在(§1.5.2 的 `no_padded_tap_target_in_inputs_test`、
   `button_density_guard_test`,§7.1 的 `no_hardcoded_colors_test`),
   它们只在测试里生效,`analyze` 发现不了。
-- **golden 基线不在本机生成。** 唯一真源是主工程
-  `.github/workflows/golden-baselines.yml` 的 ubuntu 渲染器。Windows 与 Linux
-  的 Skia 对文字/图标光栅化不同(实测文字类 golden 差异约 4.4%),所以本地
-  `--update-goldens` 只用来确认"差异是否符合预期",**生成的图不要提交**。
+- **golden 基线统一使用主工程的固定 Linux 镜像。** 在主工程运行
+  `python3 tools/goldens.py check`，流程见主工程 `docs/GOLDEN_TESTS.md`。
+  生成与比较复用同一实际镜像 ID；不得直接提交宿主生成的图、
+  扩大容差或触发付费 CI。首次渲染器迁移未完成时不得宣称视觉验证通过。
 - **PowerShell 的两个实测坑**:
   1. `git` 把进度写进 stderr,PowerShell 会判为错误——命令末尾加 `exit 0`
      或 `| Out-Null`,不要据此认为 git 失败。
@@ -621,6 +621,15 @@ dart run build_runner build --delete-conflicting-outputs
      字面量保持不变。属主题装配收敛(非组件迁移),对 `app_theme.dart` 的非零差异
      为受控例外,规则见 §1.4。**上文"迁移普通组件时 app_theme.dart 应保持零差异"
      仍成立**:组件迁移中不得夹带 app_theme 改动,主题级颜色收敛须像本次一样单独获批。
+   - **已批准的受控扩充记录**:2026-11-09 用户确认新增
+     `semantic.backgroundImageOverlay`，用于摄影背景上的主题可读性遮罩，
+     后续跨页面复用。浅色为白色约 82%，深色为主题背景色约 84%；
+     与弹窗 `scrim`、媒体底部渐变 `mediaOverlayEnd` 分工独立。
+   - **已批准的受控扩充记录**:2026-11-10 用户确认磨砂内容区块使用更低的填充不透明度
+     与更轻的背景模糊：`glass.contentSurfaceOpacity = 0.38`、
+     `glass.contentBlurSigma = 8`（媒体玻璃仍为 `surfaceOpacity = 0.82`、
+     `blurSigma = 22`），让摄影背景可辨认地透过内容区块。该值在摄影背景遮罩之上合成，
+     文字对比度仍由主题遮罩保证；内容区块不使用投影。
 2. **禁止硬编码与魔法数字**
    - 颜色、间距、尺寸、圆角、阴影、字号、透明度、动画时长/曲线全部取现有 token。
    - 禁止 `Color(0x...)`、`Colors.*`、裸 `withValues(alpha: 数字)`、裸尺寸/间距/
@@ -678,8 +687,8 @@ dart run build_runner build --delete-conflicting-outputs
    tall-style 会重排 **79/149 个文件**(实测),把无关改动混进 diff;而主仓 CI
    没有 format 步骤,拦不住。全量重排需要单独立项并 pin SDK 版本,不要顺手做。
 4. **视觉回归**:涉及渲染的改动,以 `test/` 下的 widget 测试与 golden 为准。
-   golden 基线由主工程 `golden-baselines.yml` 的 ubuntu 渲染器生成(见 §0),
-   本地跑出的差异先判断是否符合预期,不要直接提交本地生成的图。
+   golden 基线由主工程 `tools/goldens.py` 的固定 Linux 镜像生成和比较(见 §0),
+   真实界面变化确认后才显式更新，不直接提交宿主生成的图。
    - **CanvasKit 无法做像素回读**:`canvas.getContext('webgl')` 返回 null
      (未开 `preserveDrawingBuffer`),所以不能靠浏览器画布取色验证颜色。
      颜色契约(如 `secondary` 是否等于某 token)一律用 Dart 层测试断言

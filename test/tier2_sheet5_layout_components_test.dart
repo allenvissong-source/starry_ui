@@ -60,7 +60,7 @@ void main() {
               of: find.byType(StarryGlassPanel),
               matching: find.byType(DecoratedBox),
             )
-            .first,
+            .last,
       );
       final decoration = decorated.decoration as BoxDecoration;
 

@@ -50,6 +50,7 @@ class StarryExpandableCard extends StatefulWidget {
     this.animationDuration,
     this.maintainState = false,
     this.elevated = true,
+    this.embedded = false,
   });
 
   /// Header content.
@@ -104,6 +105,10 @@ class StarryExpandableCard extends StatefulWidget {
 
   /// Whether to paint the surface drop shadow (`elevation.level2`).
   final bool elevated;
+
+  /// Flat disclosure inside a content section. Keeps focus, keyboard and
+  /// expansion semantics while omitting the header and content surfaces.
+  final bool embedded;
 
   @override
   State<StarryExpandableCard> createState() => _StarryExpandableCardState();
@@ -211,32 +216,60 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
       t.radius.xxl,
       t.controlMetrics.controlHeight / 2,
     );
+    final headerBody = Padding(
+      padding:
+          widget.headerPadding ??
+          (widget.embedded
+              // Embedded rows still receive the hover/focus state layer; keep
+              // the label clear of that fill instead of letting it butt against
+              // the first glyph.
+              ? EdgeInsets.symmetric(
+                  horizontal: t.spacing.s3,
+                  vertical: t.spacing.s1,
+                )
+              : EdgeInsets.symmetric(horizontal: t.spacing.s5)),
+      child: Row(
+        children: <Widget>[
+          Expanded(child: widget.header),
+          SizedBox(width: t.spacing.s3),
+          _buildTrailingIcon(s),
+        ],
+      ),
+    );
     final header = StarryDisclosureTrigger(
+      embedded: widget.embedded,
       color: widget.backgroundColor,
-      radius: BorderRadius.circular(headerRadius),
+      radius: BorderRadius.circular(
+        widget.embedded ? t.radius.sm : headerRadius,
+      ),
       elevated: widget.elevated,
       onTap: _toggle,
       expanded: _isExpanded,
       focusNode: widget.focusNode,
-      child: SizedBox(
-        height: t.controlMetrics.controlHeight,
-        child: Padding(
-          padding:
-              widget.headerPadding ??
-              EdgeInsets.symmetric(horizontal: t.spacing.s5),
-          child: Row(
-            children: <Widget>[
-              Expanded(child: widget.header),
-              SizedBox(width: t.spacing.s3),
-              _buildTrailingIcon(s),
-            ],
-          ),
-        ),
-      ),
+      child: widget.embedded
+          ? ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: t.controlMetrics.controlHeight,
+              ),
+              child: headerBody,
+            )
+          : SizedBox(height: t.controlMetrics.controlHeight, child: headerBody),
     );
 
     // Detached content panel: its own rounded-rectangle surface below the
     // header, revealed by the height-factor animation and cross-faded in.
+    final children = Padding(
+      padding:
+          widget.childrenPadding ??
+          (widget.embedded
+              ? EdgeInsets.fromLTRB(t.spacing.s3, 0, t.spacing.s3, t.spacing.s4)
+              : EdgeInsets.all(t.spacing.s5)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: widget.children,
+      ),
+    );
     final content = AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -271,18 +304,15 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
       },
       child: Padding(
         padding: EdgeInsets.only(top: t.spacing.s3),
-        child: StarrySurface(
-          color: widget.backgroundColor,
-          borderRadius:
-              widget.borderRadius ?? BorderRadius.circular(t.radius.xxl),
-          elevated: widget.elevated,
-          padding: widget.childrenPadding ?? EdgeInsets.all(t.spacing.s5),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: widget.children,
-          ),
-        ),
+        child: widget.embedded
+            ? children
+            : StarrySurface(
+                color: widget.backgroundColor,
+                borderRadius:
+                    widget.borderRadius ?? BorderRadius.circular(t.radius.xxl),
+                elevated: widget.elevated,
+                child: children,
+              ),
       ),
     );
 
@@ -314,7 +344,7 @@ class _StarryExpandableCardState extends State<StarryExpandableCard>
       turns: _iconTurns,
       child: Icon(
         Icons.expand_more,
-        color: s.textTertiary,
+        color: widget.embedded ? s.textSecondary : s.textTertiary,
         size: Theme.of(
           context,
         ).extension<StarryTokens>()!.controlMetrics.iconMd,

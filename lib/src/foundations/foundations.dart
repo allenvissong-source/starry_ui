@@ -523,6 +523,7 @@ const List<(String, _RoleGetter)> _semanticRoles = [
   ('bg/primary', _rBackground),
   ('bg/secondary', _rBackgroundSecondary),
   ('bg/tertiary', _rBackgroundTertiary),
+  ('bg/image-overlay', _rBackgroundImageOverlay),
   ('surface/card', _rSurface),
   ('surface/variant', _rSurfaceVariant),
   ('text/primary', _rTextPrimary),
@@ -551,6 +552,8 @@ Color _rOnBrand(StarrySemanticColors s) => s.onBrand;
 Color _rBackground(StarrySemanticColors s) => s.background;
 Color _rBackgroundSecondary(StarrySemanticColors s) => s.backgroundSecondary;
 Color _rBackgroundTertiary(StarrySemanticColors s) => s.backgroundTertiary;
+Color _rBackgroundImageOverlay(StarrySemanticColors s) =>
+    s.backgroundImageOverlay;
 Color _rSurface(StarrySemanticColors s) => s.surface;
 Color _rSurfaceVariant(StarrySemanticColors s) => s.surfaceVariant;
 Color _rTextPrimary(StarrySemanticColors s) => s.textPrimary;

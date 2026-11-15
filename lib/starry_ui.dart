@@ -76,6 +76,7 @@ export 'src/layout/sliver_masonry_feed.dart';
 export 'src/layout/starry_ambient_background.dart';
 export 'src/layout/starry_desktop_window_frame.dart';
 export 'src/layout/starry_glass_panel.dart';
+export 'src/layout/starry_content_section.dart';
 export 'src/layout/starry_gradient_fallback.dart';
 export 'src/layout/starry_immersive_background.dart';
 export 'src/layout/starry_master_detail_layout.dart';

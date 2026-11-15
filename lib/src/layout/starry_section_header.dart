@@ -26,6 +26,9 @@ class StarrySectionHeader extends StatelessWidget {
     this.trailing,
     this.compact = false,
     this.emphasis = false,
+    this.subtitle,
+    this.icon,
+    this.titleFontWeight,
   }) : assert(
          title != null || description != null || child != null,
          'StarrySectionHeader requires at least one of title, description or child.',
@@ -57,6 +60,11 @@ class StarrySectionHeader extends StatelessWidget {
   final bool emphasis;
   final bool accent;
   final Widget? trailing;
+  final String? subtitle;
+  final IconData? icon;
+
+  /// Explicit heading weight. When omitted, emphasis keeps its default weight.
+  final FontWeight? titleFontWeight;
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +90,14 @@ class StarrySectionHeader extends StatelessWidget {
                 ),
           child: Row(
             children: [
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  size: tokens.controlMetrics.iconSm,
+                  color: s.textSecondary,
+                ),
+                SizedBox(width: tokens.spacing.s2),
+              ],
               if (accent) ...[
                 Container(
                   width: tokens.controlMetrics.borderThick,
@@ -94,20 +110,40 @@ class StarrySectionHeader extends StatelessWidget {
                 SizedBox(width: tokens.spacing.s2),
               ],
               Expanded(
-                child: Text(
-                  title!,
-                  style: emphasis
-                      ? tokens.typography.titleMedium.textStyle.copyWith(
-                          color: titleColor,
-                          fontWeight: FontWeight.w600,
-                        )
-                      : tokens.typography.labelLarge.textStyle.copyWith(
-                          color: titleColor,
-                        ),
+                child: Semantics(
+                  header: true,
+                  child: Text(
+                    title!,
+                    style: emphasis
+                        ? tokens.typography.titleMedium.textStyle.copyWith(
+                            color: titleColor,
+                            fontWeight: titleFontWeight ?? FontWeight.w600,
+                          )
+                        : tokens.typography.labelLarge.textStyle.copyWith(
+                            color: titleColor,
+                            fontWeight: titleFontWeight,
+                          ),
+                  ),
                 ),
               ),
               ?trailing,
             ],
+          ),
+        ),
+      );
+    }
+
+    if (subtitle != null && subtitle!.isNotEmpty) {
+      children.add(
+        Padding(
+          padding: EdgeInsets.only(top: tokens.spacing.s1),
+          child: Text(
+            subtitle!,
+            style: tokens.typography.bodySmall.textStyle.copyWith(
+              color: s.textSecondary,
+              fontWeight: FontWeight.w400,
+              letterSpacing: tokens.letterSpacing.wider,
+            ),
           ),
         ),
       );
@@ -126,6 +162,7 @@ class StarrySectionHeader extends StatelessWidget {
             description!,
             style: tokens.typography.bodySmall.textStyle.copyWith(
               color: s.textSecondary,
+              fontWeight: FontWeight.w400,
             ),
           ),
         ),

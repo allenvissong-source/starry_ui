@@ -16,6 +16,7 @@ class StarryDisclosureTrigger extends StatefulWidget {
     this.value,
     this.color,
     this.elevated = true,
+    this.embedded = false,
     super.key,
   });
 
@@ -29,6 +30,7 @@ class StarryDisclosureTrigger extends StatefulWidget {
   final String? value;
   final Color? color;
   final bool elevated;
+  final bool embedded;
 
   @override
   State<StarryDisclosureTrigger> createState() =>
@@ -41,6 +43,30 @@ class _StarryDisclosureTriggerState extends State<StarryDisclosureTrigger> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
+    final body = DecoratedBox(
+      position: DecorationPosition.foreground,
+      decoration: BoxDecoration(
+        borderRadius: widget.radius,
+        border: _focused
+            ? Border.all(
+                color: t.semantic.brandStrong,
+                width: t.controlMetrics.focusBorderWidth,
+              )
+            : null,
+      ),
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+          borderRadius: widget.radius,
+          focusNode: widget.focusNode,
+          canRequestFocus: widget.enabled,
+          onFocusChange: (focused) => setState(() => _focused = focused),
+          onTap: widget.enabled ? widget.onTap : null,
+          excludeFromSemantics: true,
+          child: widget.child,
+        ),
+      ),
+    );
     return Semantics(
       button: true,
       enabled: widget.enabled,
@@ -50,35 +76,14 @@ class _StarryDisclosureTriggerState extends State<StarryDisclosureTrigger> {
       child: Focus(
         canRequestFocus: false,
         onKeyEvent: widget.onKeyEvent,
-        child: StarrySurface(
-          color: widget.color,
-          borderRadius: widget.radius,
-          elevated: widget.elevated,
-          child: DecoratedBox(
-            position: DecorationPosition.foreground,
-            decoration: BoxDecoration(
-              borderRadius: widget.radius,
-              border: _focused
-                  ? Border.all(
-                      color: t.semantic.brandStrong,
-                      width: t.controlMetrics.focusBorderWidth,
-                    )
-                  : null,
-            ),
-            child: Material(
-              type: MaterialType.transparency,
-              child: InkWell(
+        child: widget.embedded
+            ? body
+            : StarrySurface(
+                color: widget.color,
                 borderRadius: widget.radius,
-                focusNode: widget.focusNode,
-                canRequestFocus: widget.enabled,
-                onFocusChange: (focused) => setState(() => _focused = focused),
-                onTap: widget.enabled ? widget.onTap : null,
-                excludeFromSemantics: true,
-                child: widget.child,
+                elevated: widget.elevated,
+                child: body,
               ),
-            ),
-          ),
-        ),
       ),
     );
   }

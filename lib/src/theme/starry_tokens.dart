@@ -97,6 +97,7 @@ class StarrySemanticColors {
     required this.onError,
     required this.onMedia,
     required this.mediaOverlayEnd,
+    required this.backgroundImageOverlay,
     required this.infoBg,
     required this.info,
     required this.infoStrong,
@@ -141,6 +142,11 @@ class StarrySemanticColors {
   /// (image/video) so light overlay content stays legible. The gradient starts
   /// transparent at the top and lands on this color at the bottom.
   final Color mediaOverlayEnd;
+
+  /// Flat veil over page background photography. Pairs with the active theme's
+  /// text colors, including text outside glass panels. Distinct from a modal
+  /// barrier and from the on-media bottom gradient.
+  final Color backgroundImageOverlay;
   final Color infoBg;
   final Color info;
   final Color infoStrong;
@@ -194,6 +200,10 @@ class StarrySemanticColors {
       onError: l(a.onError, b.onError),
       onMedia: l(a.onMedia, b.onMedia),
       mediaOverlayEnd: l(a.mediaOverlayEnd, b.mediaOverlayEnd),
+      backgroundImageOverlay: l(
+        a.backgroundImageOverlay,
+        b.backgroundImageOverlay,
+      ),
       infoBg: l(a.infoBg, b.infoBg),
       info: l(a.info, b.info),
       infoStrong: l(a.infoStrong, b.infoStrong),
@@ -987,6 +997,8 @@ class StarryGlass {
   const StarryGlass({
     this.blurSigma = 22,
     this.surfaceOpacity = 0.82,
+    this.contentBlurSigma = 8,
+    this.contentSurfaceOpacity = 0.38,
     this.borderOpacity = 0.58,
   });
 
@@ -995,6 +1007,18 @@ class StarryGlass {
 
   /// Alpha applied to the theme surface fill.
   final double surfaceOpacity;
+
+  /// Backdrop blur for content sections sitting on photographic backdrops.
+  ///
+  /// Lighter than [blurSigma] so the page image stays recognisable through the
+  /// panel instead of dissolving into a flat wash.
+  final double contentBlurSigma;
+
+  /// Alpha applied to content sections sitting on photographic backdrops.
+  ///
+  /// Lower than [surfaceOpacity] so the backdrop image still reads through the
+  /// panel; composited over the themed image veil it keeps text contrast.
+  final double contentSurfaceOpacity;
 
   /// Alpha applied to the `onMedia` hairline border color.
   final double borderOpacity;
@@ -1006,6 +1030,12 @@ class StarryGlass {
       blurSigma: lerpDouble(a.blurSigma, b.blurSigma, t) ?? a.blurSigma,
       surfaceOpacity:
           lerpDouble(a.surfaceOpacity, b.surfaceOpacity, t) ?? a.surfaceOpacity,
+      contentBlurSigma:
+          lerpDouble(a.contentBlurSigma, b.contentBlurSigma, t) ??
+          a.contentBlurSigma,
+      contentSurfaceOpacity:
+          lerpDouble(a.contentSurfaceOpacity, b.contentSurfaceOpacity, t) ??
+          a.contentSurfaceOpacity,
       borderOpacity:
           lerpDouble(a.borderOpacity, b.borderOpacity, t) ?? a.borderOpacity,
     );
@@ -1294,6 +1324,7 @@ class StarryTokens extends ThemeExtension<StarryTokens> {
     onError: Color(0xFFFFFFFF),
     onMedia: Color(0xFFFFFFFF),
     mediaOverlayEnd: Color(0x99000000),
+    backgroundImageOverlay: Color(0xD1FFFFFF),
     infoBg: Color(0xFFCFFAFE),
     info: Color(0xFF0891B2),
     infoStrong: Color(0xFF0E7490),
@@ -1330,6 +1361,7 @@ class StarryTokens extends ThemeExtension<StarryTokens> {
     onError: Color(0xFFFFFFFF),
     onMedia: Color(0xFFFFFFFF),
     mediaOverlayEnd: Color(0xCC030014),
+    backgroundImageOverlay: Color(0xD6121217),
     infoBg: Color(0xFF08303A),
     info: Color(0xFF22D3EE),
     infoStrong: Color(0xFF67E8F9),

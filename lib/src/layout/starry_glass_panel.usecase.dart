@@ -45,6 +45,12 @@ Widget playgroundStarryGlassPanel(BuildContext context) {
     ),
     child: Center(
       child: StarryGlassPanel(
+        variant: context.knobs.object.dropdown(
+          label: 'Variant',
+          options: StarryGlassPanelVariant.values,
+          initialOption: StarryGlassPanelVariant.media,
+          labelBuilder: (value) => value.name,
+        ),
         borderRadius: context.knobs.double.slider(
           label: 'borderRadius',
           initialValue: 34,
