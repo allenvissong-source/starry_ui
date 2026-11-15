@@ -49,6 +49,7 @@ export 'src/feedback/starry_dialog.dart';
 export 'src/feedback/starry_input_dialog.dart';
 export 'src/feedback/starry_message_list.dart';
 export 'src/feedback/starry_empty_state.dart';
+export 'src/media/starry_illustration.dart';
 export 'src/feedback/starry_loading_indicator.dart';
 export 'src/feedback/starry_skeleton_or_content.dart';
 export 'src/feedback/starry_sliver_skeleton_or_content.dart';

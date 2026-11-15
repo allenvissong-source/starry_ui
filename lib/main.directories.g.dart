@@ -434,6 +434,11 @@ final directories = <_widgetbook.WidgetbookNode>[
         name: 'StarryEmptyState',
         useCases: [
           _widgetbook.WidgetbookUseCase(
+            name: 'All Variants',
+            builder: _starry_ui_src_feedback_starry_empty_state_usecase
+                .allVariantsStarryEmptyState,
+          ),
+          _widgetbook.WidgetbookUseCase(
             name: 'Default',
             builder: _starry_ui_src_feedback_starry_empty_state_usecase
                 .defaultStarryEmptyState,

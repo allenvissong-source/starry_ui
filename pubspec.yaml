@@ -24,6 +24,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/illustrations/states/empty/no_content.webp
     - fonts/Inter-LICENSE.txt
     - fonts/Outfit-LICENSE.txt
     - fonts/MiSans-LICENSE.txt

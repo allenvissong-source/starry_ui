@@ -2,8 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:widgetbook/widgetbook.dart';
 import 'package:widgetbook_annotation/widgetbook_annotation.dart';
 
-import '../buttons/starry_button.dart';
-import 'starry_empty_state.dart';
+import 'package:starry_ui/starry_ui.dart';
+
+@UseCase(name: 'All Variants', type: StarryEmptyState)
+Widget allVariantsStarryEmptyState(BuildContext context) {
+  return SingleChildScrollView(
+    child: Column(
+      children: [
+        const StarryEmptyState(
+          illustration: StarryIllustration.noContent,
+          title: '这里还没有内容',
+        ),
+        defaultStarryEmptyState(context),
+        withActionStarryEmptyState(context),
+      ],
+    ),
+  );
+}
 
 @UseCase(name: 'Default', type: StarryEmptyState)
 Widget defaultStarryEmptyState(BuildContext context) {
@@ -22,8 +37,13 @@ Widget withActionStarryEmptyState(BuildContext context) {
 
 @UseCase(name: 'Playground', type: StarryEmptyState)
 Widget playgroundStarryEmptyState(BuildContext context) {
+  final illustrated = context.knobs.boolean(
+    label: 'No content illustration',
+    initialValue: true,
+  );
   return StarryEmptyState(
-    title: context.knobs.stringOrNull(label: 'Title', initialValue: '暂无数据'),
+    illustration: illustrated ? StarryIllustration.noContent : null,
+    title: context.knobs.string(label: 'Title', initialValue: '暂无数据'),
     message: context.knobs.stringOrNull(
       label: 'Message',
       initialValue: '这里还什么都没有。',

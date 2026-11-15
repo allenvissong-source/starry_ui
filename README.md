@@ -8,6 +8,7 @@ Shared Flutter design-system package for the Starry product family.
   interactions, text, and card / surface / control-shell container components).
 - The `StarryTokens` theme extension family: colors, spacing, radius, motion, and opacity tokens.
 - Bundled variable fonts (Outfit, Inter, MiSans) and the Twemoji emoji font.
+- Bundled compressed illustrations for product states.
 - A Widgetbook component catalogue (`*.usecase.dart` files) that documents the public widgets
   visually.
 
@@ -37,6 +38,23 @@ dependencies:
   starry_ui:
     path: ../starry_ui
 ```
+
+### Illustrated empty states
+
+```dart
+StarryEmptyState(
+  illustration: StarryIllustration.noContent,
+  title: translations.noContent,
+)
+```
+
+The transparent WebP is bundled in this package (768 × 768, about 144 KiB).
+Copy is real text below the image, supplied and localized by the host. Artwork
+is decorative for accessibility, scales to the available space, and retains
+its square proportions. The component scrolls in short windows with large text.
+Use `noContent` only after a successful empty load; errors, sign-in prompts,
+and search misses keep their own icons and messages. Omitting `illustration`
+preserves the default icon. `icon` and `illustration` are mutually exclusive.
 
 ### Tables and forms
 
