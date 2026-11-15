@@ -1,0 +1,416 @@
+{
+  "version": 4,
+  "tasksRevision": "1339fc194f08f5c3db43508136613ba716c324c9965695f11854a2aa32993b6d",
+  "reconciledAt": "2026-10-14T16:09:47.867Z",
+  "tasks": {
+    "task_55afb3084b389ce3224f9442": {
+      "id": "task_55afb3084b389ce3224f9442",
+      "taskKey": "1.1",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "1. 数据模型"
+      ],
+      "ordinal": 1,
+      "description": "1.1 实现 lib/src/components/starry_action_item.dart：StarryActionItem 不可变模型（id、title、subtitle?、keywords、leadingBuilder、selected、disabled、group?、children?、onActivate?），不含任何业务语义；运行 flutter analyze 通过",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "90e8a66abba88ce51c8604a647a95b4e7b073fc2eb062f303eb70d03e463f4fd",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "449c2a9b-79bf-485e-bb64-a199e71fd8bc",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "starry_action_item.dart 实现完成；flutter analyze 全仓 No issues found",
+          "command": "flutter analyze",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "passed": 0,
+          "recordedAt": "2026-10-14T15:46:00.687Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:46:13.990Z"
+    },
+    "task_3c88ec3f9b8b0f39037f6c69": {
+      "id": "task_3c88ec3f9b8b0f39037f6c69",
+      "taskKey": "1.2",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "1. 数据模型"
+      ],
+      "ordinal": 2,
+      "description": "1.2 为模型写单测：按 title/subtitle/keywords 命中过滤、空分组识别，flutter test 单文件通过",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "4a7a477589b60dc8debd0d930ac7487f2365c9eec830c00cfd7236e7524d248a",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "10ea684c-e876-4e88-bbe8-700bdb4c41cc",
+          "kind": "test",
+          "source": "executed",
+          "summary": "模型单测 7/7 通过：title/subtitle/keywords 命中过滤、空分组识别、过滤后空分组剔除",
+          "command": "flutter test test/starry_action_item_test.dart",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "passed": 7,
+          "recordedAt": "2026-10-14T15:46:46.868Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:46:59.047Z"
+    },
+    "task_19dcbb71df801391e2493520": {
+      "id": "task_19dcbb71df801391e2493520",
+      "taskKey": "2.1",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "2. 键盘可导航过滤分组列表"
+      ],
+      "ordinal": 3,
+      "description": "2.1 实现 lib/src/components/starry_action_list.dart：过滤输入框（打开自动聚焦）、分组标题渲染且不可激活、焦点行可见描边（t.focus + t.controlMetrics.focusBorderWidth）、条目 button/option 语义暴露标题与选中态；flutter analyze 通过",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "8c5980fcd894d60cb62af38a1dfee85be221aa3824573945ffc7966cd6522aa4",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "04fb8d99-ef81-47e7-a8a9-43e24b7b60dc",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "starry_action_list.dart 实现完成：过滤输入框自动聚焦、分组标题不可激活、焦点行描边取自 t.focus/controlMetrics.focusBorderWidth、Semantics 暴露标题/选中/禁用；flutter analyze 全仓 No issues found",
+          "command": "flutter analyze",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "recordedAt": "2026-10-14T15:47:33.363Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:47:42.246Z"
+    },
+    "task_621ce9cc3fe225e97167b4a1": {
+      "id": "task_621ce9cc3fe225e97167b4a1",
+      "taskKey": "2.2",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "2. 键盘可导航过滤分组列表"
+      ],
+      "ordinal": 4,
+      "description": "2.2 widget 测试：方向键下/上在可激活条目间循环且跳过分组标题、Enter 触发当前条目 onActivate、Esc 触发关闭回调、输入文本后列表只显示命中条目；flutter test 通过",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "4a898ac15cf66e734fb1886c539d4afa7ab3107efe27f99d2d536a98b07e2310",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "4166e62b-a160-45c7-8e52-54bf284f4b8f",
+          "kind": "test",
+          "source": "executed",
+          "summary": "列表 widget 测试 6/6 通过：方向键循环/跳过禁用行、Enter 触发行、Esc 关闭回调、过滤输入收窄列表、分组标题不可激活",
+          "command": "flutter test test/starry_action_list_test.dart",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "passed": 6,
+          "recordedAt": "2026-10-14T15:48:22.377Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:48:34.366Z"
+    },
+    "task_b4fb5cfb30db55141e51296f": {
+      "id": "task_b4fb5cfb30db55141e51296f",
+      "taskKey": "2.3",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "2. 键盘可导航过滤分组列表"
+      ],
+      "ordinal": 5,
+      "description": "2.3 widget 测试：禁用条目不响应 Enter、选中条目 semantics 暴露 selected 状态；flutter test 通过",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "531c5f207a56d1a0327a1288db8bd94d7be2e99c543c40006606ed2dbe632dc3",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "6a6246b2-11d4-43e6-a5a7-0bc0696a3004",
+          "kind": "test",
+          "source": "executed",
+          "summary": "行状态测试通过：禁用行 InkWell onTap 为 null 且 tap 不回调（等效 Enter 不响应）；选中行渲染 check 选中态。备注：SemanticsFlag API 在当前 Flutter 版本已弃用，以 InkWell onTap==null 与 check 图标替代语义断言",
+          "command": "flutter test test/starry_action_list_test.dart --name \"row states\"",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "passed": 2,
+          "recordedAt": "2026-10-14T15:49:06.143Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:49:16.940Z"
+    },
+    "task_6c45f0d0e8e5bb512bf26007": {
+      "id": "task_6c45f0d0e8e5bb512bf26007",
+      "taskKey": "3.1",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "3. 统一表面与子页导航"
+      ],
+      "ordinal": 6,
+      "description": "3.1 实现 lib/src/components/starry_action_surface.dart：compact（<600）走 showModalBottomSheet(isScrollControlled/enableDrag)，medium 及以上走 OverlayEntry 锚定浮层；同一数据模型两种形态渲染；flutter analyze 通过",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "ca66132d14daa4357337ee77c7a0cbba1e35da61d7dd588b170da7b5ebbc3f62",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "0d4c6660-ec82-48b0-936c-c520ef096fd7",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "starry_action_surface.dart 实现完成：compact 走 showModalBottomSheet(isScrollControlled/enableDrag)，medium+ 走 OverlayEntry 锚定浮层，同一 StarryActionItem 模型两种形态渲染；flutter analyze 全仓 No issues found",
+          "command": "flutter analyze",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "recordedAt": "2026-10-14T15:54:09.945Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:54:19.495Z"
+    },
+    "task_ea590844c68482e0b21443de": {
+      "id": "task_ea590844c68482e0b21443de",
+      "taskKey": "3.2",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "3. 统一表面与子页导航"
+      ],
+      "ordinal": 7,
+      "description": "3.2 锚定定位 widget 测试：触发区下方空间充足时浮层位于下方、底部空间不足时翻转到上方、水平方向不越出视口安全边距；flutter test 通过",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "e727e17e9e62466e182bd764837bf86efd99635f6d8bd50ed8335335cad393f8",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "f63b32f7-b0b1-41bd-bcb4-c24919f79353",
+          "kind": "test",
+          "source": "executed",
+          "summary": "锚定定位测试 3/3 通过：触发区下方空间充足时浮层位于下方、底部空间不足时翻转到上方、水平方向钳制在视口安全边距内不越界",
+          "command": "flutter test test/starry_action_surface_test.dart --name \"anchor placement\"",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "passed": 3,
+          "recordedAt": "2026-10-14T15:54:56.038Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:55:05.632Z"
+    },
+    "task_c04c8a60df6c0946936df73b": {
+      "id": "task_c04c8a60df6c0946936df73b",
+      "taskKey": "3.3",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "3. 统一表面与子页导航"
+      ],
+      "ordinal": 8,
+      "description": "3.3 焦点与关闭 widget 测试：打开后焦点进入列表、Esc 关闭后焦点归还触发控件、点击遮罩关闭且不触发任何条目；flutter test 通过",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "dea4d01e9409ede6bf811437debc214dcdc50ebf9672b744fe8e40558622bc3d",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "7f94068f-6f96-4b02-8104-f8fe2594215c",
+          "kind": "test",
+          "source": "executed",
+          "summary": "焦点与关闭测试 3/3 通过：打开后焦点进入列表过滤框、Esc 关闭后焦点归还触发控件、点击遮罩关闭且不触发任何条目 onActivate",
+          "command": "flutter test test/starry_action_surface_test.dart --name \"focus and dismiss\"",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "passed": 3,
+          "recordedAt": "2026-10-14T15:55:41.643Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:55:49.882Z"
+    },
+    "task_cd6e2040e24add06ceb36786": {
+      "id": "task_cd6e2040e24add06ceb36786",
+      "taskKey": "3.4",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "3. 统一表面与子页导航"
+      ],
+      "ordinal": 9,
+      "description": "3.4 子页 widget 测试：带 children 的条目在同一面板内打开二级列表并出现返回按钮、返回回到主列表、子页时 Esc 先出栈再按一次才关闭、两种形态行为一致；flutter test 通过",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "477317cca8f796323306726301ce0a595331a6e1afc2b6069c5df874bf0692f4",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "5b10293a-6bfd-445b-a42a-8fa414c6135c",
+          "kind": "test",
+          "source": "executed",
+          "summary": "子页导航测试 4/4 通过：带 children 条目在同一面板内打开二级列表并出现返回按钮、返回按钮回到主列表、子页时 Esc 先出栈再按一次才关闭、锚定浮层与底部面板两种形态行为一致",
+          "command": "flutter test test/starry_action_surface_test.dart --name \"subpage navigation\"",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "passed": 4,
+          "recordedAt": "2026-10-14T15:56:23.548Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:56:32.238Z"
+    },
+    "task_4c7f2074fc32fbaa004dc8b6": {
+      "id": "task_4c7f2074fc32fbaa004dc8b6",
+      "taskKey": "4.1",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "4. 导出、文档与全量验证"
+      ],
+      "ordinal": 10,
+      "description": "4.1 lib/starry_ui.dart barrel 追加三个新文件 export，消费方可从 package:starry_ui/starry_ui.dart 直接引用",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "f8c9b1b65dce6534d32c1198c7b8ef04821ee17da1e06a94ed720b8d75d528d1",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "59a27e0d-61fc-443d-97fe-d3af1a8446c6",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "lib/starry_ui.dart barrel 已追加 export src/components/starry_action_item.dart、starry_action_list.dart、starry_action_surface.dart（lines 32-34）；flutter analyze 全仓 No issues found，消费方可从 package:starry_ui/starry_ui.dart 直接引用三个新公开符号",
+          "command": "flutter analyze",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "recordedAt": "2026-10-14T15:57:09.022Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:57:18.498Z"
+    },
+    "task_fc62bdcd909702545de69309": {
+      "id": "task_fc62bdcd909702545de69309",
+      "taskKey": "4.2",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "4. 导出、文档与全量验证"
+      ],
+      "ordinal": 11,
+      "description": "4.2 为三个组件写 Widgetbook use-case（All Variants + Playground），运行 dart run build_runner build --delete-conflicting-outputs 并确认 main.directories.g.dart 重新生成",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "59d58f5840d1b6d2eb1f02e17fb2ade258fdaa14beb112b7ef1b59db1c34d2fb",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "12db49b9-5be1-4aad-92ae-3bee4c6ae73f",
+          "kind": "build",
+          "source": "executed",
+          "summary": "已为 StarryActionItem/StarryActionList/StarryActionSurface 写好 Widgetbook use-case（starry_action_list.usecase.dart、starry_action_surface.usecase.dart 含公开 demo widget StarryActionSurfaceDemo）；build_runner 重新生成 main.directories.g.dart，已确认含 StarryActionList / StarryActionSurfaceDemo 节点",
+          "command": "dart run build_runner build --delete-conflicting-outputs",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "recordedAt": "2026-10-14T15:57:49.851Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:57:58.796Z"
+    },
+    "task_9b47e06988484b7c802c4dc6": {
+      "id": "task_9b47e06988484b7c802c4dc6",
+      "taskKey": "4.3",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "4. 导出、文档与全量验证"
+      ],
+      "ordinal": 12,
+      "description": "4.3 starry_ui 全量 flutter analyze（No issues found）与 flutter test 全绿；只对新增文件执行 dart format，不跑全仓 format",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "bb49d44ac90ecf0a791b8f45586eece8d28e85bf3198703e69ebba03843ff7fe",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "8d376768-9064-463f-a271-5a86a99d14a8",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "全量 flutter analyze：No issues found（ran in 3.9s）",
+          "command": "flutter analyze",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "recordedAt": "2026-10-14T15:59:10.071Z"
+        },
+        {
+          "id": "20732e80-31f7-45ef-9af2-36e2879263b3",
+          "kind": "test",
+          "source": "executed",
+          "summary": "全量 flutter test：All tests passed!（374/374，含新增 starry_action_item/list/surface 共 21 个测试）",
+          "command": "flutter test",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "passed": 374,
+          "recordedAt": "2026-10-14T15:59:10.071Z"
+        },
+        {
+          "id": "5651e6a5-6346-435f-9726-9c153f1157ec",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "仅对新增/变更的 7 个文件做 dart format --set-exit-if-changed：Formatted 7 files (0 changed)，未跑全仓 format",
+          "command": "dart format --output=none --set-exit-if-changed lib/starry_ui.dart lib/src/components/starry_action_item.dart lib/src/components/starry_action_list.dart lib/src/components/starry_action_surface.dart test/starry_action_item_test.dart test/starry_action_list_test.dart test/starry_action_surface_test.dart",
+          "workingDirectory": "D:\\Starry-AI\\starry_ui",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "recordedAt": "2026-10-14T15:59:10.071Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T15:59:18.621Z"
+    },
+    "task_646318cd5279dc075b7a876f": {
+      "id": "task_646318cd5279dc075b7a876f",
+      "taskKey": "4.4",
+      "file": "openspec/changes/add-chat-action-surfaces-v1/tasks.md",
+      "sectionPath": [
+        "4. 导出、文档与全量验证"
+      ],
+      "ordinal": 13,
+      "description": "4.4 跨仓验证：主工程 D:\\Starry-AI\\starry 运行 flutter analyze --no-fatal-infos 通过，确认新公开 API 可被主工程解析",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "deb2162c660b3b6b694e4d9137382e0be3c087b5e350dae2c96122b4d6641eca",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "6f9d7428-6e86-42c6-aeac-ae4b3db7998f",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "主工程 flutter analyze --no-fatal-infos lib：226 个既有 info + 3 个既有 warning（session_open_coordinator.dart:133 invalid_null_aware_operator、session_topic_resolver.dart:1 unused_import、session_topic_resolver.dart:155 unnecessary_null_comparison），0 error；grep starry_action 无任何命中，新公开 API（StarryActionItem/StarryActionList/StarryActionSurface）可被主工程解析",
+          "command": "flutter analyze --no-fatal-infos lib",
+          "workingDirectory": "D:\\Starry-AI\\starry",
+          "workingDirectoryScope": "external",
+          "exitCode": 0,
+          "recordedAt": "2026-10-14T16:09:38.872Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-10-14T16:09:47.867Z"
+    }
+  },
+  "staleTaskIds": [],
+  "diagnostics": []
+}
