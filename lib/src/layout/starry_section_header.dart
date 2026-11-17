@@ -152,12 +152,17 @@ class StarrySectionHeader extends StatelessWidget {
     if (description != null) {
       children.add(
         Padding(
-          padding: EdgeInsets.fromLTRB(
-            tokens.spacing.s3,
-            0,
-            tokens.spacing.s3,
-            tokens.spacing.s3,
-          ),
+          padding: compact
+              ? EdgeInsets.only(
+                  top: tokens.spacing.s1,
+                  bottom: tokens.spacing.s2,
+                )
+              : EdgeInsets.fromLTRB(
+                  tokens.spacing.s3,
+                  0,
+                  tokens.spacing.s3,
+                  tokens.spacing.s3,
+                ),
           child: Text(
             description!,
             style: tokens.typography.bodySmall.textStyle.copyWith(

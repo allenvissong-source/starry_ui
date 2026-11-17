@@ -109,17 +109,22 @@ class StarryFormSection extends StatelessWidget {
     required this.title,
     required this.children,
     this.description,
+    this.compact = false,
     super.key,
   });
   final String title;
   final String? description;
   final List<Widget> children;
 
+  /// Tighter spacing for related rows such as permission toggles.
+  /// Field editors retain the regular form rhythm by default.
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
     return Padding(
-      padding: EdgeInsets.only(bottom: t.spacing.s6),
+      padding: EdgeInsets.only(bottom: compact ? t.spacing.s3 : t.spacing.s6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -143,7 +148,7 @@ class StarryFormSection extends StatelessWidget {
             ),
           ],
           for (final child in children) ...[
-            SizedBox(height: t.spacing.s4),
+            SizedBox(height: compact ? t.spacing.s2 : t.spacing.s4),
             child,
           ],
         ],

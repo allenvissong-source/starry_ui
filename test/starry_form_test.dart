@@ -3,6 +3,64 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:starry_ui/starry_ui.dart';
 
 void main() {
+  testWidgets('compact sections tighten row gaps without shrinking controls', (
+    tester,
+  ) async {
+    for (final compact in [false, true]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light(),
+          home: Scaffold(
+            body: StarryFormSection(
+              title: 'Permissions',
+              description: 'Choose access',
+              compact: compact,
+              children: [
+                SizedBox(
+                  key: const Key('first'),
+                  height: StarryTokens.light.controlMetrics.minTouchTarget,
+                ),
+                SizedBox(
+                  key: const Key('second'),
+                  height: StarryTokens.light.controlMetrics.minTouchTarget,
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      final first = tester.getRect(find.byKey(const Key('first')));
+      final second = tester.getRect(find.byKey(const Key('second')));
+      expect(
+        second.top - first.bottom,
+        compact ? StarryTokens.light.spacing.s2 : StarryTokens.light.spacing.s4,
+      );
+      expect(first.height, StarryTokens.light.controlMetrics.minTouchTarget);
+    }
+  });
+
+  testWidgets('compact section descriptions align with their heading', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: const Scaffold(
+          body: StarrySectionHeader(
+            compact: true,
+            title: 'Permissions',
+            description: 'Choose access',
+          ),
+        ),
+      ),
+    );
+    expect(
+      tester.getTopLeft(find.text('Choose access')).dx,
+      tester.getTopLeft(find.text('Permissions')).dx,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('a tall invalid field keeps its error message in view', (
     tester,
   ) async {
