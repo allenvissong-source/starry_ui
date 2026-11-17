@@ -79,6 +79,30 @@ class StarryTopBarActionItem {
   bool get isCustom => child != null;
 }
 
+/// Navigation and chrome supplied by the host route or workspace.
+///
+/// The host owns route history and the no-history destination. The toolbar
+/// owns layout, so workspace actions share its trailing strip instead of
+/// floating over page controls.
+class StarryPageTopBarScope extends InheritedWidget {
+  const StarryPageTopBarScope({
+    required super.child,
+    this.onBack,
+    this.rightActions = const <StarryTopBarActionItem>[],
+    super.key,
+  });
+
+  final VoidCallback? onBack;
+  final List<StarryTopBarActionItem> rightActions;
+
+  static StarryPageTopBarScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<StarryPageTopBarScope>();
+
+  @override
+  bool updateShouldNotify(StarryPageTopBarScope oldWidget) =>
+      onBack != oldWidget.onBack || rightActions != oldWidget.rightActions;
+}
+
 /// Starry UI page top bar.
 ///
 /// A fixed-height chrome header with a centered [title] (or [titleText]) and
@@ -138,8 +162,8 @@ class StarryPageTopBar extends StatelessWidget implements PreferredSizeWidget {
   /// Whether to inject a default back affordance at the start of the leading
   /// strip.
   ///
-  /// When `true` and the current route can be popped
-  /// ([Navigator.canPop] == true), a back arrow is prepended before
+  /// When `true` and the host supplies [StarryPageTopBarScope.onBack] or the
+  /// current Navigator can pop, a back arrow is prepended before
   /// [leftActions]. An explicit [leading] still overrides everything (matching
   /// the leading-precedence contract), so the default back button only appears
   /// when [leading] is null. Icons stay font-free: the arrow is a plain
@@ -204,18 +228,24 @@ class StarryPageTopBar extends StatelessWidget implements PreferredSizeWidget {
         (titleText != null
             ? Text(titleText!, overflow: TextOverflow.ellipsis)
             : null);
+    final scope = StarryPageTopBarScope.maybeOf(context);
+    final onBack = scope?.onBack;
 
     final List<Widget> leftWidgets;
     if (leading != null) {
       leftWidgets = <Widget>[leading!];
     } else {
       leftWidgets = <Widget>[
-        if (showDefaultBack && Navigator.of(context).canPop())
-          _buildDefaultBackAction(context),
+        if (showDefaultBack &&
+            (onBack != null || Navigator.of(context).canPop()))
+          _buildDefaultBackAction(context, onBack),
         ...leftActions.map(_buildAction),
       ];
     }
-    final rightWidgets = rightActions.map(_buildAction).toList(growable: false);
+    final rightWidgets = <StarryTopBarActionItem>[
+      ...rightActions,
+      ...?scope?.rightActions,
+    ].map(_buildAction).toList(growable: false);
 
     final leadingWidget = leftWidgets.isEmpty
         ? null
@@ -297,15 +327,16 @@ class StarryPageTopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   /// Builds the default back affordance injected when [showDefaultBack] is set
-  /// and the route can be popped. Uses a font-free [Icons.arrow_back_ios_new]
+  /// and the host supplies navigation or the route can be popped.
+  /// Uses a font-free [Icons.arrow_back_ios_new]
   /// glyph, the localized back tooltip and the shared [backHoverShift] motion,
   /// so it stays visually identical to a host-supplied back action.
-  Widget _buildDefaultBackAction(BuildContext context) {
+  Widget _buildDefaultBackAction(BuildContext context, VoidCallback? onBack) {
     return _buildAction(
       StarryTopBarActionItem(
         icon: const Icon(Icons.arrow_back_ios_new, size: 20),
         tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-        onPressed: () => Navigator.of(context).maybePop(),
+        onPressed: onBack ?? () => Navigator.of(context).maybePop(),
         motion: StarryTopBarIconMotion.backHoverShift,
       ),
     );
