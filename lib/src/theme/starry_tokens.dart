@@ -1,5 +1,6 @@
 import 'dart:ui' show lerpDouble;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 /// Starry design-system tokens carried as a [ThemeExtension].
@@ -402,7 +403,7 @@ class StarryTextStyleToken {
   double get heightFactor => lineHeight / size;
 
   /// Ready-to-use [TextStyle] with size + relative line height + font families
-  /// applied. Latin text uses [fontFamily]; CJK falls back to MiSans and emoji
+  /// applied. Text uses [fontFamily]; CJK and emoji use the platform families
   /// to Twemoji via [StarryTypography.fontFamilyFallback].
   TextStyle get textStyle => TextStyle(
     fontSize: size,
@@ -463,18 +464,26 @@ class StarryTypography {
   final StarryTextStyleToken labelSmall;
 
   /// Latin font family for display / headline / title ramp entries.
-  static const String fontFamilyDisplay = 'Outfit';
+  static const String fontFamilyDisplay = kIsWeb
+      ? 'Starry Sans Core'
+      : 'packages/starry_ui/Outfit';
 
   /// Latin font family for body / label ramp entries.
-  static const String fontFamilyBody = 'Inter';
+  static const String fontFamilyBody = kIsWeb
+      ? 'Starry Sans Core'
+      : 'packages/starry_ui/Inter';
 
   /// Emoji font family (color glyphs).
-  static const String fontFamilyEmoji = 'Twemoji';
+  static const String fontFamilyEmoji = kIsWeb
+      ? 'Twemoji'
+      : 'packages/starry_ui/Twemoji';
 
   /// CJK font family (single track, differentiated by weight only).
-  static const String fontFamilyCjk = 'MiSans';
+  static const String fontFamilyCjk = kIsWeb
+      ? 'Starry Sans Core'
+      : 'packages/starry_ui/MiSans';
 
-  /// Shared fallback chain: CJK glyphs resolve to MiSans, emoji to Twemoji.
+  /// Shared fallback chain uses the bundled CJK and emoji platform families.
   /// Applied to every ramp entry so mixed CN / EN / emoji text renders
   /// correctly regardless of the primary Latin family.
   static const List<String> fontFamilyFallback = <String>[

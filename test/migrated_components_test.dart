@@ -842,34 +842,46 @@ void main() {
   group('StarryTypography font tokens', () {
     test('display/title styles resolve to Outfit', () {
       const t = StarryTypography.standard;
-      expect(t.displayLarge.fontFamily, 'Outfit');
-      expect(t.titleLarge.fontFamily, 'Outfit');
-      expect(t.titleMedium.fontFamily, 'Outfit');
-      expect(StarryTypography.fontFamilyDisplay, 'Outfit');
+      expect(t.displayLarge.fontFamily, 'packages/starry_ui/Outfit');
+      expect(t.titleLarge.fontFamily, 'packages/starry_ui/Outfit');
+      expect(t.titleMedium.fontFamily, 'packages/starry_ui/Outfit');
+      expect(StarryTypography.fontFamilyDisplay, 'packages/starry_ui/Outfit');
     });
 
     test('body/label styles resolve to Inter', () {
       const t = StarryTypography.standard;
-      expect(t.bodyMedium.fontFamily, 'Inter');
-      expect(t.bodySmall.fontFamily, 'Inter');
-      expect(StarryTypography.fontFamilyBody, 'Inter');
+      expect(t.bodyMedium.fontFamily, 'packages/starry_ui/Inter');
+      expect(t.bodySmall.fontFamily, 'packages/starry_ui/Inter');
+      expect(StarryTypography.fontFamilyBody, 'packages/starry_ui/Inter');
     });
 
     test('textStyle carries CJK + emoji fallback in order', () {
       const t = StarryTypography.standard;
       final titleFallback = t.titleLarge.textStyle.fontFamilyFallback;
       final bodyFallback = t.bodyMedium.textStyle.fontFamilyFallback;
-      expect(titleFallback, containsAllInOrder(<String>['MiSans', 'Twemoji']));
-      expect(bodyFallback, containsAllInOrder(<String>['MiSans', 'Twemoji']));
-      expect(StarryTypography.fontFamilyCjk, 'MiSans');
-      expect(StarryTypography.fontFamilyEmoji, 'Twemoji');
+      expect(
+        titleFallback,
+        containsAllInOrder(<String>[
+          'packages/starry_ui/MiSans',
+          'packages/starry_ui/Twemoji',
+        ]),
+      );
+      expect(
+        bodyFallback,
+        containsAllInOrder(<String>[
+          'packages/starry_ui/MiSans',
+          'packages/starry_ui/Twemoji',
+        ]),
+      );
+      expect(StarryTypography.fontFamilyCjk, 'packages/starry_ui/MiSans');
+      expect(StarryTypography.fontFamilyEmoji, 'packages/starry_ui/Twemoji');
     });
 
     test('titleLarge textStyle applies Outfit family with fallback', () {
       final style = StarryTypography.standard.titleLarge.textStyle;
-      expect(style.fontFamily, 'Outfit');
-      expect(style.fontFamilyFallback, contains('MiSans'));
-      expect(style.fontFamilyFallback, contains('Twemoji'));
+      expect(style.fontFamily, 'packages/starry_ui/Outfit');
+      expect(style.fontFamilyFallback, contains('packages/starry_ui/MiSans'));
+      expect(style.fontFamilyFallback, contains('packages/starry_ui/Twemoji'));
     });
   });
 }

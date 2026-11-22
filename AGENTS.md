@@ -596,6 +596,10 @@ dart run build_runner build --delete-conflicting-outputs
    - **冻结 + 受控扩充(须获批)**:token 默认冻结;确有跨组件、可复用且设计已批准的新语义
      角色或新维度时,必须单独提案并获得用户确认,不能夹带在组件迁移中。经批准的扩充属受控例外,
      其对 `starry_tokens.dart` 的非零差异不视为污染,但须在本文件记录。
+   - **已批准的 Web 字体专项例外**:2026-11-19 用户批准保留 Flutter 并精简 Web 字体。
+     2026-11-20 用户进一步批准 Web 正文改为 Starry Sans Core，发布包移除 MiSans，
+     并清理原生重复字体及旧 Twemoji。原生统一使用本包字体，以 package family
+     引用；字号及字重不变。Web 消费方构建须应用主工程 `tools/web_fonts.py` 策略。
    - **已批准的受控扩充记录**:2026-07 经用户批准新增第 8 个 token 组 `controlMetrics`
      (`StarryControlMetrics`)——「交互控件本体固有尺寸」独立原子维度,与 `spacing`(间距)
      `radius`(圆角)正交。该维度经授权一次性做满成套刻度(高度 5 档 / 图标 5 档 / 描边 2 档

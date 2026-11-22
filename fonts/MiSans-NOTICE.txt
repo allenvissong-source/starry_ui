@@ -1,0 +1,12 @@
+Starry uses MiSans fonts.
+
+MiSans VF version 4.003
+Copyright © 2020-2023 Beijing Xiaomi Mobile Software Co., Ltd.
+
+Source: https://hyperos.mi.com/font
+License: MiSans Font Intellectual Property License Agreement
+Official agreement:
+https://hyperos.mi.com/font-download/MiSans%E5%AD%97%E4%BD%93%E7%9F%A5%E8%AF%86%E4%BA%A7%E6%9D%83%E8%AE%B8%E5%8F%AF%E5%8D%8F%E8%AE%AE.pdf
+
+The font is bundled without modification. The official agreement is preserved
+in MiSans-LICENSE.pdf; MiSans-LICENSE.txt contains its extracted text.
