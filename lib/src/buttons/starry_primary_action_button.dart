@@ -10,8 +10,7 @@ import 'starry_button.dart';
 /// so call sites express intent ("this is *the* page action") without repeating
 /// the `variant / fullWidth / pressScale` triad.
 ///
-/// Unlike the legacy main-app control it does **not** hand-tune a 52px height —
-/// the height folds to [StarryButton]'s token `controlHeight` (48) so every
+/// The height uses [StarryButton]'s token `controlHeight` (48) so every
 /// button in the system shares one vertical rhythm. All color / radius /
 /// typography come from the underlying token-driven [StarryButton].
 class StarryPrimaryActionButton extends StatelessWidget {

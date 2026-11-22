@@ -26,8 +26,7 @@ enum StarrySearchInputSize {
   compact,
 }
 
-/// Token-driven search input consolidating the legacy `SearchInput`
-/// (debounce / clear) and `SearchCapsule` (search button / focus ring).
+/// Token-driven search input with debounce, clearing and a focus ring.
 ///
 /// Behavior:
 ///   * [onChanged] fires after [debounceMs] of inactivity.

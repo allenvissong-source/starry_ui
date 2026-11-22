@@ -23,7 +23,7 @@ class StarrySlidableDrawer extends StatelessWidget {
     this.backgroundColor,
   });
 
-  /// Default per-action chip width. Matches the legacy drawer's `actionWidth`.
+  /// Default per-action chip width.
   static const double _defaultActionWidth = 64;
 
   final Widget child;

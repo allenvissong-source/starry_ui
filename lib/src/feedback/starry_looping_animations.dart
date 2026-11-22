@@ -342,8 +342,8 @@ class _StarryScalingWidgetState
 /// A thin, token-driven composition of [StarryScalingWidget] (scale breathing)
 /// and [StarryPulsingWidget] (opacity breathing) rendering a brand-colored
 /// circle. The dot diameter comes from `indicator.dotMd`; the default
-/// scale/opacity ranges reproduce the legacy `BreathingDot` (scale 0.7→1.1,
-/// opacity 0.5→1.0) but are exposed as parameters. An optional [glow] (default
+/// scale/opacity ranges are 0.7→1.1 and 0.5→1.0, respectively, and are exposed
+/// as parameters. An optional [glow] (default
 /// off) layers a token-derived halo — the `elevation.level2` shadow geometry
 /// recolored to `semantic.brand` — so nothing is hardcoded.
 class StarryBreathingDot extends StatelessWidget {

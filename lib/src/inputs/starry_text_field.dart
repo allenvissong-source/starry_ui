@@ -13,10 +13,7 @@ enum StarryTextFieldState { none, success, warning, error }
 /// Token-driven text field with a brand focus-shell, validation, counter,
 /// leading/trailing slots, accessible clearing and native multi-line growth.
 ///
-/// Consolidates the legacy `AppTextField` (validation / counter / clear) and
-/// `AiloreInputField` (brand shell / slots / auto-expand / formatters) into a
-/// single greenfield component. All colors, sizes, motion and typography come
-/// from [StarryTokens]; the field carries no hardcoded styling.
+/// Colors, sizes, motion and typography come from [StarryTokens].
 class StarryTextField extends StatefulWidget {
   const StarryTextField({
     super.key,
