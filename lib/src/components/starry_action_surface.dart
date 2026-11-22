@@ -35,13 +35,14 @@ class StarryActionSurface {
   // One anchored panel per OverlayState: opening a new panel dismisses only
   // the entry registered for THIS overlay, so other overlays/windows are
   // never cancelled by a panel they did not host.
-  static final Map<OverlayState, OverlayEntry> _anchoredByOverlay = {};
+  static final Map<
+    OverlayState,
+    ({VoidCallback close, FocusNode? previousFocus})
+  >
+  _anchoredByOverlay = {};
 
   static void _dismissInOverlay(OverlayState overlay) {
-    final entry = _anchoredByOverlay.remove(overlay);
-    if (entry != null && entry.mounted) {
-      entry.remove();
-    }
+    _anchoredByOverlay[overlay]?.close();
   }
 
   /// Opens the surface. [anchorRect] is the trigger rect in global
@@ -75,10 +76,10 @@ class StarryActionSurface {
     /// Ignored by the internal autofocus/Plus path.
     StarryActionListController? externalController,
 
-    /// Optional live root-items source. When non-null, the panel rebuilds its
-    /// root level from the latest value without reopening; the sub-page stack
-    /// and its active content are left untouched. Null keeps the static
-    /// snapshot behavior.
+    /// Optional live root-items source. When non-null, the panel refreshes the
+    /// root and open sub-pages from the latest tree without reopening. A removed,
+    /// disabled or childless parent returns navigation to its valid ancestor.
+    /// Null keeps the static snapshot behavior.
     ValueListenable<List<StarryActionItem>>? itemsListenable,
 
     /// Optional root item id the panel opens directly at (its children render
@@ -106,11 +107,11 @@ class StarryActionSurface {
     final useSheet =
         sizeClass == StarryWindowSizeClass.compact ||
         MediaQuery.sizeOf(context).width < kStarryActionSurfaceWidth * 2;
-    Future<void> restoreFocus() async {
+    Future<void> restoreFocus(FocusNode? target) async {
       // Wait a frame so the list's autofocus has been released by the time we
       // give focus back.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        previousFocus?.requestFocus();
+        target?.requestFocus();
       });
     }
 
@@ -150,23 +151,27 @@ class StarryActionSurface {
           );
         },
       );
-      await restoreFocus();
+      await restoreFocus(previousFocus);
     } else {
       final overlay = Overlay.of(context);
+      final previous = _anchoredByOverlay[overlay];
+      final restoreTarget = previous == null
+          ? previousFocus
+          : previous.previousFocus;
       final closed = Completer<void>();
       late final OverlayEntry entry;
-      void close() {
-        final mine = identical(_anchoredByOverlay[overlay], entry);
+      late final VoidCallback close;
+      close = () {
+        final mine = identical(_anchoredByOverlay[overlay]?.close, close);
         if (!mine) {
-          // Stale handle: a newer panel owns this overlay. Finish only this own
-          // awaiter so the caller does not hang; never remove the newer entry.
           if (!closed.isCompleted) closed.complete();
           return;
         }
         _anchoredByOverlay.remove(overlay);
-        if (entry.mounted) entry.remove();
+        entry.remove();
+        entry.dispose();
         if (!closed.isCompleted) closed.complete();
-      }
+      };
 
       // Dismiss only the panel hosted by THIS overlay; other overlays/windows
       // keep their own surface open.
@@ -213,9 +218,14 @@ class StarryActionSurface {
         ),
       );
       overlay.insert(entry);
-      _anchoredByOverlay[overlay] = entry;
+      _anchoredByOverlay[overlay] = (
+        close: close,
+        previousFocus: restoreTarget,
+      );
       await closed.future;
-      await restoreFocus();
+      if (!_anchoredByOverlay.containsKey(overlay)) {
+        await restoreFocus(restoreTarget);
+      }
     }
   }
 }
@@ -292,21 +302,24 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
     }
   }
 
-  /// Republishes the root level on a live update and re-resolves each open
-  /// sub-page's children from the fresh root list; stack depth, titles and the
-  /// current level are preserved rather than rebuilt over.
+  /// Re-resolves open pages against the current tree and drops invalid frames.
   void _onItemsChanged() {
     if (!mounted) return;
     setState(() {
       _stack[0] = widget.itemsListenable!.value;
       for (var frame = 1; frame < _stack.length; frame++) {
         final parentId = _stackParentIds[frame - 1];
-        for (final parent in _stack[frame - 1]) {
-          if (parent.id == parentId && parent.hasChildren) {
-            _stack[frame] = parent.children!;
-            break;
-          }
+        final parent = _stack[frame - 1]
+            .where((item) => item.id == parentId)
+            .firstOrNull;
+        if (parent == null || parent.disabled || !parent.hasChildren) {
+          _stack.removeRange(frame, _stack.length);
+          _stackTitles.removeRange(frame - 1, _stackTitles.length);
+          _stackParentIds.removeRange(frame - 1, _stackParentIds.length);
+          break;
         }
+        _stack[frame] = parent.children!;
+        _stackTitles[frame - 1] = parent.title;
       }
     });
   }
@@ -322,6 +335,13 @@ class _StarryActionPanelState extends State<_StarryActionPanel> {
       widget.externalFilterQuery != null && !_isSubPage;
 
   void _handleItemSelected(StarryActionItem item) {
+    final currentItem = _stack.last.any((current) => identical(current, item));
+    final currentPrimary =
+        !_isSubPage &&
+        widget.primaryActions.any((current) => identical(current, item));
+    if (!mounted || item.disabled || (!currentItem && !currentPrimary)) {
+      return;
+    }
     if (item.hasChildren) {
       setState(() {
         _stack.add(item.children!);
