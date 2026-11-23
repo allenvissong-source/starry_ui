@@ -1,0 +1,178 @@
+{
+  "version": 4,
+  "tasksRevision": "0afb023710bde85ffdf461318beb66a310a0eb8ff749d34cad9cc6b64e1e0de0",
+  "reconciledAt": "2026-09-23T08:50:41.893Z",
+  "tasks": {
+    "task_f0a2306589c159df67f03d46": {
+      "id": "task_f0a2306589c159df67f03d46",
+      "taskKey": "1.1",
+      "file": "openspec/changes/add-generated-files-policy-and-ci-gate/tasks.md",
+      "sectionPath": [
+        "Implementation Tasks",
+        "1. AGENTS.md policy update"
+      ],
+      "ordinal": 1,
+      "description": "1.1 Add a \"Generated files policy\" subsection to AGENTS.md documenting: which files are generated (`lib/main.directories.g.dart`), the generation command (`dart run build_runner build --delete-conflicting-outputs`), tracking status (tracked in git), and rationale. Verify by reading the updated section.",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "54e6915242a8906ca9d513470f986f7141a8c82edad20a1b81ccf51021c47f61",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "cfbeb17a-b754-4fc9-a464-d13d0aa9906a",
+          "kind": "review",
+          "source": "executed",
+          "summary": "AGENTS.md §5.1 '生成文件策略(硬性)' added with table documenting main.directories.g.dart as generated/tracked, regeneration command, and CI gate reference.",
+          "recordedAt": "2026-09-23T08:47:36.114Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-23T08:47:44.699Z"
+    },
+    "task_e8bbe87624d06cb967aabc0c": {
+      "id": "task_e8bbe87624d06cb967aabc0c",
+      "taskKey": "2.1",
+      "file": "openspec/changes/add-generated-files-policy-and-ci-gate/tasks.md",
+      "sectionPath": [
+        "Implementation Tasks",
+        "2. .gitignore comment"
+      ],
+      "ordinal": 2,
+      "description": "2.1 Add an explicit comment in .gitignore near the Flutter/Dart section stating that `lib/main.directories.g.dart` is intentionally tracked despite being generated. Verify by reading the comment.",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "fd61165d1420b152a192d1f26886c0f51be62f04e4606f69e48cfa502a3bf934",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "f0072250-e67e-42b7-b702-1757912327f1",
+          "kind": "review",
+          "source": "executed",
+          "summary": ".gitignore comment added in Flutter/Dart section: explicitly states main.directories.g.dart is intentionally tracked, references AGENTS.md §5.1 and CI workflow.",
+          "recordedAt": "2026-09-23T08:48:12.629Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-23T08:48:20.391Z"
+    },
+    "task_bbd4dbe262742f71c6ae0f04": {
+      "id": "task_bbd4dbe262742f71c6ae0f04",
+      "taskKey": "3.1",
+      "file": "openspec/changes/add-generated-files-policy-and-ci-gate/tasks.md",
+      "sectionPath": [
+        "Implementation Tasks",
+        "3. CI workflow"
+      ],
+      "ordinal": 3,
+      "description": "3.1 Create `.github/workflows/generated-files-check.yml` with steps: checkout, setup Flutter, `flutter pub get`, `dart run build_runner build --delete-conflicting-outputs`, `git diff --exit-code`. Verify the YAML is syntactically valid.",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "c96531433f2bd00edca5fe4c30068e5398173820cddf44cf089a7883c8665d08",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "7bef7e50-0357-4e5d-a79e-8ec8fb040009",
+          "kind": "review",
+          "source": "executed",
+          "summary": ".github/workflows/generated-files-check.yml created with checkout, setup Flutter (subosito/flutter-action@v2), flutter pub get, dart run build_runner build --delete-conflicting-outputs, and git diff --exit-code steps.",
+          "recordedAt": "2026-09-23T08:48:45.792Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-23T08:48:53.424Z"
+    },
+    "task_deb9dba93953a06164600923": {
+      "id": "task_deb9dba93953a06164600923",
+      "taskKey": "4.1",
+      "file": "openspec/changes/add-generated-files-policy-and-ci-gate/tasks.md",
+      "sectionPath": [
+        "Implementation Tasks",
+        "4. Verification"
+      ],
+      "ordinal": 4,
+      "description": "4.1 Run `dart run build_runner build --delete-conflicting-outputs` and then `git diff --exit-code` — verify exit code 0 (no drift).",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "7c164b751ea64f2e1623ed76e32b19e3224bf3045a70db2142c3cac1cf2b74b9",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "8dae617d-15b4-404d-902b-4b6c207e022b",
+          "kind": "build",
+          "source": "executed",
+          "summary": "build_runner completed in 7s (53 outputs). git diff showed zero changes to lib/main.directories.g.dart — generated file is fully reproducible from committed source annotations.",
+          "command": "dart run build_runner build --delete-conflicting-outputs && git diff --exit-code",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T08:49:23.148Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-23T08:49:30.201Z"
+    },
+    "task_0e8aa5697e629ceec578eb2f": {
+      "id": "task_0e8aa5697e629ceec578eb2f",
+      "taskKey": "4.2",
+      "file": "openspec/changes/add-generated-files-policy-and-ci-gate/tasks.md",
+      "sectionPath": [
+        "Implementation Tasks",
+        "4. Verification"
+      ],
+      "ordinal": 5,
+      "description": "4.2 Run `dart analyze` — verify zero errors.",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "e4151de143c0b626e036c6fd7bdeb7b85476c01cf055000107b7c2f2b16cda00",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "b5e4b840-62dd-4a7a-a201-bd865c00b28b",
+          "kind": "analysis",
+          "source": "executed",
+          "summary": "dart analyze: No issues found. Exit code 0.",
+          "command": "dart analyze",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "recordedAt": "2026-09-23T08:49:59.068Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-23T08:50:06.580Z"
+    },
+    "task_c01d0de37648b5a9279d7183": {
+      "id": "task_c01d0de37648b5a9279d7183",
+      "taskKey": "4.3",
+      "file": "openspec/changes/add-generated-files-policy-and-ci-gate/tasks.md",
+      "sectionPath": [
+        "Implementation Tasks",
+        "4. Verification"
+      ],
+      "ordinal": 6,
+      "description": "4.3 Run `dart test` — verify all tests pass.",
+      "sourceClaim": "completed",
+      "sourceFingerprint": "78ac41a78891ac399bb71c6c34cc023da9eefd59bc4a4ac1f7c3a5cfbb8dc13a",
+      "state": "completed",
+      "evidence": [
+        {
+          "id": "3e102a40-e86e-40e7-b2d3-2b98727d470e",
+          "kind": "test",
+          "source": "executed",
+          "summary": "flutter test: All 341 tests passed. Exit code 0.",
+          "command": "flutter test",
+          "workingDirectory": ".",
+          "workingDirectoryScope": "workspace",
+          "exitCode": 0,
+          "passed": 341,
+          "recordedAt": "2026-09-23T08:50:33.875Z"
+        }
+      ],
+      "evidenceCorrections": [],
+      "reconciliation": "matched",
+      "updatedAt": "2026-09-23T08:50:41.893Z"
+    }
+  },
+  "staleTaskIds": [],
+  "diagnostics": []
+}

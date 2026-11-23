@@ -1,0 +1,318 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:starry_ui/starry_ui.dart';
+
+// Internal-only primitives, tested via their implementation libraries.
+import 'package:starry_ui/src/media/starry_asset_card.dart';
+
+Widget _host(Widget child) {
+  return MaterialApp(
+    theme: AppTheme.light(),
+    home: Scaffold(body: Center(child: child)),
+  );
+}
+
+void main() {
+  testWidgets('switch label wraps and toggles in a narrow column', (
+    tester,
+  ) async {
+    var value = false;
+    const label = 'I reviewed the public content, dependencies and scope.';
+    await tester.pumpWidget(
+      _host(
+        SizedBox(
+          width: 240,
+          child: StatefulBuilder(
+            builder: (context, update) => StarrySwitch(
+              value: value,
+              label: label,
+              onChanged: (next) => update(() => value = next),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.text(label)).height, greaterThan(20));
+    await tester.tap(find.text(label));
+    await tester.pumpAndSettle();
+    expect(value, isTrue);
+  });
+
+  testWidgets('disabled switch label never toggles', (tester) async {
+    await tester.pumpWidget(
+      _host(const StarrySwitch(value: false, label: 'Disabled')),
+    );
+    await tester.tap(find.text('Disabled'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<StarrySwitch>(find.byType(StarrySwitch)).value,
+      isFalse,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('StarrySettingsTile.navigation renders and fires onTap', (
+    tester,
+  ) async {
+    var tapped = 0;
+    await tester.pumpWidget(
+      _host(
+        StarrySettingsTile.navigation(
+          title: '账号管理',
+          subtitle: '管理你的账号',
+          onTap: () => tapped++,
+        ),
+      ),
+    );
+    expect(find.text('账号管理'), findsOneWidget);
+    expect(find.text('管理你的账号'), findsOneWidget);
+    await tester.tap(find.text('账号管理'));
+    await tester.pumpAndSettle();
+    expect(tapped, 1);
+  });
+
+  testWidgets('StarrySettingsTile.value hides the chevron when read-only', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const StarrySettingsTile.value(title: '最后摘要时间', trailingText: '尚无摘要'),
+      ),
+    );
+    expect(find.text('尚无摘要'), findsOneWidget);
+    expect(
+      find.byIcon(Icons.chevron_right_rounded),
+      findsNothing,
+      reason: 'a row with no activation handler must not imply navigation',
+    );
+  });
+
+  testWidgets('StarrySettingsTile.value keeps the chevron when tappable', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        StarrySettingsTile.value(
+          title: '连接',
+          trailingText: '火山方舟',
+          onTap: () {},
+        ),
+      ),
+    );
+    expect(find.byIcon(Icons.chevron_right_rounded), findsOneWidget);
+  });
+
+  testWidgets('StarrySettingsTile.toggle drives the switch', (tester) async {
+    var value = false;
+    await tester.pumpWidget(
+      _host(
+        StatefulBuilder(
+          builder: (context, setState) => StarrySettingsTile.toggle(
+            title: '深色模式',
+            value: value,
+            onChanged: (v) => setState(() => value = v),
+          ),
+        ),
+      ),
+    );
+    expect(find.byType(StarrySwitch), findsOneWidget);
+    expect(value, isFalse);
+    // The switch sits under IgnorePointer; the row handles the toggle.
+    await tester.tap(find.text('深色模式'));
+    await tester.pumpAndSettle();
+    expect(value, isTrue);
+  });
+
+  testWidgets(
+    'StarrySettingsTile.toggle keeps the switch at the right edge on desktop',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        _host(
+          StarrySettingsTile.toggle(
+            title: '自动启动',
+            value: false,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tileRect = tester.getRect(find.byType(StarrySettingsTile));
+      final switchRect = tester.getRect(find.byType(StarrySwitch));
+      // s4 = 16px horizontal content padding; the control hugs the right edge.
+      expect(
+        (switchRect.right - (tileRect.right - 16)).abs(),
+        lessThanOrEqualTo(3.0),
+      );
+      // It must sit in the right half, not the row center.
+      expect(switchRect.center.dx, greaterThan(tileRect.right - 120));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'StarrySettingsTile.toggle right-aligns without overflow on narrow width',
+    (tester) async {
+      tester.view.physicalSize = const Size(360, 720);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        _host(
+          StarrySettingsTile.toggle(
+            title: '自动更新',
+            value: true,
+            onChanged: (_) {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final tileRect = tester.getRect(find.byType(StarrySettingsTile));
+      final switchRect = tester.getRect(find.byType(StarrySwitch));
+      expect(
+        (switchRect.right - (tileRect.right - 16)).abs(),
+        lessThanOrEqualTo(3.0),
+      );
+      expect(switchRect.right, lessThanOrEqualTo(tileRect.right));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('StarryGroupCard renders children with dividers', (tester) async {
+    await tester.pumpWidget(
+      _host(
+        StarryGroupCard(
+          elevated: true,
+          children: const [
+            StarrySettingsTile(title: 'A'),
+            StarrySettingsTile(title: 'B'),
+          ],
+        ),
+      ),
+    );
+    expect(find.text('A'), findsOneWidget);
+    expect(find.text('B'), findsOneWidget);
+  });
+
+  testWidgets('StarryGroupAction fires onTap', (tester) async {
+    var tapped = 0;
+    await tester.pumpWidget(
+      _host(
+        StarryGroupCard(
+          children: [
+            StarryGroupAction(label: '退出登录', onPressed: () => tapped++),
+          ],
+        ),
+      ),
+    );
+    expect(find.text('退出登录'), findsOneWidget);
+    await tester.tap(find.text('退出登录'));
+    await tester.pumpAndSettle();
+    expect(tapped, 1);
+  });
+
+  testWidgets('StarrySectionHeader renders title, description and child', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const StarrySectionHeader(
+          title: '通用',
+          description: '常用设置项',
+          child: Text('slot'),
+        ),
+      ),
+    );
+    expect(find.text('通用'), findsOneWidget);
+    expect(find.text('常用设置项'), findsOneWidget);
+    expect(find.text('slot'), findsOneWidget);
+  });
+
+  testWidgets('StarrySectionHeader muted tone renders title', (tester) async {
+    await tester.pumpWidget(
+      _host(
+        const StarrySectionHeader(
+          title: '高级',
+          tone: StarrySectionHeaderTone.muted,
+        ),
+      ),
+    );
+    expect(find.text('高级'), findsOneWidget);
+  });
+
+  testWidgets('StarryAssetCard empty state renders icon and title, taps', (
+    tester,
+  ) async {
+    var tapped = 0;
+    await tester.pumpWidget(
+      _host(
+        SizedBox(
+          width: 160,
+          height: 160,
+          child: StarryAssetCard(
+            title: '我的角色',
+            emptyIcon: Icons.image_outlined,
+            onTap: () => tapped++,
+          ),
+        ),
+      ),
+    );
+    expect(find.text('我的角色'), findsOneWidget);
+    expect(find.byIcon(Icons.image_outlined), findsOneWidget);
+    await tester.tap(find.byType(StarryAssetCard));
+    await tester.pumpAndSettle();
+    expect(tapped, 1);
+  });
+
+  testWidgets('StarryReferenceCard renders title, typeLabel and remove', (
+    tester,
+  ) async {
+    var removed = 0;
+    await tester.pumpWidget(
+      _host(
+        SizedBox(
+          width: 280,
+          child: StarryReferenceCard(
+            title: '参考文档',
+            description: '引用描述',
+            typeLabel: 'PDF',
+            onRemove: () => removed++,
+          ),
+        ),
+      ),
+    );
+    expect(find.text('参考文档'), findsOneWidget);
+    expect(find.text('引用描述'), findsOneWidget);
+    expect(find.text('PDF'), findsOneWidget);
+    expect(find.byType(StarryTag), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+    expect(removed, 1);
+  });
+
+  testWidgets('StarrySegmentedControl switches segments (N=4)', (tester) async {
+    var index = 0;
+    await tester.pumpWidget(
+      _host(
+        StatefulBuilder(
+          builder: (context, setState) => StarrySegmentedControl(
+            labels: const ['全部', '图片', '文本', '音频'],
+            selectedIndex: index,
+            onChanged: (i) => setState(() => index = i),
+          ),
+        ),
+      ),
+    );
+    expect(find.text('全部'), findsOneWidget);
+    expect(find.text('音频'), findsOneWidget);
+    await tester.tap(find.text('文本'));
+    await tester.pumpAndSettle();
+    expect(index, 2);
+  });
+}

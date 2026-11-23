@@ -1,0 +1,58 @@
+# Miscellaneous
+*.class
+*.log
+*.obj
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# NOTE: lib/main.directories.g.dart is a build_runner-generated file but is
+# intentionally TRACKED in git (see AGENTS.md §5.1). Do NOT add a *.g.dart
+# exclusion here. CI verifies reproducibility via
+# .github/workflows/generated-files-check.yml.
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Local diagnostics / scratch (do not commit)
+.diag/
+.wb_shot1.jpeg
+*.wb_shot*.jpeg
+run_wb.ps1
+.commit_msg_tmp.txt

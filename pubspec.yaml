@@ -1,0 +1,49 @@
+name: starry_ui
+description: "Shared Flutter design-system package for Starry: Starry* widgets, StarryTokens theme extension, bundled fonts, and a Widgetbook component catalogue."
+publish_to: 'none'
+version: 0.1.1-dev
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  emoji_regex: ^0.0.5
+  flutter:
+    sdk: flutter
+  flutter_staggered_grid_view: ^0.7.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  widgetbook: ^3.23.0
+  widgetbook_annotation: ^3.11.0
+  widgetbook_generator: ^3.24.0
+  build_runner: ^2.15.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/illustrations/states/empty/no_content.webp
+    - fonts/Inter-LICENSE.txt
+    - fonts/Outfit-LICENSE.txt
+    - fonts/MiSans-LICENSE.txt
+    - fonts/MiSans-LICENSE.pdf
+    - fonts/MiSans-NOTICE.txt
+    - fonts/Twemoji-Mozilla-LICENSE.txt
+    - fonts/Twemoji-Mozilla-NOTICE.txt
+    - fonts/Apache-2.0.txt
+    - fonts/CC-BY-4.0.txt
+  fonts:
+    - family: Outfit
+      fonts:
+        - asset: fonts/Outfit-VF.ttf
+    - family: Inter
+      fonts:
+        - asset: fonts/Inter-VF.ttf
+    - family: MiSans
+      fonts:
+        - asset: fonts/MiSans-VF.ttf
+    - family: Twemoji
+      fonts:
+        - asset: fonts/Twemoji.ttf

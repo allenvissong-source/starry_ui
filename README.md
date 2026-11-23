@@ -1,0 +1,141 @@
+# starry_ui
+
+Shared Flutter design-system package for the Starry product family.
+
+## What it contains
+
+- Every public `Starry*` widget (buttons, inputs, tags, feedback, layout, navigation, media,
+  interactions, text, and card / surface / control-shell container components).
+- The `StarryTokens` theme extension family: colors, spacing, radius, motion, and opacity tokens.
+- Bundled variable fonts (Outfit, Inter, MiSans) and the Twemoji emoji font.
+- Bundled compressed illustrations for product states.
+- A Widgetbook component catalogue (`*.usecase.dart` files) that documents the public widgets
+  visually.
+
+Bundled fonts retain their own licenses in `fonts/`: Inter and Outfit use
+SIL OFL 1.1; Twemoji Mozilla v0.7.0 uses Apache-2.0 for code and CC-BY-4.0 for
+artwork. MiSans uses Xiaomi's dedicated agreement, which permits distribution
+with applications but prohibits standalone redistribution and modification of
+the font. These fonts are not covered by a license for Starry's own code.
+
+## Boundary
+
+- Consumed by `starry` through a `path: ../starry_ui` dependency.
+- One-way dependency rule: this package must never import `package:starry/`.
+- **Public API surface = the barrel.** The only supported entry point is
+  `package:starry_ui/starry_ui.dart` (`lib/starry_ui.dart`); whatever it exports is the stable
+  public contract. Everything under `lib/src/` is internal implementation.
+- Consumers must never import `package:starry_ui/src/...` directly. A component that still ships
+  only under `lib/src/` (implementation, tests, and `*.usecase.dart` may all exist) is internal-only
+  by design; it becomes public only when its `export` line is added to the barrel.
+- Colors and spacing come from tokens; hardcoded literals are gated by `custom_lint` rules plus
+  repo checkers in the host application.
+
+## Usage
+
+```yaml
+dependencies:
+  starry_ui:
+    path: ../starry_ui
+```
+
+### Illustrated empty states
+
+```dart
+StarryEmptyState(
+  illustration: StarryIllustration.noContent,
+  title: translations.noContent,
+)
+```
+
+The transparent WebP is bundled in this package (768 × 768, about 144 KiB).
+Copy is real text below the image, supplied and localized by the host. Artwork
+is decorative for accessibility, scales to the available space, and retains
+its square proportions. The component scrolls in short windows with large text.
+Use `noContent` only after a successful empty load; errors, sign-in prompts,
+and search misses keep their own icons and messages. Omitting `illustration`
+preserves the default icon. `icon` and `illustration` are mutually exclusive.
+
+### Tables and forms
+
+`StarryDataTable<T>` takes typed rows, a unique stable `rowKey`, and
+`StarryDataColumn<T>` definitions. A column's optional `compare` enables sorting.
+The table paginates locally (`pageSize: 10` by default); callers own filtering and
+remote requests. It shares cells and actions between aligned wide columns and
+labelled narrow rows, and provides `loading`, `error`, and `empty` states.
+Wide rows share a uniform token-derived height, centered contents, and the
+same column padding as the header. Text supports two lines; the shared row
+height grows with accessibility text scaling. Use `StarryDataTableAction`
+for row operations: its label aligns with the cell while retaining the
+standard touch target. Place the table inside the page's scroll view.
+Set `maxLines: 1` on `SelectableText` cells containing IDs so their editable
+text area occupies one line and centers alongside ordinary text.
+
+```dart
+StarryDataTable<String>(
+  rows: applications,
+  rowKey: (name) => name,
+  empty: const Text('No applications'),
+  columns: [
+    StarryDataColumn(
+      label: 'Application',
+      compare: (a, b) => a.compareTo(b),
+      cellBuilder: (context, name) => Text(name),
+    ),
+  ],
+)
+```
+
+`StarryForm` wraps Flutter's form lifecycle. Keep a
+`GlobalKey<StarryFormState>` in the owning state and call `validate()` before
+`save()`. Validation scrolls the first invalid field into view and focuses its
+optional `focusNode`. `StarryFormSection` groups fields without nested surfaces.
+`StarryFormField<T>` supplies a label, helper/error message and
+`FormFieldState<T>` to any input builder.
+
+```dart
+StarryFormField<String>(
+  label: 'Name',
+  initialValue: nameController.text,
+  focusNode: nameFocus,
+  validator: (value) =>
+      value?.trim().isNotEmpty == true ? null : 'Enter a name',
+  builder: (field) => StarryTextField(
+    controller: nameController,
+    focusNode: nameFocus,
+    onChanged: field.didChange,
+    validationState: field.hasError
+        ? StarryTextFieldState.error
+        : StarryTextFieldState.none,
+  ),
+)
+```
+
+The caller owns and disposes controllers/focus nodes. If using `reset()` with
+an external controller, synchronize it in the field's `onReset` callback.
+
+### Content composers
+
+`StarryMediaPicker` displays an empty add area, a scrollable media grid, removal
+and optional edit actions, and caller-defined source buttons. Place it inside
+a parent with a bounded height. Callers own picking, cropping, uploads, and
+media state; `mediaBuilder` supplies each preview.
+
+`StarryTextArea.composer` fills a bounded editor panel and places an optional
+toolbar beside its character counter. Set `maxLengthEnforcement` explicitly
+when a character count is advisory. Use `StarrySectionHeader(compact: true,
+accent: true)` for sections within an existing card.
+
+## Development
+
+```bash
+flutter pub get
+flutter analyze   # must report no issues
+flutter test      # includes source gates: no_padded_tap_target_in_inputs, button_density_guard, no_hardcoded_colors
+```
+
+The Widgetbook catalogue is generated by `build_runner` from `@UseCase` annotations:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
