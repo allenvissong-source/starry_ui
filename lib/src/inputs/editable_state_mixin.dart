@@ -23,6 +23,14 @@ mixin StarryEditableStateMixin<T extends StatefulWidget> on State<T> {
   late bool _ownsFocusNode;
   bool _focused = false;
 
+  /// Use the native editor's activation path, including when Android has
+  /// hidden the keyboard without moving focus away from the field.
+  void requestKeyboard() {
+    focusNode.context
+        ?.findAncestorStateOfType<EditableTextState>()
+        ?.requestKeyboard();
+  }
+
   TextEditingController? _lastConfiguredController;
   FocusNode? _lastConfiguredFocusNode;
 

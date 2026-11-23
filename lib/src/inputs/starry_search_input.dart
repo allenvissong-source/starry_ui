@@ -210,6 +210,7 @@ class _StarrySearchInputState extends State<StarrySearchInput>
             return StarryInputShell(
               focused: isFocused,
               enabled: widget.enabled,
+              onTap: requestKeyboard,
               pill: true,
               soft: widget.soft,
               controlHeight: controlHeight,

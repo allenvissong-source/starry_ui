@@ -36,11 +36,13 @@ class StarryInputShell extends StatelessWidget {
     this.trailingPadding,
     this.soft = false,
     this.controlHeight,
+    this.onTap,
   });
 
   final Widget child;
   final bool focused;
   final bool enabled;
+  final VoidCallback? onTap;
 
   /// Quiet ("soft") visual variant. When true the shell reads at a lower
   /// contrast: a thinner rest/focus border (`controlMetrics.restBorderWidth`)
@@ -165,7 +167,7 @@ class StarryInputShell extends StatelessWidget {
     final Color fill = enabled
         ? (soft ? s.backgroundSecondary : s.surface)
         : s.backgroundSecondary;
-    return StarryAnimatedControlShell(
+    final shell = StarryAnimatedControlShell(
       shellBorderSide: shellSide,
       backgroundColor: fill,
       shellBoxShadow: focused ? t.elevation.level2 : t.elevation.level1,
@@ -179,6 +181,14 @@ class StarryInputShell extends StatelessWidget {
       ),
       padding: EdgeInsetsDirectional.only(start: endPadding(t), end: end),
       child: child,
+    );
+    return TextFieldTapRegion(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        excludeFromSemantics: true,
+        onTap: enabled ? onTap : null,
+        child: shell,
+      ),
     );
   }
 }

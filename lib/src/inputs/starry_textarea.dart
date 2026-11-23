@@ -162,6 +162,7 @@ class _StarryTextAreaState extends State<StarryTextArea>
     final shell = StarryInputShell(
       focused: isFocused,
       enabled: widget.enabled,
+      onTap: requestKeyboard,
       borderRadius: widget.expands ? t.radius.lg : t.radius.xxl,
       // 大型写作面板在浅色背景上仍需明确边界，聚焦后沿用输入家族的品牌色。
       borderColor:

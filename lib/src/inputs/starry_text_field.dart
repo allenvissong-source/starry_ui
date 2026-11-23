@@ -236,6 +236,7 @@ class _StarryTextFieldState extends State<StarryTextField>
             return StarryInputShell(
               focused: isFocused,
               enabled: widget.enabled,
+              onTap: requestKeyboard,
               borderColor: borderColor,
               // A single fixed corner radius drives both shapes via Skia's clamp
               // (corner = min(radius, height / 2)):
