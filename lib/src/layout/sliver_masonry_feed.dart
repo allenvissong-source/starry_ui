@@ -1,8 +1,12 @@
-import 'package:flutter/rendering.dart' show SliverGeometry;
+import 'dart:math' as math;
+
+import 'package:flutter/foundation.dart' show precisionErrorTolerance;
+import 'package:flutter/rendering.dart' show SliverConstraints, SliverGeometry;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'masonry_feed_metrics.dart';
+import 'masonry_feed_scope.dart';
 
 /// A sliver-level masonry feed container.
 ///
@@ -18,10 +22,11 @@ class SliverMasonryFeed extends StatefulWidget {
     required this.itemCount,
     required this.itemBuilder,
     this.padding = EdgeInsets.zero,
+    this.wideCrossAxisInset = 0,
     this.minimumColumns = 2,
     this.maximumColumns = 5,
     super.key,
-  });
+  }) : assert(wideCrossAxisInset >= 0 && wideCrossAxisInset < double.infinity);
 
   /// Number of cards to render.
   final int itemCount;
@@ -32,7 +37,18 @@ class SliverMasonryFeed extends StatefulWidget {
   /// Extra business padding (e.g. top/bottom breathing room). The horizontal
   /// side insets required to center the grid are added on top of this.
   final EdgeInsetsGeometry padding;
+
+  /// Extra inset per side, growing from zero to this value as the feed widens.
+  final double wideCrossAxisInset;
   final int minimumColumns, maximumColumns;
+
+  /// Decode width in physical pixels for a cover in this feed. Sized for the
+  /// widest supported card so live resizing can reuse the same decoded frame.
+  static int? coverCacheWidthOf(BuildContext context) =>
+      context.getInheritedWidgetOfExactType<MasonryFeedScope>() == null
+      ? null
+      : (masonryFeedTargetCardWidth * MediaQuery.devicePixelRatioOf(context))
+            .ceil();
 
   @override
   State<SliverMasonryFeed> createState() => _SliverMasonryFeedState();
@@ -42,11 +58,16 @@ class _SliverMasonryFeedState extends State<SliverMasonryFeed> {
   double? _crossAxisExtent;
   Axis? _axis;
   Widget? _sliver;
+  SliverChildBuilderDelegate? _delegate;
 
   @override
   void didUpdateWidget(covariant SliverMasonryFeed oldWidget) {
     super.didUpdateWidget(oldWidget);
     _sliver = null;
+    if (oldWidget.itemBuilder != widget.itemBuilder ||
+        oldWidget.itemCount != widget.itemCount) {
+      _delegate = null;
+    }
   }
 
   @override
@@ -77,79 +98,59 @@ class _SliverMasonryFeedState extends State<SliverMasonryFeed> {
         // Negative-width guard: during shell transitions the cross-axis extent
         // can momentarily collapse, which would otherwise trip a "negative
         // minimum width" assertion inside the masonry grid.
-        final childCrossAxisExtent = metrics.columns > 0
-            ? (metrics.gridWidth -
-                      masonryFeedColumnGap * (metrics.columns - 1)) /
-                  metrics.columns
-            : 0.0;
-        if (childCrossAxisExtent <= 0 || widget.itemCount == 0) {
+        if (metrics.cardWidth <= 0 || widget.itemCount == 0) {
           return _sliver = const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
-        final sideInset = EdgeInsets.symmetric(horizontal: metrics.gridInset);
-        final resolvedPadding = widget.padding.resolve(
-          Directionality.of(context),
-        );
-        final businessCrossAxisPadding = constraints.axis == Axis.vertical
+        final axis = constraints.axis;
+        final extraInset = widget.wideCrossAxisInset * metrics.densityProgress;
+        final resolvedPadding = widget.padding
+            .resolve(Directionality.of(context))
+            .add(_crossAxisInsets(axis, extraInset));
+        final businessCrossAxisPadding = axis == Axis.vertical
             ? resolvedPadding.horizontal
             : resolvedPadding.vertical;
         final paddedCardWidth =
-            childCrossAxisExtent - businessCrossAxisPadding / metrics.columns;
+            metrics.cardWidth - businessCrossAxisPadding / metrics.columns;
         if (paddedCardWidth <= 0) {
           return _sliver = const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
+        // Center only the occupied columns, without enlarging their cards.
+        // Keeping one sliver and delegate also preserves mounted cards when a
+        // single row becomes a multi-row grid (or vice versa).
+        final columns = math.min(metrics.columns, widget.itemCount);
+        final emptyWidth =
+            (metrics.columns - columns) * (paddedCardWidth + metrics.columnGap);
+        final sideInset = _crossAxisInsets(
+          axis,
+          metrics.gridInset + emptyWidth / 2,
+        );
         return _sliver = SliverPadding(
           padding: sideInset.add(resolvedPadding),
-          // A single row has no masonry offsets to estimate. The dependency's
-          // masonry renderer incorrectly corrects the viewport when a short
-          // leading grid leaves empty columns and scrolls out of view.
-          sliver: widget.itemCount <= metrics.columns
-              ? SliverToBoxAdapter(
-                  child: Flex(
-                    direction: constraints.axis == Axis.vertical
-                        ? Axis.horizontal
-                        : Axis.vertical,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var i = 0; i < widget.itemCount; i++) ...[
-                        if (i > 0)
-                          SizedBox(
-                            width: constraints.axis == Axis.vertical
-                                ? masonryFeedColumnGap
-                                : null,
-                            height: constraints.axis == Axis.horizontal
-                                ? masonryFeedColumnGap
-                                : null,
-                          ),
-                        SizedBox(
-                          width: constraints.axis == Axis.vertical
-                              ? paddedCardWidth
-                              : null,
-                          height: constraints.axis == Axis.horizontal
-                              ? paddedCardWidth
-                              : null,
-                          child: widget.itemBuilder(context, i),
-                        ),
-                      ],
-                    ],
-                  ),
-                )
-              : _MasonryGrid(
-                  gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: metrics.columns,
-                  ),
-                  mainAxisSpacing: masonryFeedRowGap,
-                  crossAxisSpacing: masonryFeedColumnGap,
-                  delegate: SliverChildBuilderDelegate(
-                    widget.itemBuilder,
-                    childCount: widget.itemCount,
-                  ),
-                ),
+          sliver: MasonryFeedScope(
+            cardRadius: metrics.cardRadius,
+            child: _MasonryGrid(
+              gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+              ),
+              mainAxisSpacing: metrics.rowGap,
+              crossAxisSpacing: metrics.columnGap,
+              delegate: _delegate ??= SliverChildBuilderDelegate(
+                widget.itemBuilder,
+                childCount: widget.itemCount,
+              ),
+            ),
+          ),
         );
       },
     );
   }
+
+  static EdgeInsets _crossAxisInsets(Axis axis, double inset) =>
+      axis == Axis.vertical
+      ? EdgeInsets.symmetric(horizontal: inset)
+      : EdgeInsets.symmetric(vertical: inset);
 }
 
 class _MasonryGrid extends SliverMasonryGrid {
@@ -159,6 +160,31 @@ class _MasonryGrid extends SliverMasonryGrid {
     required super.mainAxisSpacing,
     required super.crossAxisSpacing,
   });
+
+  @override
+  double? estimateMaxScrollOffset(
+    SliverConstraints? constraints,
+    int firstIndex,
+    int lastIndex,
+    double leadingScrollOffset,
+    double trailingScrollOffset,
+  ) {
+    // Reverse layout permits a slight negative origin from floating-point
+    // subtraction. When the last item is laid out, Flutter's default estimate
+    // is the trailing offset, but the grid requires at least the measured span.
+    if (lastIndex + 1 == delegate.estimatedChildCount &&
+        leadingScrollOffset < 0 &&
+        leadingScrollOffset >= -precisionErrorTolerance) {
+      return trailingScrollOffset - leadingScrollOffset;
+    }
+    return super.estimateMaxScrollOffset(
+      constraints,
+      firstIndex,
+      lastIndex,
+      leadingScrollOffset,
+      trailingScrollOffset,
+    );
+  }
 
   @override
   RenderSliverMasonryGrid createRenderObject(BuildContext context) =>
@@ -182,6 +208,8 @@ class _RenderMasonryGrid extends RenderSliverMasonryGrid {
   double? _crossAxisExtent;
   int? _columns;
   Axis? _axis;
+  double? _rowGap;
+  double? _columnGap;
   double? _completeExtent;
   int? _completeChildCount;
 
@@ -198,9 +226,13 @@ class _RenderMasonryGrid extends RenderSliverMasonryGrid {
       crossAxisSpacing,
     );
     final count = childManager.childCount;
-    if (_crossAxisExtent != constraints.crossAxisExtent ||
+    final geometryChanged =
+        _crossAxisExtent != constraints.crossAxisExtent ||
         _columns != columns ||
-        _axis != constraints.axis) {
+        _axis != constraints.axis ||
+        _rowGap != mainAxisSpacing ||
+        _columnGap != crossAxisSpacing;
+    if (geometryChanged) {
       _deletedColumnEnds.clear();
       _completeExtent = null;
     }
@@ -223,14 +255,14 @@ class _RenderMasonryGrid extends RenderSliverMasonryGrid {
     if (firstChild == null) {
       _deletedColumnEnds.clear();
       _seedFirstRow(columns);
-    } else if (_crossAxisExtent == constraints.crossAxisExtent &&
-        _columns == columns &&
-        indexOf(firstChild!) > 0) {
+    } else if (!geometryChanged && indexOf(firstChild!) > 0) {
       _restoreColumnAnchors(columns);
     }
     _crossAxisExtent = constraints.crossAxisExtent;
     _columns = columns;
     _axis = constraints.axis;
+    _rowGap = mainAxisSpacing;
+    _columnGap = crossAxisSpacing;
     super.performLayout();
     if (lastChild != null &&
         indexOf(lastChild!) == count - 1 &&

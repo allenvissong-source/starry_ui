@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart' show RenderDecoratedBox;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:starry_ui/starry_ui.dart';
 
@@ -215,17 +216,23 @@ void main() {
   });
 
   group('StarryMasonryCard', () {
-    // The card's own hover scale animates over `motion.durationMedium`; the
-    // inner StarryPressScale's press scale uses `motion.durationShort`. Target
-    // the hover one unambiguously by its duration.
-    Finder hoverScaleFinder(WidgetTester tester) {
-      final t = _tokens(tester, find.byType(StarryMasonryCard));
-      return find.descendant(
-        of: find.byType(StarryMasonryCard),
-        matching: find.byWidgetPredicate(
-          (w) => w is AnimatedScale && w.duration == t.motion.durationMedium,
-        ),
-      );
+    final card = find.byType(StarryMasonryCard);
+    final shadowLayer = find.descendant(
+      of: card,
+      matching: find.byWidgetPredicate(
+        (widget) =>
+            widget is DecoratedBox &&
+            widget.decoration is BoxDecoration &&
+            ((widget.decoration as BoxDecoration).boxShadow?.isNotEmpty ??
+                false),
+      ),
+    );
+
+    List<BoxShadow> paintedShadows(WidgetTester tester) {
+      final decoration =
+          tester.renderObject<RenderDecoratedBox>(shadowLayer).decoration
+              as BoxDecoration;
+      return decoration.boxShadow!;
     }
 
     testWidgets('composes StarryPressScale + a single shadow layer', (
@@ -241,14 +248,7 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(
-        find.descendant(
-          of: find.byType(StarryMasonryCard),
-          matching: find.byType(AnimatedContainer),
-        ),
-        findsOneWidget,
-      );
-      expect(hoverScaleFinder(tester), findsOneWidget);
+      expect(shadowLayer, findsOneWidget);
     });
 
     testWidgets('at rest: scale 1.0 and elevation.level2 shadow', (
@@ -257,17 +257,12 @@ void main() {
       await tester.pumpWidget(
         _host(const StarryMasonryCard(child: SizedBox(width: 40, height: 40))),
       );
-      final t = _tokens(tester, find.byType(StarryMasonryCard));
-      final scale = tester.widget<AnimatedScale>(hoverScaleFinder(tester));
-      expect(scale.scale, 1.0);
-      final container = tester.widget<AnimatedContainer>(
-        find.descendant(
-          of: find.byType(StarryMasonryCard),
-          matching: find.byType(AnimatedContainer),
-        ),
+      final t = _tokens(tester, card);
+      expect(
+        tester.getRect(shadowLayer).width,
+        closeTo(tester.getSize(shadowLayer).width, 0.001),
       );
-      final deco = container.decoration! as BoxDecoration;
-      expect(deco.boxShadow, t.elevation.level2);
+      expect(paintedShadows(tester), t.elevation.level2);
     });
 
     testWidgets('hover: scales up to 1.01 and lifts to elevation.level3', (
@@ -276,25 +271,30 @@ void main() {
       await tester.pumpWidget(
         _host(const StarryMasonryCard(child: SizedBox(width: 40, height: 40))),
       );
-      final t = _tokens(tester, find.byType(StarryMasonryCard));
+      final t = _tokens(tester, card);
+      final restingWidth = tester.getRect(shadowLayer).width;
 
       final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
       await gesture.addPointer(location: Offset.zero);
       addTearDown(gesture.removePointer);
       await tester.pump();
-      await gesture.moveTo(tester.getCenter(find.byType(StarryMasonryCard)));
+      await gesture.moveTo(tester.getCenter(card));
+      await tester.pump();
+      await tester.pump(t.motion.durationMedium ~/ 2);
+      expect(paintedShadows(tester), isNot(equals(t.elevation.level2)));
+      expect(paintedShadows(tester), isNot(equals(t.elevation.level3)));
       await tester.pumpAndSettle();
 
-      final scale = tester.widget<AnimatedScale>(hoverScaleFinder(tester));
-      expect(scale.scale, 1.01);
-      final container = tester.widget<AnimatedContainer>(
-        find.descendant(
-          of: find.byType(StarryMasonryCard),
-          matching: find.byType(AnimatedContainer),
-        ),
+      expect(
+        tester.getRect(shadowLayer).width,
+        closeTo(restingWidth * 1.01, 0.001),
       );
-      final deco = container.decoration! as BoxDecoration;
-      expect(deco.boxShadow, t.elevation.level3);
+      expect(paintedShadows(tester), t.elevation.level3);
+
+      await gesture.moveTo(Offset.zero);
+      await tester.pumpAndSettle();
+      expect(tester.getRect(shadowLayer).width, closeTo(restingWidth, 0.001));
+      expect(paintedShadows(tester), t.elevation.level2);
     });
 
     testWidgets('onTap fires', (tester) async {

@@ -2,66 +2,24 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 
+import '../theme/starry_tokens.dart';
+
 /// Target card width used to reverse-derive the masonry column count.
-@visibleForTesting
 const double masonryFeedTargetCardWidth = 269;
-
-/// Horizontal gap between masonry columns.
-const double masonryFeedColumnGap = 24;
-
-/// Outer inset applied on both sides of the masonry frame.
-@visibleForTesting
-const double masonryFeedOuterInset = masonryFeedColumnGap;
-
-/// Vertical gap between stacked cards within a column.
-const double masonryFeedRowGap = 12;
-
-@visibleForTesting
-double masonryFeedMinGridWidthForColumns(int columns) {
-  if (columns <= 0) return 0;
-  return masonryFeedTargetCardWidth * columns +
-      masonryFeedColumnGap * (columns - 1);
-}
-
-@visibleForTesting
-int masonryFeedColumnCountForWidth(double width) {
-  final safeWidth = width.isFinite ? math.max(0.0, width) : 0.0;
-  if (safeWidth >= masonryFeedMinGridWidthForColumns(5)) return 5;
-  if (safeWidth >= masonryFeedMinGridWidthForColumns(4)) return 4;
-  if (safeWidth >= masonryFeedMinGridWidthForColumns(3)) return 3;
-  return 2;
-}
-
-@visibleForTesting
-double masonryFeedColumnWidthForWidth(double width) {
-  final safeWidth = width.isFinite ? math.max(0.0, width) : 0.0;
-  final columns = masonryFeedColumnCountForWidth(safeWidth);
-  final gaps = masonryFeedColumnGap * (columns - 1);
-  final targetGridWidth = masonryFeedTargetCardWidth * columns + gaps;
-  if (targetGridWidth <= safeWidth) return masonryFeedTargetCardWidth;
-  return ((safeWidth - gaps) / columns)
-      .clamp(0, masonryFeedTargetCardWidth)
-      .toDouble();
-}
-
-@visibleForTesting
-double masonryFeedGridWidthForWidth(double width) {
-  final safeWidth = width.isFinite ? math.max(0.0, width) : 0.0;
-  final columns = masonryFeedColumnCountForWidth(safeWidth);
-  return masonryFeedColumnWidthForWidth(safeWidth) * columns +
-      masonryFeedColumnGap * (columns - 1);
-}
 
 /// Resolved masonry layout geometry for a given available content width.
 ///
-/// Pure value object with zero domain dependencies: it only knows how wide the
-/// content area is and how a masonry grid should be centered inside it. Column
-/// count is reverse-derived from [masonryFeedTargetCardWidth] rather than from
-/// any breakpoint enum, so callers do not need a [BuildContext].
+/// Gaps and radius share a continuous transition between compact and wide
+/// geometry. The column count is derived separately from the available space.
 @immutable
 class MasonryFeedMetrics {
-  const MasonryFeedMetrics({
+  const MasonryFeedMetrics._({
     required this.contentWidth,
+    required this.densityProgress,
+    required this.outerInset,
+    required this.columnGap,
+    required this.rowGap,
+    required this.cardRadius,
     required this.frameWidth,
     required this.frameInset,
     required this.gridWidth,
@@ -70,7 +28,15 @@ class MasonryFeedMetrics {
     required this.cardWidth,
   });
 
+  static const double _compactContentWidth = 480;
+  static const _breakpoints = StarryBreakpoints();
+
   final double contentWidth;
+  final double densityProgress;
+  final double outerInset;
+  final double columnGap;
+  final double rowGap;
+  final double cardRadius;
   final double frameWidth;
   final double frameInset;
   final double gridWidth;
@@ -87,27 +53,39 @@ class MasonryFeedMetrics {
     final safeContentWidth = contentWidth.isFinite
         ? math.max(0.0, contentWidth)
         : 0.0;
-    final usableGridWidth = math.max(
-      0.0,
-      safeContentWidth - masonryFeedOuterInset * 2,
-    );
-    final preferredColumns =
-        usableGridWidth < masonryFeedMinGridWidthForColumns(2)
-        ? minimumColumns
-        : masonryFeedColumnCountForWidth(usableGridWidth);
-    final columns = preferredColumns.clamp(minimumColumns, maximumColumns);
-    final gaps = masonryFeedColumnGap * (columns - 1);
+    final fraction =
+        ((safeContentWidth - _compactContentWidth) /
+                (_breakpoints.expanded - _compactContentWidth))
+            .clamp(0.0, 1.0);
+    final progress = fraction * fraction * (3 - 2 * fraction);
+    double interpolate(double compact, double wide) =>
+        compact + (wide - compact) * progress;
+
+    const compactSpacing = StarrySpacingTokens.s1;
+    const radius = StarryRadius();
+    final outerInset = interpolate(compactSpacing, StarrySpacingTokens.s6);
+    final columnGap = interpolate(compactSpacing, StarrySpacingTokens.s6);
+    final rowGap = interpolate(compactSpacing, StarrySpacingTokens.s3);
+    final usableGridWidth = math.max(0.0, safeContentWidth - outerInset * 2);
+    final columnsFitting =
+        ((usableGridWidth + columnGap) /
+                (masonryFeedTargetCardWidth + columnGap))
+            .floor();
+    final columns = columnsFitting.clamp(minimumColumns, maximumColumns);
+    final gaps = columnGap * (columns - 1);
     final cardWidth = ((usableGridWidth - gaps) / columns)
         .clamp(0, masonryFeedTargetCardWidth)
         .toDouble();
-    final gridWidth = cardWidth * columns + gaps;
-    final frameWidth = math.min(
-      safeContentWidth,
-      gridWidth + masonryFeedOuterInset * 2,
-    );
+    final gridWidth = cardWidth <= 0 ? 0.0 : cardWidth * columns + gaps;
+    final frameWidth = math.min(safeContentWidth, gridWidth + outerInset * 2);
 
-    return MasonryFeedMetrics(
+    return MasonryFeedMetrics._(
       contentWidth: safeContentWidth,
+      densityProgress: progress,
+      outerInset: outerInset,
+      columnGap: columnGap,
+      rowGap: rowGap,
+      cardRadius: interpolate(radius.xs, radius.lg),
       frameWidth: frameWidth,
       frameInset: math.max(0.0, (safeContentWidth - frameWidth) / 2),
       gridWidth: gridWidth,

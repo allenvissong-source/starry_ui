@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../interactions/starry_press_scale.dart';
+import '../layout/masonry_feed_scope.dart';
 import '../theme/starry_tokens.dart';
 import 'starry_surface.dart';
 
@@ -32,7 +33,8 @@ class StarryMasonryCard extends StatefulWidget {
   /// Tap handler. Drives the press-scale interaction via [StarryPressScale].
   final VoidCallback? onTap;
 
-  /// Corner radius. Defaults to `radius.lg`.
+  /// Corner radius. Defaults to the feed's resolved radius, or `radius.lg`
+  /// when used outside a feed.
   final BorderRadius? borderRadius;
 
   @override
@@ -52,7 +54,11 @@ class _StarryMasonryCardState extends State<StarryMasonryCard> {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
-    final radius = widget.borderRadius ?? BorderRadius.circular(t.radius.lg);
+    final radius =
+        widget.borderRadius ??
+        BorderRadius.circular(
+          MasonryFeedScope.cardRadiusOf(context) ?? t.radius.lg,
+        );
 
     return MouseRegion(
       onEnter: (_) => _setHovered(true),
@@ -63,13 +69,21 @@ class _StarryMasonryCardState extends State<StarryMasonryCard> {
           scale: _hovered ? _hoverScale : 1,
           duration: t.motion.durationMedium,
           curve: t.motion.easingStandard,
-          child: AnimatedContainer(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: _hovered ? 1 : 0),
             duration: t.motion.durationMedium,
             curve: t.motion.easingStandard,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              boxShadow: _hovered ? t.elevation.level3 : t.elevation.level2,
+            builder: (context, lift, child) => Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                boxShadow: BoxShadow.lerpList(
+                  t.elevation.level2,
+                  t.elevation.level3,
+                  lift,
+                ),
+              ),
+              child: child,
             ),
             child: StarrySurface(
               elevated: false,

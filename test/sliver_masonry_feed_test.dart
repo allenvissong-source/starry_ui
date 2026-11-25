@@ -40,6 +40,121 @@ Future<void> _pumpAtWidth(
 }
 
 void main() {
+  for (final itemCount in [2, 12]) {
+    testWidgets('resize updates card geometry for $itemCount items', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1560, 650);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final width = ValueNotifier(390.0);
+      addTearDown(width.dispose);
+      // Reuse these card instances, as the community feed does on pagination.
+      final cards = List.generate(
+        itemCount,
+        (i) => StarryMasonryCard(
+          key: ValueKey('responsive_$i'),
+          child: const SizedBox(height: 100),
+        ),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(extensions: [StarryTokens.light]),
+          home: Scaffold(
+            body: Align(
+              alignment: Alignment.topLeft,
+              child: ValueListenableBuilder(
+                valueListenable: width,
+                child: CustomScrollView(
+                  slivers: [
+                    SliverMasonryFeed(
+                      wideCrossAxisInset: 20,
+                      padding: const EdgeInsets.only(top: 8),
+                      itemCount: itemCount,
+                      itemBuilder: (_, i) => cards[i],
+                    ),
+                  ],
+                ),
+                builder: (_, width, child) =>
+                    SizedBox(width: width, child: child),
+              ),
+            ),
+          ),
+        ),
+      );
+      final first = find.byKey(const ValueKey('responsive_0'));
+      final second = find.byKey(const ValueKey('responsive_1'));
+      for (final (w, inset, gap, rowGap, radius, columns) in [
+        (390.0, 4.0, 4.0, 4.0, 4.0, 2),
+        (840.0, 154.0, 14.0, 8.0, 10.0, 2),
+        (1200.0, 46.0, 24.0, 12.0, 16.0, 4),
+        (390.0, 4.0, 4.0, 4.0, 4.0, 2),
+      ]) {
+        width.value = w;
+        await tester.pumpAndSettle();
+        final firstRect = tester.getRect(first);
+        final extraInset = itemCount == 2 && columns == 4
+            ? firstRect.width + gap
+            : 0.0;
+        expect(firstRect.left, closeTo(inset + extraInset, 0.001));
+        expect(firstRect.top, 8);
+        expect(
+          tester.getTopLeft(second).dx - firstRect.right,
+          closeTo(gap, 0.001),
+        );
+        expect(
+          tester
+              .widget<StarrySurface>(
+                find.descendant(
+                  of: first,
+                  matching: find.byType(StarrySurface),
+                ),
+              )
+              .borderRadius,
+          BorderRadius.circular(radius),
+        );
+        if (itemCount > 2) {
+          final nextRow = find.byKey(ValueKey('responsive_$columns'));
+          expect(tester.getTopLeft(nextRow).dy - firstRect.bottom, rowGap);
+        }
+        expect(tester.takeException(), isNull);
+      }
+    });
+  }
+
+  testWidgets(
+    'three cards center and keep state while crossing column counts',
+    (tester) async {
+      await _pumpAtWidth(tester, width: 1200, itemCount: 3);
+      final first = find.byKey(const ValueKey('card_0'));
+      final last = find.byKey(const ValueKey('card_2'));
+      final elements = [
+        for (var i = 0; i < 3; i++)
+          tester.element(find.byKey(ValueKey('card_$i'))),
+      ];
+      for (final width in [1200.0, 1199.0, 860.0, 585.0, 860.0, 1200.0]) {
+        tester.view.physicalSize = Size(width, 800);
+        await tester.pump();
+        final firstRect = tester.getRect(first);
+        final lastRect = tester.getRect(last);
+        if (MasonryFeedMetrics.resolve(width).columns >= 3) {
+          expect(lastRect.top, firstRect.top);
+          expect(firstRect.left, closeTo(width - lastRect.right, 0.001));
+        } else {
+          expect(lastRect.top, greaterThan(firstRect.top));
+        }
+        for (var i = 0; i < 3; i++) {
+          expect(
+            tester.element(find.byKey(ValueKey('card_$i'))),
+            same(elements[i]),
+          );
+        }
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
+
   testWidgets('multi-row leading feed never rewinds its following section', (
     tester,
   ) async {
@@ -106,10 +221,10 @@ void main() {
           for (var j = 1; j < ends.length; j++) {
             if (ends[j] < ends[column]) column = j;
           }
-          ends[column] += height(i) + masonryFeedRowGap;
+          ends[column] += height(i) + metrics.rowGap;
         }
         final boundary =
-            64 + ends.reduce((a, b) => a > b ? a : b) - masonryFeedRowGap;
+            64 + ends.reduce((a, b) => a > b ? a : b) - metrics.rowGap;
         await tester.pumpWidget(
           Directionality(
             textDirection: TextDirection.ltr,
@@ -165,10 +280,10 @@ void main() {
           );
           expect(tester.takeException(), isNull);
         }
-        expect(
-          tester.getTopLeft(find.byKey(const ValueKey('uneven_0'))),
-          firstPosition,
+        final returnedPosition = tester.getTopLeft(
+          find.byKey(const ValueKey('uneven_0')),
         );
+        expect((returnedPosition - firstPosition).distance, lessThan(1e-9));
         await tester.pumpWidget(const SizedBox.shrink());
         controller.dispose();
       }
