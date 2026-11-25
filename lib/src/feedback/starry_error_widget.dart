@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../buttons/starry_button.dart';
+import '../buttons/starry_text_button.dart';
 import '../theme/starry_tokens.dart';
 
-/// Starry UI full-surface error state.
+/// Starry UI error state for a whole surface or an embedded section.
 ///
 /// A presentation-only failure surface: it renders an error icon, a title, an
 /// optional message, an optional collapsible technical detail block, and an
@@ -26,7 +27,21 @@ class StarryErrorWidget extends StatelessWidget {
     this.onRetry,
     this.retryLabel = 'Retry',
     this.showDetails = false,
-  });
+  }) : _compact = false;
+
+  /// Inline feedback that takes only the space it needs in the parent list.
+  const StarryErrorWidget.compact({
+    required String this.title,
+    super.key,
+    this.icon,
+    this.message,
+    this.onRetry,
+    this.retryLabel = 'Retry',
+  }) : _compact = true,
+       details = null,
+       showDetails = false;
+
+  final bool _compact;
 
   /// Leading error icon. When null a default [Icons.error_outline] is shown,
   /// tinted with the semantic error color.
@@ -54,6 +69,7 @@ class StarryErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
+    if (_compact) return _buildCompact(t);
     final s = t.semantic;
 
     return Center(
@@ -117,6 +133,68 @@ class StarryErrorWidget extends StatelessWidget {
                 pressScale: true,
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompact(StarryTokens t) {
+    final description = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconTheme(
+          data: IconThemeData(
+            color: t.semantic.errorStrong,
+            size: t.controlMetrics.iconLg,
+          ),
+          child: icon ?? const Icon(Icons.error_outline),
+        ),
+        SizedBox(width: t.spacing.s2),
+        Flexible(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title!,
+                style: t.typography.bodyMedium.textStyle.copyWith(
+                  color: t.semantic.textPrimary,
+                ),
+              ),
+              if (message != null) ...[
+                SizedBox(height: t.spacing.s1),
+                Text(
+                  message!,
+                  style: t.typography.bodySmall.textStyle.copyWith(
+                    color: t.semantic.textSecondary,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: t.semantic.errorBg,
+        borderRadius: BorderRadius.circular(t.radius.md),
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: t.spacing.s3,
+          vertical: onRetry == null ? t.spacing.s3 : t.spacing.s1,
+        ),
+        child: OverflowBar(
+          alignment: MainAxisAlignment.spaceBetween,
+          spacing: t.spacing.s2,
+          overflowSpacing: t.spacing.s1,
+          overflowAlignment: OverflowBarAlignment.start,
+          children: [
+            description,
+            if (onRetry != null)
+              StarryTextButton(label: retryLabel, onPressed: onRetry),
           ],
         ),
       ),

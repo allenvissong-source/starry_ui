@@ -6,9 +6,6 @@ import 'package:starry_ui/main.directories.g.dart' as widgetbook_directories;
 import 'package:starry_ui/starry_ui.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-// Internal-only primitive, tested via its implementation library.
-import 'package:starry_ui/src/feedback/starry_error_widget.dart';
-
 // Positive-evidence coverage for the Sheet5 action/feedback sedimentation:
 //   • StarryErrorWidget        — full-surface error state with token retry CTA
 //   • StarryPrimaryActionButton — thin full-width filled CTA wrapper
@@ -241,6 +238,45 @@ void main() {
     testWidgets('omits the retry button when onRetry is null', (tester) async {
       await tester.pumpWidget(_host(const StarryErrorWidget(title: 'Oops')));
       expect(find.byType(StarryButton), findsNothing);
+    });
+
+    testWidgets('compact retry wraps at narrow widths with large text', (
+      tester,
+    ) async {
+      const title = 'Could not load published works';
+      var tapped = 0;
+      await tester.pumpWidget(
+        _host(
+          Builder(
+            builder: (context) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(2)),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  width: 220,
+                  child: StarryErrorWidget.compact(
+                    title: title,
+                    retryLabel: 'Try again',
+                    onRetry: () => tapped++,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final retry = find.byType(StarryTextButton);
+      expect(
+        tester.getTopLeft(retry).dy,
+        greaterThanOrEqualTo(tester.getBottomLeft(find.text(title)).dy),
+      );
+      await tester.tap(retry);
+      await tester.pump();
+      expect(tapped, 1);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('shows the details block only when showDetails is true', (
