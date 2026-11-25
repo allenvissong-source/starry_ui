@@ -1,3 +1,11 @@
-Set-Location D:\Starry-1.07\starry_ui
-$env:CHROME_EXECUTABLE = $env:CHROME_EXECUTABLE
-flutter run -d chrome --web-port=54417 -t lib/main.dart *> D:\Starry-1.07\starry_ui\tool\widgetbook.log
+param([string]$LogPath = (Join-Path ([IO.Path]::GetTempPath()) 'starry-widgetbook.log'))
+$ErrorActionPreference = 'Stop'
+Push-Location (Join-Path $PSScriptRoot '..')
+try {
+  flutter run -d chrome --web-port=54417 -t lib/main.dart *> $LogPath
+  $result = $LASTEXITCODE
+  Write-Output "Log: $LogPath"
+} finally {
+  Pop-Location
+}
+exit $result

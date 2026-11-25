@@ -1,22 +1,18 @@
 # AGENTS.md — starry_ui 组件库工作契约
 
 > 本文件是任何 AI/人类贡献者在 `starry_ui` 包内写代码前 **必须先读** 的唯一权威规范。
-> 它综合三处来源:(1) ui-ux-design 设计智能技能的十大规则族与三层令牌架构;
-> (2) 本仓库真实存在的 `StarryTokens` API;(3) 迁移前三个组件
-> (StarryChip / StarryBadge / StarryMessageList) 时踩坑总结出的可执行范式。
+> 规范以本仓 `StarryTokens` API、组件行为和无障碍要求为依据。
 >
 > 冲突裁决顺序:用户明确要求 > 正确性/无障碍/契约 > 本文件 > 个人风格偏好。
 
 ---
 
-## 0. 环境与工具铁律(先看这条,能省一半时间)
+## 0. 环境与工具
 
-- **本包物理路径:`D:\Starry-1.07\starry_ui`**,与主工程
-  `D:\Starry-1.07\starry` 是**同级兄弟目录**。主工程用
-  `path: ../starry_ui` 依赖本包,两者相对位置不能改(CI 也依赖这个布局:它把
-  五个兄弟仓 checkout 到主仓的上一级再 `pub get`)。
-- **验证命令直接在 PowerShell 里跑**,工作目录设为本包根:
-  - `flutter test` —— 全量(当前 27 个测试文件)
+- 本包与主工程 `starry` 是同级兄弟目录。主工程用
+  `path: ../starry_ui` 依赖本包，两者相对位置不能改。
+- 验证命令在本包根目录运行:
+  - `flutter test` —— 全量
   - `flutter test test/xxx_test.dart` —— 单文件
   - `flutter analyze` / `dart format .`
 
@@ -28,16 +24,14 @@
   `python3 tools/goldens.py check`，流程见主工程 `docs/GOLDEN_TESTS.md`。
   生成与比较复用同一实际镜像 ID；不得直接提交宿主生成的图、
   扩大容差或触发付费 CI。首次渲染器迁移未完成时不得宣称视觉验证通过。
-- **PowerShell 的两个实测坑**:
-  1. `git` 把进度写进 stderr,PowerShell 会判为错误——命令末尾加 `exit 0`
-     或 `| Out-Null`,不要据此认为 git 失败。
+- **PowerShell 文件与进程规则**:
+  1. 外部命令用退出码判断成功，stderr 进度本身不表示失败。
   2. .NET 的 `[IO.File]::ReadAllLines()` 等 API **不跟随 `Set-Location`**,
      用的是进程工作目录。一律传绝对路径。
 - **改动影响主工程时,回主工程验证。** 本包测试全绿不代表主工程能编译:
   新增或重命名公开 API 后,到主工程跑 `flutter analyze`;涉及 Web 的改动跑
-  `flutter build web --release`——它能抓出 `dart:io` 误用这类只在 Web 炸的问题
-  (主工程 persona 编辑器曾因 `Platform.isX` 在 Web 崩溃)。
-- **不要在工作区根目录 `D:\Starry-1.07` 下创建任何文件**(日志、截图、临时
+  `flutter build web --release`，并检查 Web 可达路径的运行时行为。
+- **不要在工作区根目录创建临时文件**(日志、截图、临时
   脚本)。根目录是多仓工作区、不属于任何仓库;临时产物规则见根目录 `AGENTS.md`。
 
 ---
@@ -554,10 +548,9 @@ dart run build_runner build --delete-conflicting-outputs
 
 - **不要手改 `main.directories.g.dart`**——它是 `// GENERATED CODE - DO NOT MODIFY BY HAND`。
 - **不要在 `.gitignore` 中排除 `*.g.dart`**——本仓刻意跟踪 `main.directories.g.dart`。
-- **CI 可复现门禁**:`.github/workflows/generated-files-check.yml` 在每次 push / PR 时
-  跑 `dart run build_runner build --delete-conflicting-outputs` 后接 `git diff --exit-code`。
-  如果生成物与提交的版本不一致(即有人改了 `@UseCase` 注解但忘了重新生成),CI 会 fail。
-- 改完任何 `*.usecase.dart` 的注解后,**必须**本地跑一次生成命令并提交 diff。
+- GitHub Actions 已停用。可复现检查在本地运行生成命令，
+  再核对 `main.directories.g.dart` 差异；不得为验证启用付费 CI。
+- 改完任何 `*.usecase.dart` 的注解后，必须本地生成并核对产物差异。
 
 ---
 
@@ -687,9 +680,9 @@ dart run build_runner build --delete-conflicting-outputs
 2. **测试**:`flutter test` 跑全量(改动面小可先跑单文件,但提交前至少全量一次)。
    已有测试失败不得跳过,也不得用"界面看起来对"替代。
 3. **格式**:只格式化你改过的文件 —— `dart format lib/src/<你改的文件>.dart`。
-   **不要跑 `dart format .`**:本仓代码由更早版本的 dart 格式化,Dart 3.12.2 的
-   tall-style 会重排 **79/149 个文件**(实测),把无关改动混进 diff;而主仓 CI
-   没有 format 步骤,拦不住。全量重排需要单独立项并 pin SDK 版本,不要顺手做。
+   全仓格式验证使用 `--output=none --set-exit-if-changed`；
+   只对本次修改文件写入格式化结果。全量重排需要独立范围与统一 SDK 版本，
+   不得将无关格式变化混入当前改动。
 4. **视觉回归**:涉及渲染的改动,以 `test/` 下的 widget 测试与 golden 为准。
    golden 基线由主工程 `tools/goldens.py` 的固定 Linux 镜像生成和比较(见 §0),
    真实界面变化确认后才显式更新，不直接提交宿主生成的图。

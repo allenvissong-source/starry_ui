@@ -1,13 +1,20 @@
 # Fetch/collect font assets for starry_ui.
 # - Copies MiSans-VF.ttf and Twemoji.ttf from the main project (single source of truth).
 # - Downloads Outfit and Inter variable fonts from the Google Fonts GitHub repo (OFL licensed).
+param(
+  [string]$MainFonts = (Join-Path $PSScriptRoot '../../starry/assets/fonts')
+)
 $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-$dest = 'D:\Starry-1.07\starry_ui\fonts'
+$dest = Join-Path $PSScriptRoot '../fonts'
 New-Item -ItemType Directory -Force -Path $dest | Out-Null
 
-$mainFonts = '\\wsl.localhost\Ubuntu\home\allen\projects\starry\starry\assets\fonts'
+foreach ($font in @('MiSans-VF.ttf', 'Twemoji.ttf')) {
+  if (-not (Test-Path (Join-Path $MainFonts $font) -PathType Leaf)) {
+    throw "Missing $font; pass -MainFonts with the licensed main-application fonts directory"
+  }
+}
 Copy-Item -Force (Join-Path $mainFonts 'MiSans-VF.ttf') (Join-Path $dest 'MiSans-VF.ttf')
 Copy-Item -Force (Join-Path $mainFonts 'Twemoji.ttf')   (Join-Path $dest 'Twemoji.ttf')
 
