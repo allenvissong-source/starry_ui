@@ -27,6 +27,7 @@ class StarryTextField extends StatefulWidget {
     this.trailing,
     this.suffixIcon,
     this.obscureText = false,
+    this.monospace = false,
     this.enabled = true,
     this.readOnly = false,
     this.autofocus = false,
@@ -46,7 +47,8 @@ class StarryTextField extends StatefulWidget {
     this.onSubmitted,
     this.onPaste,
     this.onClear,
-  }) : assert(
+  }) : _isComposerTitle = false,
+       assert(
          !showClearButton || clearTooltip != null,
          'clearTooltip is required when showClearButton is true.',
        ),
@@ -59,6 +61,42 @@ class StarryTextField extends StatefulWidget {
          'maxLines must be >= minLines.',
        );
 
+  /// A single-line title inside an existing writing panel's input shell.
+  const StarryTextField.composerTitle({
+    super.key,
+    this.controller,
+    this.focusNode,
+    this.hint,
+    this.enabled = true,
+    this.inputFormatters,
+    this.onChanged,
+    this.onSubmitted,
+  }) : _isComposerTitle = true,
+       label = null,
+       prefixIcon = null,
+       leading = null,
+       leadingGap = null,
+       trailing = null,
+       suffixIcon = null,
+       obscureText = false,
+       monospace = false,
+       readOnly = false,
+       autofocus = false,
+       minLines = null,
+       maxLines = 1,
+       keyboardType = null,
+       textInputAction = TextInputAction.next,
+       validationState = StarryTextFieldState.none,
+       helperText = null,
+       errorText = null,
+       maxLength = null,
+       showCounter = false,
+       showClearButton = false,
+       clearTooltip = null,
+       onPaste = null,
+       onClear = null;
+
+  final bool _isComposerTitle;
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final String? label;
@@ -82,6 +120,11 @@ class StarryTextField extends StatefulWidget {
   final IconData? suffixIcon;
 
   final bool obscureText;
+
+  /// Uses the platform's fixed-width font for code and structured values
+  /// without changing input, validation, or shell behavior.
+  final bool monospace;
+
   final bool enabled;
   final bool readOnly;
   final bool autofocus;
@@ -139,9 +182,80 @@ class _StarryTextFieldState extends State<StarryTextField>
     widget.onChanged?.call('');
   }
 
+  Widget _buildInput(StarryTokens t) {
+    final isTitle = widget._isComposerTitle;
+    final style =
+        (isTitle ? t.typography.titleLarge : t.typography.bodyMedium).textStyle;
+    final field = TextField(
+      controller: controller,
+      focusNode: focusNode,
+      enabled: widget.enabled,
+      readOnly: widget.readOnly,
+      autofocus: widget.autofocus,
+      obscureText: widget.obscureText,
+      minLines: widget.obscureText ? null : widget.minLines,
+      maxLines: widget.obscureText ? 1 : widget.maxLines,
+      maxLength: widget.maxLength,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
+      inputFormatters: widget.inputFormatters,
+      onChanged: widget.onChanged,
+      onSubmitted: widget.onSubmitted,
+      buildCounter: _noCounter,
+      contextMenuBuilder: (context, editable) {
+        if (widget.onPaste == null) {
+          if (SystemContextMenu.isSupportedByField(editable)) {
+            return SystemContextMenu.editableText(editableTextState: editable);
+          }
+          return AdaptiveTextSelectionToolbar.editableText(
+            editableTextState: editable,
+          );
+        }
+        return AdaptiveTextSelectionToolbar.buttonItems(
+          anchors: editable.contextMenuAnchors,
+          buttonItems: editable.contextMenuButtonItems.map((item) {
+            if (item.type != ContextMenuButtonType.paste) return item;
+            return ContextMenuButtonItem(
+              type: item.type,
+              onPressed: () {
+                editable.hideToolbar();
+                widget.onPaste!();
+              },
+            );
+          }).toList(),
+        );
+      },
+      textAlignVertical: TextAlignVertical.center,
+      style: style.copyWith(
+        color: t.semantic.textPrimary,
+        fontFamily: widget.monospace ? 'monospace' : null,
+      ),
+      decoration: InputDecoration(
+        isCollapsed: true,
+        border: InputBorder.none,
+        hintText: widget.hint,
+        hintStyle: style.copyWith(
+          color: isTitle
+              ? Color.lerp(
+                  t.semantic.textSecondary,
+                  t.semantic.textTertiary,
+                  t.opacity.disabledContent,
+                )
+              : t.semantic.textDisabled,
+        ),
+        contentPadding: isTitle
+            ? EdgeInsets.zero
+            : EdgeInsets.symmetric(vertical: t.spacing.s3),
+      ),
+    );
+    final label = widget.label;
+    return label == null ? field : Semantics(label: label, child: field);
+  }
+
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).extension<StarryTokens>()!;
+    if (widget._isComposerTitle) return _buildInput(t);
     final s = t.semantic;
     final borderColor = switch (widget.validationState) {
       StarryTextFieldState.none => null,
@@ -155,10 +269,6 @@ class _StarryTextFieldState extends State<StarryTextField>
     final messageColor = widget.validationState == StarryTextFieldState.error
         ? s.error
         : s.textTertiary;
-    // obscured input is inherently single-line.
-    final effectiveMaxLines = widget.obscureText ? 1 : widget.maxLines;
-    final effectiveMinLines = widget.obscureText ? null : widget.minLines;
-
     final leading =
         widget.leading ??
         (widget.prefixIcon == null
@@ -174,10 +284,12 @@ class _StarryTextFieldState extends State<StarryTextField>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         if (widget.label != null) ...<Widget>[
-          Text(
-            widget.label!,
-            style: t.typography.labelLarge.textStyle.copyWith(
-              color: s.textSecondary,
+          ExcludeSemantics(
+            child: Text(
+              widget.label!,
+              style: t.typography.labelLarge.textStyle.copyWith(
+                color: s.textSecondary,
+              ),
             ),
           ),
           SizedBox(height: t.spacing.s2),
@@ -259,69 +371,7 @@ class _StarryTextFieldState extends State<StarryTextField>
                     leading,
                     SizedBox(width: widget.leadingGap ?? t.spacing.s3),
                   ],
-                  Expanded(
-                    child: TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      enabled: widget.enabled,
-                      readOnly: widget.readOnly,
-                      autofocus: widget.autofocus,
-                      obscureText: widget.obscureText,
-                      minLines: effectiveMinLines,
-                      maxLines: effectiveMaxLines,
-                      maxLength: widget.maxLength,
-                      keyboardType: widget.keyboardType,
-                      textInputAction: widget.textInputAction,
-                      inputFormatters: widget.inputFormatters,
-                      onChanged: widget.onChanged,
-                      onSubmitted: widget.onSubmitted,
-                      buildCounter: _noCounter,
-                      contextMenuBuilder: (context, editable) {
-                        if (widget.onPaste == null) {
-                          if (SystemContextMenu.isSupportedByField(editable)) {
-                            return SystemContextMenu.editableText(
-                              editableTextState: editable,
-                            );
-                          }
-                          return AdaptiveTextSelectionToolbar.editableText(
-                            editableTextState: editable,
-                          );
-                        }
-                        return AdaptiveTextSelectionToolbar.buttonItems(
-                          anchors: editable.contextMenuAnchors,
-                          buttonItems: editable.contextMenuButtonItems.map((
-                            item,
-                          ) {
-                            if (item.type != ContextMenuButtonType.paste) {
-                              return item;
-                            }
-                            return ContextMenuButtonItem(
-                              type: item.type,
-                              onPressed: () {
-                                editable.hideToolbar();
-                                widget.onPaste!();
-                              },
-                            );
-                          }).toList(),
-                        );
-                      },
-                      textAlignVertical: TextAlignVertical.center,
-                      style: t.typography.bodyMedium.textStyle.copyWith(
-                        color: s.textPrimary,
-                      ),
-                      decoration: InputDecoration(
-                        isCollapsed: true,
-                        border: InputBorder.none,
-                        hintText: widget.hint,
-                        hintStyle: t.typography.bodyMedium.textStyle.copyWith(
-                          color: s.textDisabled,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: t.spacing.s3,
-                        ),
-                      ),
-                    ),
-                  ),
+                  Expanded(child: _buildInput(t)),
                   if (trailingChildren.isNotEmpty) ...<Widget>[
                     // Mirror the leading gap (`s3`) so text-to-affordance
                     // spacing is symmetric on both ends.

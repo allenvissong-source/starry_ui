@@ -121,7 +121,7 @@ class _StarryTextAreaState extends State<StarryTextArea>
     final hasError = widget.validationState == StarryTextFieldState.error;
     final message = hasError ? widget.errorText : widget.helperText;
 
-    final field = TextField(
+    final input = TextField(
       key: widget.fieldKey,
       controller: controller,
       focusNode: focusNode,
@@ -153,6 +153,8 @@ class _StarryTextAreaState extends State<StarryTextArea>
         counterText: '',
       ),
     );
+    final label = widget.label;
+    final field = label == null ? input : Semantics(label: label, child: input);
 
     // A text area is multi-line by definition, so it takes the family's
     // rounded-rectangle corner (`radius.xxl`) rather than the single-line pill.
@@ -206,7 +208,6 @@ class _StarryTextAreaState extends State<StarryTextArea>
           : field,
     );
 
-    final label = widget.label;
     if (label == null &&
         message == null &&
         (widget.expands || !widget.showCounter || widget.maxLength == null)) {
@@ -219,10 +220,12 @@ class _StarryTextAreaState extends State<StarryTextArea>
         if (label != null)
           Padding(
             padding: EdgeInsets.only(bottom: t.spacing.s2),
-            child: Text(
-              label,
-              style: t.typography.labelLarge.textStyle.copyWith(
-                color: widget.enabled ? s.textSecondary : s.textDisabled,
+            child: ExcludeSemantics(
+              child: Text(
+                label,
+                style: t.typography.labelLarge.textStyle.copyWith(
+                  color: widget.enabled ? s.textSecondary : s.textDisabled,
+                ),
               ),
             ),
           ),
